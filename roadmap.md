@@ -5,26 +5,16 @@ Bygg smalt og dypt fremfor bredt og grunt. Én brukerreise skal fungere perfekt 
 
 ---
 
-## Fase 0 – Fundament (nå → 4 uker)
+## Fase 0 – Fundament ✅ FERDIG
 
 **Mål:** Alle vet hva Placely er og hva som bygges først.
 
 - [x] vision.md
 - [x] architecture.md
 - [x] slimbim-schema.json
-- [ ] Definer MVP-brukerreise (velg én av tre nedenfor)
-- [ ] Sett opp GitHub-repo med mappestruktur
-- [ ] Bestem teknologistack
-
-**Kritisk beslutning – MVP-inngang:**
-
-| Alternativ | Fordel | Ulempe |
-|---|---|---|
-| A) SketchUp-extension | Prototypen finnes, nær produksjon | Smal målgruppe (arkitekter) |
-| B) Web floorplanner | Bred målgruppe, ingen installasjon | Lengre byggetid |
-| C) XDi PDF-parser | Høy verdi, ingen konkurrenter | Teknisk kompleks |
-
-**Anbefaling: Start med A (SketchUp), valider B parallelt som konsept.**
+- [x] MVP-inngang valgt: **A (SketchUp) + C (XDi) parallelt**
+- [x] GitHub-repo opprettet: github.com/NOPSAS/Placely
+- [x] Teknologistack besluttet: Ruby (SketchUp) + Python/FastAPI (XDi)
 
 ---
 
@@ -34,29 +24,29 @@ Bygg smalt og dypt fremfor bredt og grunt. Én brukerreise skal fungere perfekt 
 
 ### Milepæler
 
-**Uke 4–6: Vegg-motor**
-- [ ] `PH_Wall_Segment` Dynamic Component fungerer stabilt
-- [ ] Akse-låsing til rød/grønn (snap-hjelp)
-- [ ] Redigering bevarer data (ikke blank ved re-åpning)
-- [ ] Input i metrisk (mm/cm), ikke inches
-- [ ] Vegg-ID og GUID genereres automatisk
+**Vegg-motor** ✅ BYGGET
+- [x] `PH_Wall_Segment`-logikk i WallBuilder
+- [x] Akse-låsing til rød/grønn (← → piltaster + Shift frigjør)
+- [x] Redigering bevarer data (SlimBIM-data lagret i AttributeDictionary)
+- [x] Input i meter, konvertering til SketchUp-inches internt
+- [x] Vegg-ID auto-generert
 
-**Uke 6–8: Takprofil**
-- [ ] `roof_driver: true` på vegg → takprofil auto-beregnes
-- [ ] Pulttak, saltak og mansard støttes
-- [ ] TopPointCount N → N-1 segmenter fungerer
+**Takprofil** ✅ BYGGET
+- [x] `is_roof_driver: true` på vegg
+- [x] TopPointCount N → N-1 segmenter via knekkpunkter
+- [x] Pulttak, saltak og mansard støttes via top_points-array
 
-**Uke 8–10: SlimBIM-eksport**
-- [ ] Export til SlimBIM JSON fra SketchUp
-- [ ] Validering mot schema
-- [ ] Enkel viewer (web) som leser JSON-filen
+**SlimBIM-eksport** ✅ BYGGET
+- [x] Export til SlimBIM JSON fra SketchUp (SlimbimExporter)
+- [x] Validering via XDi `/validate`
+- [ ] Enkel web-viewer som leser JSON-filen
 
-**Uke 10–12: iGuide-import**
-- [ ] Les iGuide Radix PDF/snitt
-- [ ] Ekstraher rom, høyder og etasjeinndeling via XDi
-- [ ] Pre-fyll SketchUp-extension med verdier
+**iGuide-import** ✅ BYGGET (XDi)
+- [x] XDi `/parse/iguide` parser iGuide Radix PDF
+- [x] Ekstraherer rom, høyder og etasjeinndeling via Claude vision
+- [ ] Pre-fyll SketchUp-extension med verdier fra XDi (kobling gjenstår)
 
-**Leveranse:** Intern beta brukt på ett reelt prosjekt (Tegnebua-kunde).
+**Leveranse:** Klar for intern beta på Tegnebua-prosjekt. Installer `placely.rbz`.
 
 ---
 
@@ -73,15 +63,18 @@ Bygg smalt og dypt fremfor bredt og grunt. Én brukerreise skal fungere perfekt 
 
 ---
 
-## Fase 3 – XDi som API (24 → 36 uker)
+## Fase 3 – XDi som API ✅ BYGGET (fremskyndet)
 
 **Mål:** Tredjeparter kan sende inn en PDF eller IFC og få ut SlimBIM JSON.
 
-- [ ] REST API: POST /parse → SlimBIM JSON
-- [ ] Støtte for: PDF-tegning, IFC, SketchUp-fil, iGuide
-- [ ] Konfidensscoring per objekt
-- [ ] Diff-funksjon: sammenlign to versjoner
-- [ ] Webhook: varsle når parsing er ferdig
+- [x] FastAPI REST API – `POST /parse/image`, `/parse/pdf`, `/parse/iguide`
+- [x] Støtte for: PNG/JPG, PDF, iGuide Radix
+- [x] Konfidensscoring per objekt (source_info.confidence)
+- [x] Diff-funksjon: `POST /diff`
+- [x] Validator: `POST /validate`
+- [x] Dockerfile for deployment
+- [ ] IFC-parser (ifcopenshell) – v0.2
+- [ ] Webhook – v0.2
 
 ---
 

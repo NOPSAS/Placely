@@ -75,20 +75,73 @@ En bygning har alltid tre parallelle versjoner:
 
 Placely behandler disse som separate lag, ikke én enkelt sannhet.
 
+## Kom i gang
+
+### SketchUp-extension (for arkitekter)
+
+1. Last ned [`placely.rbz`](placely.rbz)
+2. SketchUp → Window → Extension Manager → Install Extension
+3. Bruk **Plugins → Placely → Tegn vegg**
+
+Se [`sketchup-extension/INSTALL.md`](sketchup-extension/INSTALL.md) for detaljer.
+
+### XDi API (for utviklere)
+
+```bash
+cd xdi
+cp .env.example .env          # Legg inn ANTHROPIC_API_KEY
+pip install -r requirements.txt
+python main.py                # Starter på http://localhost:8001
+```
+
+Parse en plantegning:
+```bash
+curl -X POST http://localhost:8001/parse/image \
+  -F "file=@plantegning.png" \
+  -F "address=Birkeveien 3A, Oslo"
+```
+
+Se [`xdi/README.md`](xdi/README.md) for full API-dokumentasjon.
+
+## Repo-struktur
+
+```
+Placely/
+├── sketchup-extension/    SketchUp-extension (Ruby)
+│   ├── placely.rb
+│   └── placely/
+├── xdi/                   XDi intelligensmotor (Python/FastAPI)
+│   ├── main.py
+│   ├── parsers/
+│   ├── models/
+│   └── core/
+├── placely.rbz            Ferdig installasjonspakke
+├── slimbim-schema.json    SlimBIM JSON Schema v1.0.0
+├── vision.md
+├── architecture.md
+└── roadmap.md
+```
+
 ## Dokumentasjon
 
 | Dokument | Innhold |
 |---|---|
 | [`vision.md`](vision.md) | Overordnet visjon, problem og løsning |
 | [`architecture.md`](architecture.md) | Lagdeling, komponenter og teknologistack |
-| [`roadmap.md`](roadmap.md) | Faser, milepæler og prioriteringer |
+| [`roadmap.md`](roadmap.md) | Faser og status |
 | [`slimbim-schema.json`](slimbim-schema.json) | JSON Schema for SlimBIM v1.0.0 |
+| [`xdi/README.md`](xdi/README.md) | XDi API-dokumentasjon |
+| [`sketchup-extension/INSTALL.md`](sketchup-extension/INSTALL.md) | Installasjonsinstrukser |
 
 ## Status
 
-Tidlig fase – konsept og arkitektur definert. MVP-inngang ikke valgt ennå.
-
-Se [`roadmap.md`](roadmap.md) for neste steg.
+| Komponent | Status |
+|---|---|
+| SlimBIM JSON Schema v1.0.0 | ✅ Ferdig |
+| SketchUp-extension v0.1 | ✅ Ferdig – klar for beta |
+| XDi API v0.1 | ✅ Ferdig – klar for test |
+| Web floorplanner | Fase 2 |
+| IFC-parser | Fase 3 (XDi v0.2) |
 
 ---
 

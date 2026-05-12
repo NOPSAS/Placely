@@ -1,0 +1,71 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  xdi-lint:
+    name: XDi – Syntax check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+          cache-dependency-path: xdi/requirements.txt
+
+      - name: Install dependencies
+        run: |
+          cd xdi
+          pip install -r requirements.txt
+
+      - name: Check syntax (pyflakes)
+        run: |
+          pip install pyflakes
+          python -m pyflakes xdi/
+
+  sketchup-lint:
+    name: SketchUp extension – Ruby syntax
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.2"
+
+      - name: Check Ruby syntax
+        run: |
+          find sketchup-extension -name "*.rb" | xargs -I{} ruby -c {}
+
+  validate-schema:
+    name: Validate SlimBIM schema
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install jsonschema
+        run: pip install jsonschema
+
+      - name: Validate schema is valid JSON
+        run: python -c "import json; json.load(open('slimbim-schema.json'))"
+
+      - name: Validate example in schema
+        run: |
+          python - <<'EOF'
+          import json, jsonschema
+          schema = json.load(open('slimbim-schema.json'))
+          examples = schema.get('examples', [])
+          for i, ex in enumerate(examples):
+              jsonschema.validate(ex, schema)
+              print(f"Eksempel {i+1}: OK")
+          EOF

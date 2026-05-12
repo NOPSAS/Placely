@@ -1,0 +1,183 @@
+"""
+XDi API – Intelligensmotor for konvertering av bygningsdata til SlimBIM JSON
+NOPS AS / Konsepthus AS
+"""
+import os
+from typing import Optional
+
+from dotenv import load_dotenv
+from fastapi import FastAPI, File, Form, HTTPException, UploadFile
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+
+from core.differ import diff_slimbim
+from core.validator import validate_slimbim
+from parsers.image_parser import ImageParser
+from parsers.iguide_parser import IGuideParser
+from parsers.pdf_parser import PDFParser
+
+load_dotenv()
+
+ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
+
+app = FastAPI(
+    title="XDi API",
+    description=(
+        "Intelligensmotor som konverterer bygningsdata fra PDF, bilder og IFC "
+        "til SlimBIM JSON. Del av Placely-plattformen."
+    ),
+    version="0.1.0",
+    contact={"name": "NOPS AS", "url": "https://nops.no"},
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
+def _require_api_key() -> str:
+    if not ANTHROPIC_API_KEY:
+        raise HTTPException(
+            status_code=503,
+            detail="ANTHROPIC_API_KEY er ikke satt. Legg den til i .env-filen.",
+        )
+    return ANTHROPIC_API_KEY
+
+
+# ── Helse ──────────────────────────────────────────────────────────────────────
+
+@app.get("/", tags=["helse"])
+def root():
+    return {
+        "name":    "XDi",
+        "version": "0.1.0",
+        "status":  "ok",
+        "docs":    "/docs",
+    }
+
+
+@app.get("/health", tags=["helse"])
+def health():
+    return {"status": "ok", "api_key_set": bool(ANTHROPIC_API_KEY)}
+
+
+# ── Parse: bilde ──────────────────────────────────────────────────────────────
+
+@app.post("/parse/image", tags=["parse"])
+async def parse_image(
+    file:    UploadFile = File(..., description="PNG eller JPG av plantegning/fasade"),
+    address: Optional[str] = Form(None, description="Adresse for bygget (valgfritt)"),
+    context: Optional[str] = Form(None, description="Tilleggskontekst (f.eks. 'fasadetegning sør')"),
+):
+    """
+    Analyser et bilde av en byggetegning og returner SlimBIM JSON.
+    Støtter: plantegning, fasadetegning, snitt, drone-foto.
+    """
+    api_key = _require_api_key()
+
+    if not file.content_type.startswith("image/"):
+        raise HTTPException(400, f"Forventet bildefil, fikk: {file.content_type}")
+
+    image_bytes = await file.read()
+    parser      = ImageParser(api_key=api_key)
+
+    try:
+        doc = parser.parse(
+            image_bytes=image_bytes,
+            media_type=file.content_type,
+            address=address,
+            extra_context=context,
+        )
+    except Exception as e:
+        raise HTTPException(500, f"Parsing feilet: {str(e)}")
+
+    return doc.model_dump()
+
+
+# ── Parse: PDF ────────────────────────────────────────────────────────────────
+
+@app.post("/parse/pdf", tags=["parse"])
+async def parse_pdf(
+    file:       UploadFile = File(..., description="PDF-tegning"),
+    address:    Optional[str] = Form(None),
+    page_index: int = Form(0, description="Hvilken side som skal analyseres (0-indeksert)"),
+):
+    """
+    Analyser en PDF-byggetegning og returner SlimBIM JSON.
+    Konverterer første side til bilde og sender til Claude vision.
+    """
+    api_key = _require_api_key()
+
+    if file.content_type != "application/pdf":
+        raise HTTPException(400, "Forventet PDF-fil")
+
+    pdf_bytes = await file.read()
+    parser    = PDFParser(api_key=api_key)
+
+    try:
+        doc = parser.parse(pdf_bytes=pdf_bytes, address=address, page_index=page_index)
+    except Exception as e:
+        raise HTTPException(500, f"Parsing feilet: {str(e)}")
+
+    return doc.model_dump()
+
+
+# ── Parse: iGuide ─────────────────────────────────────────────────────────────
+
+@app.post("/parse/iguide", tags=["parse"])
+async def parse_iguide(
+    file:    UploadFile = File(..., description="iGuide Radix PDF-rapport"),
+    address: Optional[str] = Form(None),
+):
+    """
+    Analyser en iGuide Radix-rapport og returner SlimBIM JSON.
+    Ekstraherer romplan, arealer, etasjehøyder og oppmålte mål.
+    """
+    api_key = _require_api_key()
+
+    pdf_bytes = await file.read()
+    parser    = IGuideParser(api_key=api_key)
+
+    try:
+        doc = parser.parse(pdf_bytes=pdf_bytes, address=address)
+    except Exception as e:
+        raise HTTPException(500, f"Parsing feilet: {str(e)}")
+
+    return doc.model_dump()
+
+
+# ── Validering ────────────────────────────────────────────────────────────────
+
+@app.post("/validate", tags=["verktøy"])
+async def validate(doc: dict):
+    """
+    Valider et SlimBIM JSON-dokument mot SlimBIM schema v1.0.0.
+    Returnerer liste med feil, eller tom liste hvis gyldig.
+    """
+    errors = validate_slimbim(doc)
+    return {
+        "valid":  len(errors) == 0,
+        "errors": errors,
+        "count":  len(errors),
+    }
+
+
+# ── Diff ──────────────────────────────────────────────────────────────────────
+
+@app.post("/diff", tags=["verktøy"])
+async def diff(base: dict, updated: dict):
+    """
+    Sammenlign to SlimBIM-dokumenter og returner strukturerte endringer.
+    Nyttig for å finne forskjellen mellom 'sist godkjent' og 'as_built'.
+    """
+    return diff_slimbim(base, updated)
+
+
+# ── Kjør lokalt ───────────────────────────────────────────────────────────────
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run("main:app", host="0.0.0.0", port=8001, reload=True)
