@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8">
+  <title>Veggegenskaper</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 13px;
+      color: #1a1a1a;
+      background: #f0f0f0;
+      padding: 14px;
+    }
+
+    h2 {
+      font-size: 14px;
+      font-weight: 600;
+      color: #111;
+      margin-bottom: 12px;
+      letter-spacing: -0.01em;
+    }
+
+    .card {
+      background: white;
+      border-radius: 7px;
+      padding: 14px;
+      margin-bottom: 10px;
+      box-shadow: 0 1px 3px rgba(0,0,0,.09);
+    }
+
+    .section-label {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: #888;
+      margin-bottom: 10px;
+    }
+
+    .info-row { display: flex; gap: 20px; }
+    .info-item .label { font-size: 10px; color: #999; margin-bottom: 2px; }
+    .info-item .value { font-size: 15px; font-weight: 600; color: #1a1a1a; }
+
+    .field-row { display: flex; gap: 10px; margin-bottom: 10px; }
+    .field-row:last-child { margin-bottom: 0; }
+    .field { flex: 1; }
+    .field.narrow { flex: 0 0 110px; }
+
+    label.field-label {
+      display: block;
+      font-size: 11px;
+      color: #666;
+      margin-bottom: 4px;
+    }
+
+    input[type="number"],
+    input[type="text"],
+    select {
+      width: 100%;
+      padding: 6px 8px;
+      border: 1px solid #d8d8d8;
+      border-radius: 5px;
+      font-size: 13px;
+      color: #1a1a1a;
+      background: white;
+      -webkit-appearance: none;
+    }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: #0066cc;
+      box-shadow: 0 0 0 2px rgba(0,102,204,.15);
+    }
+
+    .checkbox-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 4px;
+    }
+    .checkbox-row input[type="checkbox"] {
+      width: 15px; height: 15px;
+      cursor: pointer;
+    }
+    .checkbox-row span { font-size: 12px; color: #444; }
+
+    /* Toppunktstabell */
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    th {
+      text-align: left;
+      padding: 4px 6px;
+      color: #888;
+      font-weight: 500;
+      font-size: 11px;
+      border-bottom: 1px solid #eee;
+    }
+    td { padding: 3px 4px; }
+    td.num { color: #bbb; padding-left: 8px; font-size: 11px; }
+    td input[type="number"] { padding: 4px 6px; font-size: 12px; }
+
+    .btn-remove {
+      background: none;
+      border: 1px solid #e0e0e0;
+      border-radius: 4px;
+      cursor: pointer;
+      padding: 1px 7px;
+      font-size: 15px;
+      color: #aaa;
+      line-height: 1.5;
+    }
+    .btn-remove:hover { background: #fff0f0; border-color: #f99; color: #c33; }
+
+    .btn-add-pt {
+      margin-top: 10px;
+      background: none;
+      border: 1px dashed #aac4e8;
+      color: #0066cc;
+      border-radius: 5px;
+      padding: 6px 14px;
+      font-size: 12px;
+      cursor: pointer;
+      width: 100%;
+    }
+    .btn-add-pt:hover { background: #eef4fd; }
+
+    /* Profil-preview */
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100px;
+      border-radius: 4px;
+    }
+
+    /* Footer */
+    .footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 6px;
+    }
+
+    .btn {
+      padding: 7px 20px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+    }
+    .btn-cancel { background: #e8e8e8; color: #444; }
+    .btn-cancel:hover { background: #ddd; }
+    .btn-save { background: #0066cc; color: white; }
+    .btn-save:hover { background: #0055b0; }
+  </style>
+</head>
+<body>
+  <h2>Veggegenskaper</h2>
+
+  <!-- Info -->
+  <div class="card">
+    <div class="info-row">
+      <div class="info-item">
+        <div class="label">ID</div>
+        <div class="value" id="wall-id" style="font-size:12px;font-weight:400;color:#666">–</div>
+      </div>
+      <div class="info-item">
+        <div class="label">Lengde</div>
+        <div class="value" id="wall-length">–</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Egenskaper -->
+  <div class="card">
+    <div class="section-label">Egenskaper</div>
+    <div class="field-row">
+      <div class="field">
+        <label class="field-label">Veggtype</label>
+        <select id="wall-type">
+          <option value="exterior">Yttervegg</option>
+          <option value="interior">Innervegg</option>
+          <option value="load_bearing">Bærende vegg</option>
+          <option value="partition">Skillevegg</option>
+          <option value="foundation">Grunnmur</option>
+        </select>
+      </div>
+      <div class="field narrow">
+        <label class="field-label">Tykkelse (mm)</label>
+        <input type="number" id="thickness" min="50" max="1000" step="10" value="248">
+      </div>
+    </div>
+    <div class="checkbox-row">
+      <input type="checkbox" id="roof-driver">
+      <span>Styrende for takprofil (roof driver)</span>
+    </div>
+  </div>
+
+  <!-- Topprofil -->
+  <div class="card">
+    <div class="section-label">Topprofil – knekkpunkter</div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:28px">#</th>
+            <th>X langs vegg (m)</th>
+            <th>Høyde Z (m)</th>
+            <th style="width:32px"></th>
+          </tr>
+        </thead>
+        <tbody id="points-body"></tbody>
+      </table>
+    </div>
+    <button class="btn-add-pt" onclick="addPoint()">+ Legg til knekkpunkt</button>
+  </div>
+
+  <!-- Profilvisning -->
+  <div class="card" style="padding-bottom:12px">
+    <div class="section-label" style="margin-bottom:8px">Profilforhåndsvisning</div>
+    <canvas id="profile-canvas"></canvas>
+  </div>
+
+  <div class="footer">
+    <button class="btn btn-cancel" onclick="sketchup.cancel()">Avbryt</button>
+    <button class="btn btn-save" onclick="save()">Lagre og bygg</button>
+  </div>
+
+  <script>
+    var wallData = null;
+
+    function loadData(data) {
+      wallData = data;
+      document.getElementById('wall-id').textContent     = data.id || '–';
+      document.getElementById('wall-type').value         = data.wall_type || 'exterior';
+      document.getElementById('thickness').value         = data.thickness_mm || 248;
+      document.getElementById('roof-driver').checked     = !!data.is_roof_driver;
+      updateLength(data.top_points);
+      renderPoints(data.top_points || [[0, 2.4], [1, 2.4]]);
+      drawProfile();
+    }
+
+    function renderPoints(pts) {
+      var tbody = document.getElementById('points-body');
+      tbody.innerHTML = '';
+      pts.forEach(function(pt, i) {
+        var tr = document.createElement('tr');
+        tr.innerHTML =
+          '<td class="num">' + (i + 1) + '</td>' +
+          '<td><input type="number" class="pt-x" step="0.01" min="0" value="' +
+            parseFloat(pt[0]).toFixed(3) + '" oninput="onChange()"></td>' +
+          '<td><input type="number" class="pt-z" step="0.01" min="0" max="30" value="' +
+            parseFloat(pt[1]).toFixed(3) + '" oninput="onChange()"></td>' +
+          '<td><button class="btn-remove" onclick="removePoint(' + i + ')" title="Fjern punkt">×</button></td>';
+        tbody.appendChild(tr);
+      });
+    }
+
+    function addPoint() {
+      var pts = getPoints();
+      var last = pts[pts.length - 1] || [0, 2.4];
+      pts.push([parseFloat(last[0]) + 1.0, parseFloat(last[1])]);
+      renderPoints(pts);
+      drawProfile();
+    }
+
+    function removePoint(i) {
+      var pts = getPoints();
+      if (pts.length <= 2) { alert('Minst 2 knekkpunkter er påkrevd.'); return; }
+      pts.splice(i, 1);
+      renderPoints(pts);
+      drawProfile();
+    }
+
+    function getPoints() {
+      var xs = document.querySelectorAll('.pt-x');
+      var zs = document.querySelectorAll('.pt-z');
+      var pts = [];
+      for (var i = 0; i < xs.length; i++) {
+        pts.push([parseFloat(xs[i].value) || 0, parseFloat(zs[i].value) || 0]);
+      }
+      return pts;
+    }
+
+    function onChange() {
+      updateLength(getPoints());
+      drawProfile();
+    }
+
+    function updateLength(pts) {
+      if (!pts || pts.length < 2) return;
+      var maxX = Math.max.apply(null, pts.map(function(p) { return parseFloat(p[0]) || 0; }));
+      document.getElementById('wall-length').textContent = maxX.toFixed(2) + ' m';
+    }
+
+    function drawProfile() {
+      var canvas = document.getElementById('profile-canvas');
+      var ctx    = canvas.getContext('2d');
+      var W = canvas.offsetWidth  || 460;
+      var H = canvas.offsetHeight || 100;
+      canvas.width  = W;
+      canvas.height = H;
+      ctx.clearRect(0, 0, W, H);
+
+      var pts = getPoints();
+      if (pts.length < 2) return;
+
+      var maxX = Math.max.apply(null, pts.map(function(p) { return p[0]; })) || 1;
+      var maxZ = Math.max.apply(null, pts.map(function(p) { return p[1]; })) || 3;
+
+      var pad = { t: 10, r: 16, b: 22, l: 16 };
+      var scX = (W - pad.l - pad.r) / maxX;
+      var scZ = (H - pad.t - pad.b) / maxZ;
+
+      function tx(x) { return pad.l + x * scX; }
+      function tz(z) { return H - pad.b - z * scZ; }
+
+      // Gulvlinje
+      ctx.beginPath();
+      ctx.moveTo(pad.l, tz(0));
+      ctx.lineTo(W - pad.r, tz(0));
+      ctx.strokeStyle = '#ddd';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
+      // Fylling
+      ctx.beginPath();
+      ctx.moveTo(tx(pts[0][0]), tz(0));
+      pts.forEach(function(p) { ctx.lineTo(tx(p[0]), tz(p[1])); });
+      ctx.lineTo(tx(pts[pts.length-1][0]), tz(0));
+      ctx.closePath();
+      ctx.fillStyle = 'rgba(0,102,204,.10)';
+      ctx.fill();
+
+      // Profillinje
+      ctx.beginPath();
+      pts.forEach(function(p, i) {
+        i === 0 ? ctx.moveTo(tx(p[0]), tz(p[1])) : ctx.lineTo(tx(p[0]), tz(p[1]));
+      });
+      ctx.strokeStyle = '#0066cc';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // Knekkpunkter + høyde-labels
+      pts.forEach(function(p) {
+        ctx.beginPath();
+        ctx.arc(tx(p[0]), tz(p[1]), 4, 0, Math.PI * 2);
+        ctx.fillStyle = '#0066cc';
+        ctx.fill();
+
+        ctx.fillStyle = '#555';
+        ctx.font = '9px sans-serif';
+        ctx.fillText(parseFloat(p[1]).toFixed(2) + 'm', tx(p[0]) + 5, tz(p[1]) - 5);
+      });
+    }
+
+    function save() {
+      var data = {
+        wall_type:      document.getElementById('wall-type').value,
+        thickness_mm:   parseFloat(document.getElementById('thickness').value) || 248,
+        is_roof_driver: document.getElementById('roof-driver').checked,
+        top_points:     getPoints()
+      };
+      sketchup.save(JSON.stringify(data));
+    }
+
+    window.onload = function() { sketchup.ready(); };
+  </script>
+</body>
+</html>
