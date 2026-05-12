@@ -1,0 +1,375 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://placely.no/schema/slimbim/v1",
+  "title": "SlimBIM",
+  "description": "Universelt, lettvekts dataspråk for bygg og eiendom",
+  "version": "1.0.0",
+
+  "definitions": {
+
+    "point3d": {
+      "type": "array",
+      "items": { "type": "number" },
+      "minItems": 3,
+      "maxItems": 3,
+      "description": "[x, y, z] i meter"
+    },
+
+    "source_info": {
+      "type": "object",
+      "properties": {
+        "source": {
+          "type": "string",
+          "description": "Datakilde – f.eks. 'iguide_radix', 'manual', 'ifc_import', 'pdf_scan', 'pointcloud'",
+          "examples": ["iguide_radix", "manual", "ifc_import", "pdf_scan", "pointcloud", "archicad", "revit", "sketchup"]
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Konfidensgrad 0–1. 1.0 = manuelt verifisert"
+        },
+        "measured_at": {
+          "type": "string",
+          "format": "date",
+          "description": "Dato for måling/registrering"
+        }
+      }
+    },
+
+    "version_status": {
+      "type": "string",
+      "enum": ["last_approved", "as_built", "current", "proposed"],
+      "description": "Hvilken versjon av sannheten dette objektet tilhører"
+    },
+
+    "condition": {
+      "type": "object",
+      "properties": {
+        "tg": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3,
+          "description": "Tilstandsgrad (NS 3600): 0=ny/ikke vurdert, 1=bra, 2=middels, 3=dårlig"
+        },
+        "risk": {
+          "type": "string",
+          "enum": ["low", "medium", "high"]
+        },
+        "estimated_lifetime_years": { "type": "integer" },
+        "notes": { "type": "string" }
+      }
+    },
+
+    "property": {
+      "type": "object",
+      "required": ["id", "type", "address"],
+      "properties": {
+        "id": { "type": "string" },
+        "type": { "const": "property" },
+        "address": { "type": "string" },
+        "gnr": { "type": "integer", "description": "Gårdsnummer" },
+        "bnr": { "type": "integer", "description": "Bruksnummer" },
+        "fnr": { "type": "integer", "description": "Festenummer" },
+        "municipality_number": { "type": "string" },
+        "plot_area_m2": { "type": "number" },
+        "zoning_plan_id": { "type": "string" },
+        "coordinates": { "$ref": "#/definitions/point3d" },
+        "buildings": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/building" }
+        },
+        "source_info": { "$ref": "#/definitions/source_info" },
+        "condition": { "$ref": "#/definitions/condition" }
+      }
+    },
+
+    "building": {
+      "type": "object",
+      "required": ["id", "type"],
+      "properties": {
+        "id": { "type": "string" },
+        "type": { "const": "building" },
+        "building_type": {
+          "type": "string",
+          "enum": ["detached_house", "semi_detached", "terrace", "apartment_building", "cabin", "garage", "annex", "commercial", "industrial", "other"]
+        },
+        "version_status": { "$ref": "#/definitions/version_status" },
+        "year_built": { "type": "integer" },
+        "year_approved": { "type": "integer" },
+        "bra_m2": { "type": "number", "description": "Bruksareal (BRA)" },
+        "bya_m2": { "type": "number", "description": "Bebygd areal (BYA)" },
+        "floors": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/floor" }
+        },
+        "roof": { "$ref": "#/definitions/roof" },
+        "origin": { "$ref": "#/definitions/point3d", "description": "Byggets origo i X/Y/Z på tomten" },
+        "rotation_deg": { "type": "number", "description": "Rotasjon i grader fra nord" },
+        "source_info": { "$ref": "#/definitions/source_info" },
+        "condition": { "$ref": "#/definitions/condition" }
+      }
+    },
+
+    "floor": {
+      "type": "object",
+      "required": ["id", "type", "level_index"],
+      "properties": {
+        "id": { "type": "string" },
+        "type": { "const": "floor" },
+        "level_index": {
+          "type": "integer",
+          "description": "-1=kjeller, 0=1.etg, 1=2.etg osv."
+        },
+        "floor_type": {
+          "type": "string",
+          "enum": ["basement", "ground", "upper", "attic", "mezzanine"]
+        },
+        "floor_height_m": { "type": "number", "description": "Høyde til underkant av gulv (absolutt, meter over terreng)" },
+        "ceiling_height_m": { "type": "number", "description": "Fri takhøyde (meter)" },
+        "bra_m2": { "type": "number" },
+        "rooms": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/room" }
+        },
+        "walls": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/wall" }
+        },
+        "source_info": { "$ref": "#/definitions/source_info" }
+      }
+    },
+
+    "room": {
+      "type": "object",
+      "required": ["id", "type"],
+      "properties": {
+        "id": { "type": "string" },
+        "type": { "const": "room" },
+        "room_type": {
+          "type": "string",
+          "enum": ["living_room", "kitchen", "bedroom", "bathroom", "toilet", "hallway", "utility", "storage", "garage", "office", "other"]
+        },
+        "name": { "type": "string", "description": "F.eks. 'Bad 2. etg'" },
+        "area_m2": { "type": "number" },
+        "ceiling_height_m": { "type": "number" },
+        "is_wet_room": { "type": "boolean" },
+        "surfaces": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/surface" }
+        },
+        "source_info": { "$ref": "#/definitions/source_info" },
+        "condition": { "$ref": "#/definitions/condition" }
+      }
+    },
+
+    "wall": {
+      "type": "object",
+      "required": ["id", "type", "start", "end"],
+      "properties": {
+        "id": { "type": "string" },
+        "type": { "const": "wall" },
+        "start": { "$ref": "#/definitions/point3d" },
+        "end": { "$ref": "#/definitions/point3d" },
+        "height_left_m": { "type": "number", "description": "Høyde i start-punkt" },
+        "height_right_m": { "type": "number", "description": "Høyde i slutt-punkt (ulik ved skrå vegg)" },
+        "thickness_m": { "type": "number" },
+        "wall_type": {
+          "type": "string",
+          "enum": ["exterior", "interior", "load_bearing", "partition", "foundation"]
+        },
+        "is_roof_driver": {
+          "type": "boolean",
+          "description": "Denne veggen definerer takprofilen"
+        },
+        "top_points": {
+          "type": "array",
+          "description": "Knekkpunkter langs topp-linjen. N punkter = N-1 segmenter.",
+          "items": { "$ref": "#/definitions/point3d" }
+        },
+        "openings": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/opening" }
+        },
+        "room_id_inside": { "type": "string" },
+        "room_id_outside": { "type": "string", "description": "null for yttervegg" },
+        "source_info": { "$ref": "#/definitions/source_info" },
+        "condition": { "$ref": "#/definitions/condition" }
+      }
+    },
+
+    "roof": {
+      "type": "object",
+      "required": ["id", "type", "roof_type"],
+      "properties": {
+        "id": { "type": "string" },
+        "type": { "const": "roof" },
+        "roof_type": {
+          "type": "string",
+          "enum": ["flat", "shed", "gable", "hip", "mansard", "complex"]
+        },
+        "ridge_height_m": { "type": "number" },
+        "eave_height_m": { "type": "number" },
+        "overhang_m": { "type": "number" },
+        "pitch_deg": { "type": "number", "description": "Takvinkel i grader" },
+        "derived_from_walls": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "IDs til vegger med is_roof_driver: true"
+        },
+        "source_info": { "$ref": "#/definitions/source_info" }
+      }
+    },
+
+    "opening": {
+      "type": "object",
+      "required": ["id", "type", "opening_type"],
+      "properties": {
+        "id": { "type": "string" },
+        "type": { "const": "opening" },
+        "opening_type": { "type": "string", "enum": ["door", "window", "garage_door", "hatch"] },
+        "width_m": { "type": "number" },
+        "height_m": { "type": "number" },
+        "sill_height_m": { "type": "number", "description": "Høyde til underkant åpning" },
+        "position_along_wall_m": { "type": "number" },
+        "year_installed": { "type": "integer" },
+        "source_info": { "$ref": "#/definitions/source_info" },
+        "condition": { "$ref": "#/definitions/condition" }
+      }
+    },
+
+    "surface": {
+      "type": "object",
+      "required": ["id", "type", "surface_type"],
+      "properties": {
+        "id": { "type": "string" },
+        "type": { "const": "surface" },
+        "surface_type": { "type": "string", "enum": ["floor", "ceiling", "wall_north", "wall_south", "wall_east", "wall_west", "wall_other"] },
+        "area_m2": { "type": "number" },
+        "material": { "type": "string" },
+        "moisture_percent": { "type": "number" },
+        "objects": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/building_object" }
+        },
+        "source_info": { "$ref": "#/definitions/source_info" },
+        "condition": { "$ref": "#/definitions/condition" }
+      }
+    },
+
+    "building_object": {
+      "type": "object",
+      "required": ["id", "type", "object_type"],
+      "properties": {
+        "id": { "type": "string" },
+        "type": { "const": "object" },
+        "object_type": {
+          "type": "string",
+          "examples": ["membrane", "insulation", "pipe", "electrical_panel", "radiator", "ventilation_unit", "fireplace", "stairs"]
+        },
+        "year_installed": { "type": "integer" },
+        "product_id": { "type": "string", "description": "Kobling til produktdatabase" },
+        "source_info": { "$ref": "#/definitions/source_info" },
+        "condition": { "$ref": "#/definitions/condition" }
+      }
+    }
+
+  },
+
+  "type": "object",
+  "required": ["slimbim_version", "created_at", "property"],
+  "properties": {
+    "slimbim_version": {
+      "type": "string",
+      "const": "1.0.0"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "created_by": {
+      "type": "string",
+      "description": "Verktøy eller bruker som genererte filen, f.eks. 'placely-sketchup-extension-v1'"
+    },
+    "property": { "$ref": "#/definitions/property" }
+  },
+
+  "examples": [
+    {
+      "slimbim_version": "1.0.0",
+      "created_at": "2026-05-12T10:00:00Z",
+      "created_by": "placely-sketchup-extension-v1",
+      "property": {
+        "id": "prop_001",
+        "type": "property",
+        "address": "Birkeveien 3A, Oslo",
+        "gnr": 52,
+        "bnr": 101,
+        "municipality_number": "0301",
+        "plot_area_m2": 612,
+        "source_info": {
+          "source": "manual",
+          "confidence": 1.0,
+          "measured_at": "2026-05-12"
+        },
+        "buildings": [
+          {
+            "id": "bygg_001",
+            "type": "building",
+            "building_type": "detached_house",
+            "version_status": "as_built",
+            "year_built": 1964,
+            "bra_m2": 178,
+            "origin": [0, 0, 0],
+            "rotation_deg": 15,
+            "floors": [
+              {
+                "id": "etg_01",
+                "type": "floor",
+                "level_index": 0,
+                "floor_type": "ground",
+                "floor_height_m": 0.3,
+                "ceiling_height_m": 2.4,
+                "bra_m2": 89,
+                "walls": [
+                  {
+                    "id": "wall_101",
+                    "type": "wall",
+                    "start": [0, 0, 0.3],
+                    "end": [9.66, 0, 0.3],
+                    "height_left_m": 2.4,
+                    "height_right_m": 2.4,
+                    "thickness_m": 0.248,
+                    "wall_type": "exterior",
+                    "is_roof_driver": true,
+                    "top_points": [
+                      [0, 0, 2.7],
+                      [1.87, 0, 4.5],
+                      [4.83, 0, 6.2],
+                      [7.79, 0, 4.5],
+                      [9.66, 0, 2.7]
+                    ],
+                    "source_info": {
+                      "source": "iguide_radix",
+                      "confidence": 0.95,
+                      "measured_at": "2026-05-10"
+                    }
+                  }
+                ]
+              }
+            ],
+            "roof": {
+              "id": "roof_001",
+              "type": "roof",
+              "roof_type": "mansard",
+              "ridge_height_m": 6.2,
+              "eave_height_m": 2.7,
+              "overhang_m": 0.5,
+              "derived_from_walls": ["wall_101"]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
