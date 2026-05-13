@@ -16,6 +16,12 @@ from parsers.image_parser import ImageParser
 from parsers.iguide_parser import IGuideParser
 from parsers.pdf_parser import PDFParser
 
+try:
+    from parsers.ifc_parser import IfcParser
+    HAS_IFC = True
+except ImportError:
+    HAS_IFC = False
+
 load_dotenv()
 
 ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
@@ -163,6 +169,35 @@ async def validate(doc: dict):
         "errors": errors,
         "count":  len(errors),
     }
+
+
+# ── Parse: IFC ────────────────────────────────────────────────────────────────
+
+@app.post("/parse/ifc", tags=["parse"])
+async def parse_ifc(
+    file:    UploadFile = File(..., description="IFC-fil (.ifc)"),
+    address: Optional[str] = Form(None),
+):
+    """
+    Konverter en IFC-fil til SlimBIM JSON.
+    Krever at ifcopenshell er installert (pip install ifcopenshell).
+    """
+    if not HAS_IFC:
+        raise HTTPException(
+            501,
+            "ifcopenshell er ikke installert på denne serveren. "
+            "Kjør: pip install ifcopenshell"
+        )
+
+    ifc_bytes = await file.read()
+    parser    = IfcParser()
+
+    try:
+        doc = parser.parse(ifc_bytes=ifc_bytes, address=address)
+    except Exception as e:
+        raise HTTPException(500, f"IFC-parsing feilet: {str(e)}")
+
+    return doc.model_dump()
 
 
 # ── Diff ──────────────────────────────────────────────────────────────────────

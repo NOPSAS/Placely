@@ -4,6 +4,7 @@ require_relative 'wall_builder'
 require_relative 'wall_tool'
 require_relative 'wall_dialog'
 require_relative 'slimbim_exporter'
+require_relative 'xdi_importer'
 
 module Placely
   unless file_loaded?(__FILE__)
@@ -16,6 +17,12 @@ module Placely
 
     placely_menu.add_item('Rediger valgt vegg') do
       WallDialog.edit_selected
+    end
+
+    placely_menu.add_separator
+
+    placely_menu.add_item('Importer fra XDi (PDF/bilde)...') do
+      XdiImporter.import_from_file
     end
 
     placely_menu.add_separator
@@ -39,6 +46,12 @@ module Placely
     end
     cmd_edit.tooltip = 'Placely: Rediger valgt vegg'
     toolbar.add_item(cmd_edit)
+
+    cmd_xdi = UI::Command.new('XDi Import') do
+      XdiImporter.import_from_file
+    end
+    cmd_xdi.tooltip = 'Placely: Importer tegning via XDi (PDF/PNG)'
+    toolbar.add_item(cmd_xdi)
 
     cmd_export = UI::Command.new('Eksporter SlimBIM') do
       SlimbimExporter.export

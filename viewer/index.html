@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Placely – SlimBIM Viewer</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --blue:   #0066cc;
+      --dark:   #1a1a1a;
+      --mid:    #555;
+      --light:  #f4f4f4;
+      --border: #e0e0e0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 13px;
+      color: var(--dark);
+      background: #ecedf0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Header ── */
+    header {
+      background: white;
+      border-bottom: 1px solid var(--border);
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-shrink: 0;
+    }
+    header h1 { font-size: 15px; font-weight: 700; letter-spacing: -0.02em; }
+    header span { color: var(--mid); font-size: 12px; }
+    .badge {
+      background: var(--blue);
+      color: white;
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 7px;
+      border-radius: 99px;
+      letter-spacing: .04em;
+    }
+
+    /* ── Layout ── */
+    .layout {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    /* ── Sidebar ── */
+    .sidebar {
+      width: 280px;
+      background: white;
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      overflow-y: auto;
+    }
+
+    .drop-zone {
+      margin: 16px;
+      border: 2px dashed var(--border);
+      border-radius: 10px;
+      padding: 28px 16px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color .15s, background .15s;
+    }
+    .drop-zone:hover, .drop-zone.drag-over {
+      border-color: var(--blue);
+      background: #f0f6ff;
+    }
+    .drop-zone input { display: none; }
+    .drop-zone .icon { font-size: 28px; margin-bottom: 8px; }
+    .drop-zone p { font-size: 12px; color: var(--mid); line-height: 1.5; }
+    .drop-zone strong { color: var(--blue); }
+
+    .section {
+      padding: 0 16px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .section-title {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      color: #999;
+      padding: 14px 0 8px;
+    }
+
+    .meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .meta-item .label { font-size: 10px; color: #aaa; }
+    .meta-item .value { font-size: 13px; font-weight: 500; }
+
+    .room-list { display: flex; flex-direction: column; gap: 4px; }
+    .room-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 5px 8px;
+      background: var(--light);
+      border-radius: 5px;
+      font-size: 12px;
+    }
+    .room-item .room-name { font-weight: 500; }
+    .room-item .room-area { color: var(--mid); font-size: 11px; }
+    .room-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      margin-right: 7px; flex-shrink: 0;
+    }
+
+    .wall-stats { display: flex; flex-direction: column; gap: 4px; }
+    .wall-type-row {
+      display: flex; align-items: center; justify-content: space-between;
+      font-size: 12px; padding: 3px 0;
+    }
+    .wall-swatch {
+      width: 12px; height: 12px; border-radius: 2px;
+      margin-right: 6px; flex-shrink: 0;
+    }
+    .wt-label { display: flex; align-items: center; }
+
+    /* ── Canvas area ── */
+    .canvas-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .canvas-toolbar {
+      background: white;
+      border-bottom: 1px solid var(--border);
+      padding: 8px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+    .canvas-toolbar button {
+      padding: 4px 12px;
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      background: white;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .canvas-toolbar button:hover { background: var(--light); }
+    #view-label { font-size: 12px; color: var(--mid); margin-left: auto; }
+
+    #canvas-wrap {
+      flex: 1;
+      overflow: hidden;
+      position: relative;
+    }
+    canvas#viewer {
+      display: block;
+      width: 100%;
+      height: 100%;
+      cursor: grab;
+    }
+    canvas#viewer:active { cursor: grabbing; }
+
+    .empty-state {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #bbb;
+      gap: 8px;
+      pointer-events: none;
+    }
+    .empty-state .big { font-size: 48px; }
+    .empty-state p { font-size: 13px; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Placely</h1>
+  <span class="badge">SlimBIM Viewer</span>
+  <span>v1.0</span>
+</header>
+
+<div class="layout">
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-input').click()">
+      <div class="icon">📐</div>
+      <p>Slipp en <strong>SlimBIM JSON</strong>-fil her<br>eller klikk for å velge</p>
+      <input type="file" id="file-input" accept=".json">
+    </div>
+
+    <div class="section" id="meta-section" style="display:none">
+      <div class="section-title">Eiendom</div>
+      <div class="meta-grid">
+        <div class="meta-item"><div class="label">Adresse</div><div class="value" id="m-address">–</div></div>
+        <div class="meta-item"><div class="label">BRA</div><div class="value" id="m-bra">–</div></div>
+        <div class="meta-item"><div class="label">Byggeår</div><div class="value" id="m-year">–</div></div>
+        <div class="meta-item"><div class="label">Status</div><div class="value" id="m-status">–</div></div>
+      </div>
+    </div>
+
+    <div class="section" id="walls-section" style="display:none">
+      <div class="section-title">Vegger</div>
+      <div class="wall-stats" id="wall-stats"></div>
+    </div>
+
+    <div class="section" id="rooms-section" style="display:none">
+      <div class="section-title">Rom</div>
+      <div class="room-list" id="room-list"></div>
+    </div>
+  </div>
+
+  <!-- Canvas -->
+  <div class="canvas-area">
+    <div class="canvas-toolbar">
+      <button onclick="resetView()">↺ Tilbakestill</button>
+      <button onclick="zoomIn()">+</button>
+      <button onclick="zoomOut()">−</button>
+      <span id="view-label">Ingen fil lastet</span>
+    </div>
+    <div id="canvas-wrap">
+      <div class="empty-state" id="empty-state">
+        <div class="big">🏠</div>
+        <p>Last inn en SlimBIM JSON-fil for å se bygget</p>
+      </div>
+      <canvas id="viewer"></canvas>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ── Farger per veggtype ──────────────────────────────────────────────────────
+const WALL_COLORS = {
+  exterior:     '#1a1a1a',
+  interior:     '#777',
+  load_bearing: '#c0392b',
+  partition:    '#aaa',
+  foundation:   '#5d4037',
+  default:      '#555'
+};
+const WALL_LABELS = {
+  exterior:     'Yttervegg',
+  interior:     'Innervegg',
+  load_bearing: 'Bærende vegg',
+  partition:    'Skillevegg',
+  foundation:   'Grunnmur'
+};
+const ROOM_COLORS = ['#d4e6ff','#d4f5e0','#fff3cd','#f8d7da','#e2d9f3','#d1ecf1'];
+
+// ── State ────────────────────────────────────────────────────────────────────
+let doc = null;
+let walls = [], rooms = [];
+let cam = { x: 0, y: 0, scale: 50 }; // scale = px per meter
+let drag = { active: false, sx: 0, sy: 0, cx: 0, cy: 0 };
+
+// ── File drop ────────────────────────────────────────────────────────────────
+const dropZone = document.getElementById('drop-zone');
+dropZone.addEventListener('dragover',  e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+dropZone.addEventListener('drop', e => {
+  e.preventDefault();
+  dropZone.classList.remove('drag-over');
+  const file = e.dataTransfer.files[0];
+  if (file) loadFile(file);
+});
+document.getElementById('file-input').addEventListener('change', e => {
+  if (e.target.files[0]) loadFile(e.target.files[0]);
+});
+
+function loadFile(file) {
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      doc = JSON.parse(e.target.result);
+      processDoc(doc);
+    } catch (err) {
+      alert('Ugyldig JSON-fil: ' + err.message);
+    }
+  };
+  reader.readAsText(file);
+}
+
+// ── Process SlimBIM doc ──────────────────────────────────────────────────────
+function processDoc(d) {
+  walls = [];
+  rooms = [];
+  const prop     = d.property || {};
+  const buildings = prop.buildings || [];
+
+  buildings.forEach(b => {
+    (b.floors || []).forEach(f => {
+      (f.walls || []).forEach(w => walls.push(w));
+      (f.rooms || []).forEach(r => rooms.push(r));
+    });
+  });
+
+  updateSidebar(prop, buildings);
+  document.getElementById('empty-state').style.display = 'none';
+  fitView();
+  draw();
+}
+
+function updateSidebar(prop, buildings) {
+  document.getElementById('meta-section').style.display = '';
+  document.getElementById('m-address').textContent = prop.address || '–';
+
+  const b = buildings[0] || {};
+  document.getElementById('m-bra').textContent    = b.bra_m2 ? b.bra_m2.toFixed(0) + ' m²' : '–';
+  document.getElementById('m-year').textContent   = b.year_built || '–';
+  document.getElementById('m-status').textContent = b.version_status || '–';
+
+  // Veggstatistikk
+  if (walls.length > 0) {
+    document.getElementById('walls-section').style.display = '';
+    const counts = {};
+    walls.forEach(w => { const t = w.wall_type || 'default'; counts[t] = (counts[t] || 0) + 1; });
+    const statsEl = document.getElementById('wall-stats');
+    statsEl.innerHTML = '';
+    Object.entries(counts).forEach(([type, n]) => {
+      statsEl.innerHTML +=
+        '<div class="wall-type-row">' +
+        '  <div class="wt-label"><div class="wall-swatch" style="background:' + (WALL_COLORS[type]||WALL_COLORS.default) + '"></div>' +
+           (WALL_LABELS[type] || type) + '</div>' +
+        '  <strong>' + n + '</strong>' +
+        '</div>';
+    });
+  }
+
+  // Romliste
+  if (rooms.length > 0) {
+    document.getElementById('rooms-section').style.display = '';
+    const listEl = document.getElementById('room-list');
+    listEl.innerHTML = '';
+    rooms.forEach((r, i) => {
+      const color = ROOM_COLORS[i % ROOM_COLORS.length];
+      const area  = r.area_m2 ? r.area_m2.toFixed(1) + ' m²' : '–';
+      listEl.innerHTML +=
+        '<div class="room-item">' +
+        '  <div style="display:flex;align-items:center">' +
+        '    <div class="room-dot" style="background:' + color + '"></div>' +
+        '    <span class="room-name">' + (r.name || r.room_type || 'Rom') + '</span>' +
+        '  </div>' +
+        '  <span class="room-area">' + area + '</span>' +
+        '</div>';
+    });
+  }
+
+  document.getElementById('view-label').textContent =
+    walls.length + ' vegger · ' + rooms.length + ' rom';
+}
+
+// ── Canvas rendering ─────────────────────────────────────────────────────────
+const canvas = document.getElementById('viewer');
+const ctx = canvas.getContext('2d');
+
+function resize() {
+  const wrap = document.getElementById('canvas-wrap');
+  canvas.width  = wrap.clientWidth;
+  canvas.height = wrap.clientHeight;
+  draw();
+}
+window.addEventListener('resize', resize);
+
+function worldToScreen(x, y) {
+  return [
+    canvas.width  / 2 + (x - cam.x) * cam.scale,
+    canvas.height / 2 - (y - cam.y) * cam.scale  // flip Y (screen Y goes down)
+  ];
+}
+
+function draw() {
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0, 0, W, H);
+  ctx.fillStyle = '#ecedf0';
+  ctx.fillRect(0, 0, W, H);
+
+  if (!doc || walls.length === 0) return;
+
+  // Grid
+  drawGrid();
+
+  // Vegger
+  walls.forEach(w => {
+    const s = w.start || [0,0,0];
+    const e = w.end   || [1,0,0];
+    const [sx, sy] = worldToScreen(s[0], s[1]);
+    const [ex, ey] = worldToScreen(e[0], e[1]);
+
+    const color = WALL_COLORS[w.wall_type] || WALL_COLORS.default;
+    const thick = (w.thickness_m || 0.2) * cam.scale;
+
+    // Fylte vegg (tykkelse)
+    const dx = ex - sx, dy = ey - sy;
+    const len = Math.sqrt(dx*dx + dy*dy) || 1;
+    const nx = -dy/len * thick/2, ny = dx/len * thick/2;
+
+    ctx.beginPath();
+    ctx.moveTo(sx + nx, sy + ny);
+    ctx.lineTo(ex + nx, ey + ny);
+    ctx.lineTo(ex - nx, ey - ny);
+    ctx.lineTo(sx - nx, sy - ny);
+    ctx.closePath();
+    ctx.fillStyle = color + '33';
+    ctx.fill();
+
+    // Senterlinje
+    ctx.beginPath();
+    ctx.moveTo(sx, sy);
+    ctx.lineTo(ex, ey);
+    ctx.strokeStyle = color;
+    ctx.lineWidth = Math.max(1.5, thick * 0.4);
+    ctx.stroke();
+
+    // Endepunkter
+    ctx.beginPath();
+    ctx.arc(sx, sy, 3, 0, Math.PI*2);
+    ctx.arc(ex, ey, 3, 0, Math.PI*2);
+    ctx.fillStyle = color;
+    ctx.fill();
+  });
+}
+
+function drawGrid() {
+  const step = 1; // 1m grid
+  const minX = cam.x - canvas.width  / (2 * cam.scale);
+  const maxX = cam.x + canvas.width  / (2 * cam.scale);
+  const minY = cam.y - canvas.height / (2 * cam.scale);
+  const maxY = cam.y + canvas.height / (2 * cam.scale);
+
+  ctx.strokeStyle = '#dde';
+  ctx.lineWidth = 0.5;
+
+  for (let x = Math.floor(minX); x <= maxX; x += step) {
+    const [sx] = worldToScreen(x, 0);
+    ctx.beginPath();
+    ctx.moveTo(sx, 0);
+    ctx.lineTo(sx, canvas.height);
+    ctx.stroke();
+  }
+  for (let y = Math.floor(minY); y <= maxY; y += step) {
+    const [, sy] = worldToScreen(0, y);
+    ctx.beginPath();
+    ctx.moveTo(0, sy);
+    ctx.lineTo(canvas.width, sy);
+    ctx.stroke();
+  }
+
+  // Origo-kryss
+  const [ox, oy] = worldToScreen(0, 0);
+  ctx.strokeStyle = '#bbc';
+  ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(ox - 10, oy); ctx.lineTo(ox + 10, oy); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(ox, oy - 10); ctx.lineTo(ox, oy + 10); ctx.stroke();
+}
+
+// ── Kamera ───────────────────────────────────────────────────────────────────
+function fitView() {
+  if (walls.length === 0) return;
+  let minX=Infinity, maxX=-Infinity, minY=Infinity, maxY=-Infinity;
+  walls.forEach(w => {
+    [w.start, w.end].forEach(p => {
+      if (!p) return;
+      minX = Math.min(minX, p[0]); maxX = Math.max(maxX, p[0]);
+      minY = Math.min(minY, p[1]); maxY = Math.max(maxY, p[1]);
+    });
+  });
+  const W = canvas.width || 800, H = canvas.height || 600;
+  const rangeX = (maxX - minX) || 10;
+  const rangeY = (maxY - minY) || 10;
+  cam.scale = Math.min(W / (rangeX * 1.3), H / (rangeY * 1.3));
+  cam.x = (minX + maxX) / 2;
+  cam.y = (minY + maxY) / 2;
+  resize();
+}
+
+function resetView() { fitView(); }
+function zoomIn()    { cam.scale *= 1.3; draw(); }
+function zoomOut()   { cam.scale /= 1.3; draw(); }
+
+// ── Zoom med scroll ──────────────────────────────────────────────────────────
+canvas.addEventListener('wheel', e => {
+  e.preventDefault();
+  const factor = e.deltaY < 0 ? 1.15 : 0.87;
+  const rect = canvas.getBoundingClientRect();
+  const mx = e.clientX - rect.left;
+  const my = e.clientY - rect.top;
+  const wx = cam.x + (mx - canvas.width/2)  / cam.scale;
+  const wy = cam.y - (my - canvas.height/2) / cam.scale;
+  cam.scale *= factor;
+  cam.x = wx - (mx - canvas.width/2)  / cam.scale;
+  cam.y = wy + (my - canvas.height/2) / cam.scale;
+  draw();
+}, { passive: false });
+
+// ── Pan ──────────────────────────────────────────────────────────────────────
+canvas.addEventListener('mousedown', e => {
+  drag.active = true;
+  drag.sx = e.clientX; drag.sy = e.clientY;
+  drag.cx = cam.x;     drag.cy = cam.y;
+});
+window.addEventListener('mousemove', e => {
+  if (!drag.active) return;
+  cam.x = drag.cx - (e.clientX - drag.sx) / cam.scale;
+  cam.y = drag.cy + (e.clientY - drag.sy) / cam.scale;
+  draw();
+});
+window.addEventListener('mouseup', () => { drag.active = false; });
+
+// Init
+resize();
+</script>
+</body>
+</html>
