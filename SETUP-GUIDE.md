@@ -1,29 +1,13 @@
 # Placely – Kom i gang
 
-## For Jakob: Deploy XDi til skyen (gjøres én gang)
+## XDi er live
 
-Slik unngår du at alle som bruker Placely trenger egen API-nøkkel.
+XDi API kjører på Railway og er tilgjengelig for alle:
 
-### Steg 1: Få Anthropic API-nøkkel
-1. Gå til **console.anthropic.com**
-2. Registrer deg eller logg inn
-3. Klikk **API Keys** i venstremenyen
-4. Klikk **Create Key** – gi den et navn (f.eks. "Placely XDi")
-5. Kopier nøkkelen (ser slik ut: `sk-ant-api03-...`)
-6. **Ta vare på den** – den vises bare én gang
+**`https://xdi-production.up.railway.app`**
 
-### Steg 2: Deploy XDi til Render.com (gratis)
-1. Gå til **render.com** og logg inn med GitHub
-2. Klikk **New → Web Service**
-3. Koble til GitHub-repoet **NOPSAS/Placely**
-4. Render oppdager `render.yaml` automatisk
-5. Legg inn `ANTHROPIC_API_KEY` i Environment-feltet (fra steg 1)
-6. Klikk **Deploy**
-7. Etter 2–3 minutter får du en URL: `https://placely-xdi.onrender.com`
-
-### Steg 3: Del URL-en med alle brukere
-Send `https://placely-xdi.onrender.com` til far og alle andre som skal bruke Placely.  
-De trenger ikke egen API-nøkkel.
+- Status: https://xdi-production.up.railway.app/health
+- API-dokumentasjon: https://xdi-production.up.railway.app/docs
 
 ---
 
@@ -31,10 +15,11 @@ De trenger ikke egen API-nøkkel.
 
 ### Det du trenger
 - SketchUp (gratis prøveversjon på sketchup.com eller Pro)
-- Filen `placely.rbz` (får du av Jakob)
-- XDi-URL fra Jakob (f.eks. `https://placely-xdi.onrender.com`)
+- Filen `placely.rbz` (last ned fra github.com/NOPSAS/Placely eller få av Jakob)
 
-### Installer Placely-extensionen
+XDi-URL er allerede innebygd i extensionen – du trenger ikke gjøre noe ekstra.
+
+### Steg 1 – Installer Placely-extensionen
 1. Åpne SketchUp
 2. Gå til **Window → Extension Manager**
 3. Klikk **Install Extension...**
@@ -42,28 +27,37 @@ De trenger ikke egen API-nøkkel.
 5. Godkjenn installasjonen
 6. Restart SketchUp
 
-### Sett inn XDi-URL (gjøres én gang)
-1. Gå til **Plugins → Placely → Innstillinger (XDi URL)**
-2. Lim inn URL-en du fikk av Jakob
-3. Klikk OK
+Du finner nå **Placely** under **Plugins**-menyen.
 
-### Tegn din første vegg
+### Steg 2 – Tegn din første vegg
 1. Gå til **Plugins → Placely → Tegn vegg**
 2. Klikk i modellen for startpunkt
 3. Klikk for sluttpunkt
-4. Juster høyde og tykkelse i dialogen som åpner
+   - `←` låser til grønn akse
+   - `→` låser til rød akse
+   - `ESC` avbryter
+4. Juster høyde og tykkelse i dialogen
 5. Klikk **Lagre og bygg**
 
-### Importer en plantegning (PDF eller bilde)
+### Steg 3 – Importer en tegning automatisk
 1. Gå til **Plugins → Placely → Importer fra XDi (PDF/bilde)**
 2. Velg en PDF-tegning eller et bilde av en plantegning
 3. Skriv inn adressen (valgfritt)
-4. Klikk OK – vegger opprettes automatisk i SketchUp
+4. Klikk OK – vegger og rom opprettes automatisk i SketchUp
 
-### Se bygget i nettleseren (uten SketchUp)
-1. Åpne filen `viewer/index.html` i Chrome eller Edge
-2. Slipp en SlimBIM JSON-fil inn i vinduet
-3. Bygget vises med vegger, rom og etasjer
+### Steg 4 – Eksporter og se bygget i nettleseren
+1. Gå til **Plugins → Placely → Eksporter SlimBIM JSON**
+2. Lagre JSON-filen
+3. Åpne `viewer/index.html` i Chrome
+4. Slipp JSON-filen inn – bygget vises med vegger, rom og målestokk
+
+---
+
+## Endre XDi-URL (kun ved behov)
+Hvis du vil bruke en annen XDi-instans:
+**Plugins → Placely → Innstillinger (XDi URL)**
+
+Standard URL: `https://xdi-production.up.railway.app`
 
 ---
 

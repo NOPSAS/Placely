@@ -3,7 +3,7 @@ module Placely
     PREF_KEY = 'placely'
 
     def self.xdi_url
-      Sketchup.read_default(PREF_KEY, 'xdi_url', 'http://localhost:8001')
+      Sketchup.read_default(PREF_KEY, 'xdi_url', 'https://xdi-production.up.railway.app')
     end
 
     def self.xdi_url=(url)
