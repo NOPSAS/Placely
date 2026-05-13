@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: placely-xdi
+    runtime: docker
+    dockerfilePath: ./xdi/Dockerfile
+    dockerContext: ./xdi
+    plan: free
+    envVars:
+      - key: ANTHROPIC_API_KEY
+        sync: false   # Legges inn manuelt i Render-dashboardet
+      - key: PORT
+        value: 8001
+    healthCheckPath: /health
+    autoDeploy: true

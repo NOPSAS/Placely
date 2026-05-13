@@ -1,5 +1,6 @@
 require 'json'
 require_relative 'constants'
+require_relative 'settings'
 require_relative 'wall_builder'
 require_relative 'wall_tool'
 require_relative 'wall_dialog'
@@ -29,6 +30,12 @@ module Placely
 
     placely_menu.add_item('Eksporter SlimBIM JSON') do
       SlimbimExporter.export
+    end
+
+    placely_menu.add_separator
+
+    placely_menu.add_item('Innstillinger (XDi URL)...') do
+      Settings.open_dialog
     end
 
     # --- Verktøylinje ---

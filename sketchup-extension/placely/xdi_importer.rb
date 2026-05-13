@@ -9,8 +9,11 @@ require 'tempfile'
 
 module Placely
   module XdiImporter
-    XDI_BASE_URL = 'http://localhost:8001'
-    TIMEOUT_SEC  = 120
+    TIMEOUT_SEC = 120
+
+    def self.xdi_url
+      Settings.xdi_url
+    end
 
     def self.import_from_file
       # 1. Velg fil
@@ -55,7 +58,7 @@ module Placely
     end
 
     def self.check_health
-      uri = URI("#{XDI_BASE_URL}/health")
+      uri = URI("#{xdi_url}/health")
       resp = Net::HTTP.get_response(uri)
       resp.code == '200'
     rescue
@@ -67,13 +70,13 @@ module Placely
     def self.call_xdi(file_path, endpoint, address, context)
       unless check_health
         UI.messagebox(
-          "Klarte ikke å nå XDi API på #{XDI_BASE_URL}\n\n" \
+          "Klarte ikke å nå XDi API på #{xdi_url}\n\n" \
           "Start XDi:\n  cd xdi\n  python main.py"
         )
         return nil
       end
 
-      uri      = URI("#{XDI_BASE_URL}#{endpoint}")
+      uri      = URI("#{xdi_url}#{endpoint}")
       boundary = "PlacelyBoundary#{Time.now.to_i}"
 
       body = build_multipart(file_path, address, context, boundary)
