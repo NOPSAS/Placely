@@ -1,7 +1,5 @@
-"""
-Placely XDi Importer
-Sender plantegninger/PDF til XDi API og oppretter vegger i SketchUp.
-"""
+# Placely XDi Importer
+# Sender plantegninger/PDF til XDi API og oppretter vegger i SketchUp.
 require 'net/http'
 require 'json'
 require 'uri'
