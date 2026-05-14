@@ -15,6 +15,8 @@ from core.validator import validate_slimbim
 from parsers.image_parser import ImageParser
 from parsers.iguide_parser import IGuideParser
 from parsers.pdf_parser import PDFParser
+from analyzers.floor_plan_analyzer import FloorPlanAnalyzer
+from analyzers.compliance_checker import ComplianceChecker
 
 try:
     from parsers.ifc_parser import IfcParser
@@ -198,6 +200,71 @@ async def parse_ifc(
         raise HTTPException(500, f"IFC-parsing feilet: {str(e)}")
 
     return doc.model_dump()
+
+
+# ── Analyse: Romplan ─────────────────────────────────────────────────────────
+
+@app.post("/analyse/romplan", tags=["analyse"])
+async def analyse_romplan(
+    file:    UploadFile = File(..., description="Plantegning – PNG, JPG eller PDF"),
+    address: Optional[str] = Form(None, description="Adresse (valgfritt)"),
+):
+    """
+    Analyser en plantegning og returner BRA, romplan og grovkalkyle.
+    Støtter PNG, JPG og PDF (første side).
+    """
+    api_key = _require_api_key()
+    raw = await file.read()
+
+    if file.content_type == "application/pdf":
+        from parsers.pdf_parser import PDFParser
+        parser = PDFParser(api_key=api_key)
+        # Konverter PDF til bilde for analyse
+        img_bytes = parser._pdf_page_to_image(raw)
+        mime      = "image/png"
+    else:
+        img_bytes = raw
+        mime      = file.content_type or "image/jpeg"
+
+    try:
+        analyzer = FloorPlanAnalyzer(api_key=api_key)
+        result   = analyzer.analyze(img_bytes, mime, address)
+    except Exception as e:
+        raise HTTPException(500, f"Analyse feilet: {str(e)}")
+
+    return result
+
+
+# ── Analyse: Byggesjekk ───────────────────────────────────────────────────────
+
+@app.post("/analyse/byggesjekk", tags=["analyse"])
+async def analyse_byggesjekk(
+    godkjent:  UploadFile = File(..., description="Godkjent tegning fra kommunen (PDF/PNG/JPG)"),
+    navarende: UploadFile = File(..., description="Nåværende plantegning fra Finn.no/befaring (PNG/JPG/PDF)"),
+    address:   Optional[str] = Form(None, description="Adresse (valgfritt)"),
+):
+    """
+    Sammenlign godkjent kommunetegning med nåværende plantegning.
+    Identifiserer potensielt ulovlige endringer etter plan- og bygningsloven.
+    """
+    api_key = _require_api_key()
+
+    approved_bytes = await godkjent.read()
+    current_bytes  = await navarende.read()
+
+    try:
+        checker = ComplianceChecker(api_key=api_key)
+        result  = checker.check(
+            approved_bytes = approved_bytes,
+            approved_type  = godkjent.content_type  or "image/jpeg",
+            current_bytes  = current_bytes,
+            current_type   = navarende.content_type or "image/jpeg",
+            address        = address,
+        )
+    except Exception as e:
+        raise HTTPException(500, f"Byggesjekk feilet: {str(e)}")
+
+    return result
 
 
 # ── Diff ──────────────────────────────────────────────────────────────────────

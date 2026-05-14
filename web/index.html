@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Placely – Byggeanalyse</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --blue:    #0066cc;
+      --green:   #1a7f4b;
+      --orange:  #c05c00;
+      --red:     #c0392b;
+      --dark:    #111;
+      --mid:     #555;
+      --border:  #e0e0e0;
+      --bg:      #f4f5f7;
+    }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 14px; color: var(--dark); background: var(--bg); min-height: 100vh; }
+
+    /* ── Header ── */
+    header { background: white; border-bottom: 1px solid var(--border); padding: 14px 32px; display: flex; align-items: center; gap: 14px; }
+    .logo { font-size: 20px; font-weight: 800; letter-spacing: -.03em; }
+    .logo span { color: var(--blue); }
+    .tagline { font-size: 12px; color: var(--mid); }
+
+    /* ── Tabs ── */
+    .tabs { display: flex; gap: 0; border-bottom: 2px solid var(--border); background: white; padding: 0 32px; }
+    .tab { padding: 14px 24px; font-size: 14px; font-weight: 500; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; color: var(--mid); transition: all .15s; }
+    .tab.active { color: var(--blue); border-bottom-color: var(--blue); }
+    .tab:hover { color: var(--dark); }
+
+    /* ── Content ── */
+    .content { max-width: 820px; margin: 32px auto; padding: 0 20px; }
+    .panel { display: none; }
+    .panel.active { display: block; }
+
+    h2 { font-size: 22px; font-weight: 700; margin-bottom: 6px; }
+    .desc { color: var(--mid); margin-bottom: 28px; font-size: 14px; line-height: 1.6; }
+
+    /* ── Upload ── */
+    .upload-grid { display: grid; gap: 16px; }
+    .upload-grid.two { grid-template-columns: 1fr 1fr; }
+
+    .upload-box { border: 2px dashed var(--border); border-radius: 10px; padding: 32px 20px; text-align: center; cursor: pointer; transition: all .15s; background: white; }
+    .upload-box:hover, .upload-box.drag-over { border-color: var(--blue); background: #f0f6ff; }
+    .upload-box.has-file { border-color: var(--green); background: #f0fdf5; border-style: solid; }
+    .upload-box input { display: none; }
+    .upload-icon { font-size: 32px; margin-bottom: 8px; }
+    .upload-label { font-size: 13px; font-weight: 500; color: var(--dark); margin-bottom: 4px; }
+    .upload-hint  { font-size: 12px; color: var(--mid); }
+    .upload-file-name { font-size: 12px; color: var(--green); font-weight: 500; margin-top: 6px; }
+
+    .field { margin-bottom: 16px; }
+    label.field-label { display: block; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; color: var(--mid); margin-bottom: 6px; }
+    input[type=text] { width: 100%; padding: 9px 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 14px; }
+    input[type=text]:focus { outline: none; border-color: var(--blue); }
+
+    .btn-analyse { display: block; width: 100%; padding: 13px; background: var(--blue); color: white; font-size: 15px; font-weight: 600; border: none; border-radius: 8px; cursor: pointer; margin-top: 20px; transition: background .15s; }
+    .btn-analyse:hover { background: #0055b0; }
+    .btn-analyse:disabled { background: #aaa; cursor: not-allowed; }
+
+    /* ── Loading ── */
+    .loading { text-align: center; padding: 48px 0; }
+    .spinner { display: inline-block; width: 36px; height: 36px; border: 3px solid #ddd; border-top-color: var(--blue); border-radius: 50%; animation: spin .7s linear infinite; margin-bottom: 12px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading p { color: var(--mid); font-size: 13px; }
+
+    /* ── Resultater ── */
+    .result-card { background: white; border-radius: 10px; padding: 24px; margin-top: 24px; border: 1px solid var(--border); }
+    .result-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+    .result-title { font-size: 17px; font-weight: 700; }
+
+    /* BRA-grid */
+    .bra-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; margin-bottom: 20px; }
+    .bra-item { background: var(--bg); border-radius: 8px; padding: 14px; text-align: center; }
+    .bra-value { font-size: 26px; font-weight: 800; color: var(--blue); line-height: 1; }
+    .bra-unit  { font-size: 12px; color: var(--mid); }
+    .bra-label { font-size: 11px; color: var(--mid); margin-top: 4px; text-transform: uppercase; letter-spacing: .04em; }
+
+    /* Romtabell */
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th { text-align: left; padding: 8px 10px; background: var(--bg); font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--mid); }
+    td { padding: 8px 10px; border-bottom: 1px solid var(--border); }
+    tr:last-child td { border-bottom: none; }
+    .tag { display: inline-block; padding: 2px 8px; border-radius: 99px; font-size: 11px; font-weight: 500; }
+
+    /* Risiko */
+    .risiko-badge { padding: 6px 16px; border-radius: 99px; font-size: 13px; font-weight: 700; }
+    .risiko-HØY    { background: #fde8e8; color: var(--red); }
+    .risiko-MIDDELS { background: #fff3e0; color: var(--orange); }
+    .risiko-LAV    { background: #e8f5ee; color: var(--green); }
+    .risiko-INGEN  { background: #e8f5ee; color: var(--green); }
+
+    .funn-list { display: flex; flex-direction: column; gap: 12px; margin-top: 16px; }
+    .funn-item { border-left: 3px solid; border-radius: 0 8px 8px 0; padding: 12px 14px; background: var(--bg); }
+    .funn-item.HØY    { border-color: var(--red); }
+    .funn-item.MIDDELS { border-color: var(--orange); }
+    .funn-item.LAV    { border-color: var(--green); }
+    .funn-type  { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: var(--mid); margin-bottom: 4px; }
+    .funn-tekst { font-size: 13px; color: var(--dark); margin-bottom: 6px; }
+    .funn-handling { font-size: 12px; color: var(--mid); font-style: italic; }
+    .funn-pbl { font-size: 11px; color: var(--blue); margin-top: 4px; }
+
+    .sammendrag { background: var(--bg); border-radius: 8px; padding: 14px 16px; font-size: 14px; line-height: 1.6; margin-bottom: 16px; }
+    .anbefaling { border-left: 3px solid var(--blue); padding: 12px 16px; font-size: 13px; line-height: 1.6; }
+
+    .section-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--mid); margin: 20px 0 10px; }
+
+    .error-box { background: #fde8e8; border: 1px solid #f5c6c6; border-radius: 8px; padding: 16px; color: var(--red); font-size: 13px; margin-top: 16px; }
+
+    @media (max-width: 600px) { .upload-grid.two { grid-template-columns: 1fr; } .bra-grid { grid-template-columns: repeat(2, 1fr); } }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Place<span>ly</span></div>
+  <div class="tagline">Byggeanalyse drevet av AI</div>
+</header>
+
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('romplan')">Romplan-analyse</div>
+  <div class="tab" onclick="switchTab('byggesjekk')">Byggesjekk</div>
+</div>
+
+<div class="content">
+
+  <!-- ── ROMPLAN-ANALYSE ── -->
+  <div class="panel active" id="panel-romplan">
+    <h2>Romplan-analyse</h2>
+    <p class="desc">Last opp en plantegning (PDF, PNG eller JPG) og få automatisk beregnet BRA, romplan og estimert verdi. Fungerer med håndtegnede skisser, kommunale tegninger og bilder fra annonser.</p>
+
+    <div class="upload-grid">
+      <div class="upload-box" id="drop-romplan" onclick="document.getElementById('file-romplan').click()">
+        <div class="upload-icon">📐</div>
+        <div class="upload-label">Last opp plantegning</div>
+        <div class="upload-hint">PDF, PNG eller JPG – dra og slipp eller klikk</div>
+        <div class="upload-file-name" id="name-romplan"></div>
+        <input type="file" id="file-romplan" accept=".pdf,.png,.jpg,.jpeg">
+      </div>
+    </div>
+
+    <div class="field" style="margin-top:16px">
+      <label class="field-label">Adresse (valgfritt)</label>
+      <input type="text" id="addr-romplan" placeholder="f.eks. Birkeveien 3A, Oslo">
+    </div>
+
+    <button class="btn-analyse" id="btn-romplan" onclick="runRomplan()">Analyser plantegning</button>
+
+    <div id="loading-romplan" style="display:none" class="loading">
+      <div class="spinner"></div>
+      <p>Analyserer plantegning med AI – tar 10–30 sekunder…</p>
+    </div>
+    <div id="result-romplan"></div>
+  </div>
+
+  <!-- ── BYGGESJEKK ── -->
+  <div class="panel" id="panel-byggesjekk">
+    <h2>Byggesjekk</h2>
+    <p class="desc">Sammenlign godkjent tegning fra kommunen med nåværende plantegning (f.eks. fra Finn.no). AI-en identifiserer avvik som kan være ulovlige tiltak etter plan- og bygningsloven.</p>
+
+    <div class="upload-grid two">
+      <div>
+        <label class="field-label">Godkjent tegning (kommunen)</label>
+        <div class="upload-box" id="drop-godkjent" onclick="document.getElementById('file-godkjent').click()">
+          <div class="upload-icon">🏛️</div>
+          <div class="upload-label">Last opp godkjent tegning</div>
+          <div class="upload-hint">PDF eller bilde fra kommunen</div>
+          <div class="upload-file-name" id="name-godkjent"></div>
+          <input type="file" id="file-godkjent" accept=".pdf,.png,.jpg,.jpeg">
+        </div>
+      </div>
+      <div>
+        <label class="field-label">Nåværende situasjon (Finn.no)</label>
+        <div class="upload-box" id="drop-navarende" onclick="document.getElementById('file-navarende').click()">
+          <div class="upload-icon">🏠</div>
+          <div class="upload-label">Last opp Finn.no-tegning</div>
+          <div class="upload-hint">Skjermbilde, PNG eller JPG</div>
+          <div class="upload-file-name" id="name-navarende"></div>
+          <input type="file" id="file-navarende" accept=".pdf,.png,.jpg,.jpeg">
+        </div>
+      </div>
+    </div>
+
+    <div class="field" style="margin-top:16px">
+      <label class="field-label">Adresse (valgfritt)</label>
+      <input type="text" id="addr-byggesjekk" placeholder="f.eks. Birkeveien 3A, Oslo">
+    </div>
+
+    <button class="btn-analyse" id="btn-byggesjekk" onclick="runByggesjekk()">Kjør byggesjekk</button>
+
+    <div id="loading-byggesjekk" style="display:none" class="loading">
+      <div class="spinner"></div>
+      <p>Sammenligner tegninger med AI – tar 15–40 sekunder…</p>
+    </div>
+    <div id="result-byggesjekk"></div>
+  </div>
+
+</div>
+
+<script>
+const XDI = 'https://xdi-production.up.railway.app';
+
+// ── Tabs ────────────────────────────────────────────────────────────────────
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', ['romplan','byggesjekk'][i] === name));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-' + name).classList.add('active');
+}
+
+// ── File inputs ──────────────────────────────────────────────────────────────
+function setupUpload(inputId, boxId, nameId) {
+  const input = document.getElementById(inputId);
+  const box   = document.getElementById(boxId);
+  const name  = document.getElementById(nameId);
+
+  input.addEventListener('change', () => {
+    if (input.files[0]) { name.textContent = '✓ ' + input.files[0].name; box.classList.add('has-file'); }
+  });
+  box.addEventListener('dragover',  e => { e.preventDefault(); box.classList.add('drag-over'); });
+  box.addEventListener('dragleave', () => box.classList.remove('drag-over'));
+  box.addEventListener('drop', e => {
+    e.preventDefault();
+    box.classList.remove('drag-over');
+    if (e.dataTransfer.files[0]) {
+      const dt = new DataTransfer();
+      dt.items.add(e.dataTransfer.files[0]);
+      input.files = dt.files;
+      name.textContent = '✓ ' + e.dataTransfer.files[0].name;
+      box.classList.add('has-file');
+    }
+  });
+}
+setupUpload('file-romplan',   'drop-romplan',   'name-romplan');
+setupUpload('file-godkjent',  'drop-godkjent',  'name-godkjent');
+setupUpload('file-navarende', 'drop-navarende', 'name-navarende');
+
+// ── Romplan-analyse ──────────────────────────────────────────────────────────
+async function runRomplan() {
+  const file = document.getElementById('file-romplan').files[0];
+  if (!file) { alert('Velg en plantegning først.'); return; }
+
+  setLoading('romplan', true);
+  const fd = new FormData();
+  fd.append('file', file);
+  const addr = document.getElementById('addr-romplan').value.trim();
+  if (addr) fd.append('address', addr);
+
+  try {
+    const res  = await fetch(XDI + '/analyse/romplan', { method: 'POST', body: fd });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || 'Ukjent feil');
+    renderRomplan(data);
+  } catch (e) {
+    showError('result-romplan', e.message);
+  } finally {
+    setLoading('romplan', false);
+  }
+}
+
+function renderRomplan(d) {
+  const k = d.kalkyle || {};
+  const rooms = (d.rom || []).sort((a, b) => (b.areal_m2||0) - (a.areal_m2||0));
+
+  const roomRows = rooms.map(r =>
+    `<tr>
+      <td>${r.navn || '–'}</td>
+      <td>${romTypeLabel(r.type)}</td>
+      <td>${r.etasje || 1}. etg</td>
+      <td style="font-weight:600">${r.areal_m2 ? r.areal_m2.toFixed(1) + ' m²' : '–'}</td>
+    </tr>`
+  ).join('');
+
+  const verdi = k.estimert_verdi_nok ? 'ca. ' + (k.estimert_verdi_nok/1e6).toFixed(1) + ' mill.' : '–';
+
+  document.getElementById('result-romplan').innerHTML = `
+    <div class="result-card">
+      <div class="result-header">
+        <div class="result-title">${d.adresse || 'Plantegning analysert'}</div>
+        <div style="font-size:12px;color:var(--mid)">${d.bygningstype || ''}</div>
+      </div>
+
+      <div class="bra-grid">
+        <div class="bra-item">
+          <div class="bra-value">${d.bra_total_m2 ? d.bra_total_m2.toFixed(0) : '–'}</div>
+          <div class="bra-unit">m²</div>
+          <div class="bra-label">BRA</div>
+        </div>
+        <div class="bra-item">
+          <div class="bra-value">${d.soverom ?? '–'}</div>
+          <div class="bra-label">Soverom</div>
+        </div>
+        <div class="bra-item">
+          <div class="bra-value">${d.bad ?? '–'}</div>
+          <div class="bra-label">Bad</div>
+        </div>
+        <div class="bra-item">
+          <div class="bra-value">${d.etasjer ?? '–'}</div>
+          <div class="bra-label">Etasjer</div>
+        </div>
+        <div class="bra-item">
+          <div class="bra-value" style="font-size:18px">${verdi}</div>
+          <div class="bra-label">Est. verdi</div>
+        </div>
+      </div>
+
+      ${rooms.length ? `
+      <div class="section-title">Rom (${rooms.length})</div>
+      <table>
+        <thead><tr><th>Rom</th><th>Type</th><th>Etasje</th><th>Areal</th></tr></thead>
+        <tbody>${roomRows}</tbody>
+      </table>` : ''}
+
+      ${d.merknad ? `<p style="margin-top:14px;font-size:12px;color:var(--mid);font-style:italic">${d.merknad}</p>` : ''}
+      <p style="margin-top:10px;font-size:11px;color:#aaa">Konfidensgrad: ${Math.round((d.confidence||0.8)*100)}% · ${k.merknad_verdi || ''}</p>
+    </div>`;
+}
+
+// ── Byggesjekk ────────────────────────────────────────────────────────────────
+async function runByggesjekk() {
+  const fGodkjent  = document.getElementById('file-godkjent').files[0];
+  const fNavarende = document.getElementById('file-navarende').files[0];
+  if (!fGodkjent || !fNavarende) { alert('Last opp begge tegningene.'); return; }
+
+  setLoading('byggesjekk', true);
+  const fd = new FormData();
+  fd.append('godkjent',  fGodkjent);
+  fd.append('navarende', fNavarende);
+  const addr = document.getElementById('addr-byggesjekk').value.trim();
+  if (addr) fd.append('address', addr);
+
+  try {
+    const res  = await fetch(XDI + '/analyse/byggesjekk', { method: 'POST', body: fd });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || 'Ukjent feil');
+    renderByggesjekk(data);
+  } catch (e) {
+    showError('result-byggesjekk', e.message);
+  } finally {
+    setLoading('byggesjekk', false);
+  }
+}
+
+function renderByggesjekk(d) {
+  const funn   = d.funn || [];
+  const risiko = d.risiko_totalt || 'LAV';
+
+  const funnHtml = funn.map(f => `
+    <div class="funn-item ${f.risiko}">
+      <div class="funn-type">${f.type || ''} <span class="tag risiko-${f.risiko}">${f.risiko}</span></div>
+      <div class="funn-tekst">${f.beskrivelse || ''}</div>
+      ${f.handling ? `<div class="funn-handling">→ ${f.handling}</div>` : ''}
+      ${f.pbl_paragraf ? `<div class="funn-pbl">PBL ${f.pbl_paragraf}</div>` : ''}
+    </div>`).join('');
+
+  document.getElementById('result-byggesjekk').innerHTML = `
+    <div class="result-card">
+      <div class="result-header">
+        <div class="result-title">Byggesjekk-rapport</div>
+        <div class="risiko-badge risiko-${risiko}">Risiko: ${risiko}</div>
+      </div>
+
+      ${d.sammendrag ? `<div class="sammendrag">${d.sammendrag}</div>` : ''}
+
+      ${funn.length ? `
+        <div class="section-title">${funn.length} funn</div>
+        <div class="funn-list">${funnHtml}</div>` :
+        `<p style="color:var(--green);font-weight:500;margin:12px 0">✓ Ingen vesentlige avvik funnet</p>`}
+
+      ${d.anbefaling ? `
+        <div class="section-title">Anbefaling</div>
+        <div class="anbefaling">${d.anbefaling}</div>` : ''}
+
+      ${d.usikkerhet ? `<p style="margin-top:14px;font-size:12px;color:var(--mid);font-style:italic">${d.usikkerhet}</p>` : ''}
+    </div>`;
+}
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+function setLoading(name, on) {
+  document.getElementById('loading-' + name).style.display = on ? 'block' : 'none';
+  document.getElementById('btn-' + name).disabled = on;
+  if (on) document.getElementById('result-' + name).innerHTML = '';
+}
+
+function showError(id, msg) {
+  document.getElementById(id).innerHTML = `<div class="error-box">Feil: ${msg}</div>`;
+}
+
+function romTypeLabel(type) {
+  const map = { living_room:'Stue', kitchen:'Kjøkken', bedroom:'Soverom', bathroom:'Bad',
+    toilet:'WC', hallway:'Gang', utility:'Vaskerom', storage:'Bod', garage:'Garasje', office:'Kontor' };
+  return map[type] || type || '–';
+}
+</script>
+</body>
+</html>

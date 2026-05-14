@@ -1,6 +1,8 @@
 # Placely XDi Importer
 # Sender plantegninger/PDF til XDi API og oppretter vegger i SketchUp.
 require 'net/http'
+require 'net/https'
+require 'openssl'
 require 'json'
 require 'uri'
 require 'tempfile'
@@ -56,8 +58,13 @@ module Placely
     end
 
     def self.check_health
-      uri = URI("#{xdi_url}/health")
-      resp = Net::HTTP.get_response(uri)
+      uri      = URI("#{xdi_url}/health")
+      use_ssl  = uri.scheme == 'https'
+      resp     = Net::HTTP.start(uri.hostname, uri.port,
+                                 use_ssl: use_ssl,
+                                 verify_mode: OpenSSL::SSL::VERIFY_PEER,
+                                 open_timeout: 10,
+                                 read_timeout: 10) { |h| h.get(uri.request_uri) }
       resp.code == '200'
     rescue
       false
@@ -83,7 +90,11 @@ module Placely
       req['Content-Type'] = "multipart/form-data; boundary=#{boundary}"
       req.body = body
 
-      resp = Net::HTTP.start(uri.hostname, uri.port, read_timeout: TIMEOUT_SEC) { |h| h.request(req) }
+      use_ssl = uri.scheme == 'https'
+      resp = Net::HTTP.start(uri.hostname, uri.port,
+                             use_ssl:     use_ssl,
+                             verify_mode: OpenSSL::SSL::VERIFY_PEER,
+                             read_timeout: TIMEOUT_SEC) { |h| h.request(req) }
 
       if resp.code == '200'
         JSON.parse(resp.body)
