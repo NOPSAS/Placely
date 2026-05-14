@@ -6,7 +6,8 @@ import os
 from typing import Optional
 
 from dotenv import load_dotenv
-from fastapi import FastAPI, File, Form, HTTPException, UploadFile
+from fastapi import Depends, FastAPI, File, Form, HTTPException, UploadFile
+from core.api_keys import require_api_key
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
@@ -208,6 +209,7 @@ async def parse_ifc(
 async def analyse_romplan(
     file:    UploadFile = File(..., description="Plantegning – PNG, JPG eller PDF"),
     address: Optional[str] = Form(None, description="Adresse (valgfritt)"),
+    _key:    str = Depends(require_api_key),
 ):
     """
     Analyser en plantegning og returner BRA, romplan og grovkalkyle.
@@ -242,6 +244,7 @@ async def analyse_byggesjekk(
     godkjent:  UploadFile = File(..., description="Godkjent tegning fra kommunen (PDF/PNG/JPG)"),
     navarende: UploadFile = File(..., description="Nåværende plantegning fra Finn.no/befaring (PNG/JPG/PDF)"),
     address:   Optional[str] = Form(None, description="Adresse (valgfritt)"),
+    _key:      str = Depends(require_api_key),
 ):
     """
     Sammenlign godkjent kommunetegning med nåværende plantegning.
