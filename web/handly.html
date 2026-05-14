@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#ffffff">
+  <title>Handly – Håndverkerens arbeidsbok</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --black:#0d0d0d; --white:#fff; --bg:#f7f5f2;
+      --g50:#f0ede9; --g100:#e5e2dd; --g200:#ccc9c4;
+      --g400:#999690; --g500:#706d68; --g700:#3d3a36;
+      --green:#166534; --green-bg:#dcfce7;
+      --orange:#c2410c; --orange-bg:#ffedd5;
+      --red:#991b1b; --red-bg:#fee2e2;
+      --blue:#1e40af; --blue-bg:#dbeafe;
+      --ease:cubic-bezier(.22,.1,.22,1);
+      --r:10px; --hh:56px;
+    }
+    *,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+    html,body { height:100%; }
+    body { font-family:'Inter',-apple-system,sans-serif; font-size:14px; color:var(--black); background:var(--bg); -webkit-font-smoothing:antialiased; overflow-x:hidden; }
+    a { color:inherit; text-decoration:none; }
+    button { font-family:inherit; cursor:pointer; border:none; background:none; }
+    input,textarea,select { font-family:inherit; font-size:inherit; }
+
+    /* HEADER */
+    #hdr { position:sticky; top:0; height:var(--hh); background:rgba(255,255,255,.94); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); border-bottom:1px solid var(--g100); display:flex; align-items:center; padding:0 16px; gap:10px; z-index:100; }
+    #back-btn { width:36px; height:36px; border-radius:8px; display:flex; align-items:center; justify-content:center; color:var(--black); transition:background .15s; flex-shrink:0; }
+    #back-btn:hover { background:var(--g50); }
+    #back-btn.hidden { visibility:hidden; }
+    #page-title { flex:1; font-size:16px; font-weight:700; letter-spacing:-.02em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .logo-hl { font-weight:800; font-size:17px; letter-spacing:-.04em; }
+    .logo-hl em { font-style:normal; color:var(--g400); font-weight:500; }
+    #hdr-action { padding:7px 14px; border-radius:7px; font-size:13px; font-weight:600; transition:all .15s; flex-shrink:0; white-space:nowrap; }
+    #hdr-action.primary { background:var(--black); color:var(--white); }
+    #hdr-action.primary:hover { background:#1a1a1a; }
+    #hdr-action.ghost { background:var(--white); color:var(--black); border:1px solid var(--g100); }
+    #hdr-action.ghost:hover { border-color:var(--black); }
+    #hdr-action.hidden { visibility:hidden; }
+
+    /* SCREENS */
+    main { min-height:calc(100vh - var(--hh)); }
+    .screen { display:none; animation:sIn .18s var(--ease) both; }
+    .screen.active { display:block; }
+    @keyframes sIn { from { opacity:0; transform:translateX(16px); } to { opacity:1; transform:none; } }
+    .pad { padding:18px 16px; max-width:620px; margin:0 auto; }
+
+    /* JOB CARDS */
+    .job-list { display:flex; flex-direction:column; gap:10px; }
+    .job-card { background:var(--white); border-radius:var(--r); padding:14px 16px; border:1px solid var(--g100); cursor:pointer; display:flex; align-items:center; gap:14px; transition:transform .12s,box-shadow .12s; }
+    .job-card:hover { transform:translateY(-1px); box-shadow:0 4px 16px rgba(0,0,0,.07); }
+    .job-card:active { transform:none; }
+    .jc-icon { width:44px; height:44px; border-radius:10px; background:var(--g50); display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0; }
+    .jc-info { flex:1; min-width:0; }
+    .jc-name { font-size:15px; font-weight:600; letter-spacing:-.01em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .jc-meta { font-size:12px; color:var(--g500); margin-top:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .jc-prog { margin-top:8px; }
+    .pb { height:4px; background:var(--g100); border-radius:2px; overflow:hidden; }
+    .pb-fill { height:100%; background:#22c55e; border-radius:2px; transition:width .3s; }
+    .pb-txt { font-size:11px; color:var(--g500); margin-top:3px; }
+    .status-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+    .sd-aktiv { background:#22c55e; }
+    .sd-ferdig { background:var(--blue); }
+    .sd-fakturert { background:var(--g400); }
+
+    /* EMPTY */
+    .empty { text-align:center; padding:64px 24px; color:var(--g500); }
+    .empty-icon { font-size:48px; margin-bottom:16px; }
+    .empty-title { font-size:16px; font-weight:600; color:var(--g700); margin-bottom:8px; }
+    .empty-sub { font-size:14px; line-height:1.6; }
+
+    /* FAB */
+    .fab { position:fixed; bottom:24px; right:20px; width:56px; height:56px; background:var(--black); color:var(--white); border-radius:50%; font-size:26px; font-weight:300; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 20px rgba(0,0,0,.22); transition:transform .15s,box-shadow .15s; z-index:90; }
+    .fab:hover { transform:scale(1.06); box-shadow:0 8px 28px rgba(0,0,0,.28); }
+    .fab:active { transform:scale(.95); }
+    .fab.hidden { display:none; }
+
+    /* FORMS */
+    .fg { margin-bottom:16px; }
+    .fl { display:block; font-size:11px; font-weight:700; color:var(--g500); letter-spacing:.06em; text-transform:uppercase; margin-bottom:6px; }
+    .fi { width:100%; padding:11px 14px; border:1px solid var(--g200); border-radius:8px; font-size:14px; color:var(--black); background:var(--white); outline:none; transition:border-color .15s; }
+    .fi:focus { border-color:var(--black); }
+    .fi::placeholder { color:var(--g400); }
+    .frow { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .btn-p { width:100%; padding:13px; background:var(--black); color:var(--white); border-radius:8px; font-size:15px; font-weight:600; letter-spacing:-.01em; transition:background .15s; margin-top:8px; }
+    .btn-p:hover { background:#1a1a1a; }
+    .btn-s { width:100%; padding:12px; background:transparent; color:var(--g500); border-radius:8px; font-size:14px; font-weight:500; border:1px solid var(--g200); transition:all .15s; margin-top:8px; }
+    .btn-s:hover { border-color:var(--black); color:var(--black); }
+
+    /* JOB HEADER */
+    .jhc { background:var(--black); color:var(--white); border-radius:var(--r); padding:20px; margin-bottom:16px; }
+    .jh-name { font-size:22px; font-weight:800; letter-spacing:-.03em; margin-bottom:4px; }
+    .jh-addr { font-size:13px; opacity:.6; margin-bottom:16px; }
+    .jh-stats { display:flex; gap:20px; }
+    .jhs-v { font-size:22px; font-weight:700; }
+    .jhs-l { font-size:11px; opacity:.5; text-transform:uppercase; letter-spacing:.04em; margin-top:1px; }
+    .jh-pb { height:4px; background:rgba(255,255,255,.2); border-radius:2px; overflow:hidden; margin-top:16px; }
+    .jh-pb-fill { height:100%; background:#22c55e; border-radius:2px; transition:width .4s; }
+
+    .sec-ttl { font-size:11px; font-weight:700; color:var(--g500); letter-spacing:.07em; text-transform:uppercase; margin-bottom:10px; margin-top:20px; }
+
+    /* ROOM CARDS */
+    .rc { background:var(--white); border-radius:var(--r); padding:13px 16px; border:1px solid var(--g100); cursor:pointer; display:flex; align-items:center; gap:12px; transition:transform .12s,box-shadow .12s; margin-bottom:8px; }
+    .rc:hover { transform:translateY(-1px); box-shadow:0 3px 12px rgba(0,0,0,.06); }
+    .rc-icon { font-size:22px; flex-shrink:0; width:34px; text-align:center; }
+    .rc-info { flex:1; min-width:0; }
+    .rc-name { font-size:14px; font-weight:600; }
+    .rc-meta { font-size:12px; color:var(--g500); margin-top:2px; }
+    .rc-prog { display:flex; align-items:center; gap:8px; flex-shrink:0; }
+    .rc-pct { font-size:12px; font-weight:600; color:var(--g500); }
+    .mpb { width:44px; height:4px; background:var(--g100); border-radius:2px; overflow:hidden; }
+    .mpb-f { height:100%; background:#22c55e; border-radius:2px; }
+
+    /* ACTION ROW */
+    .arow { display:flex; gap:8px; margin-bottom:16px; }
+    .abtn { flex:1; padding:10px; border-radius:8px; font-size:13px; font-weight:600; display:flex; align-items:center; justify-content:center; gap:6px; border:1px solid var(--g200); color:var(--g700); background:var(--white); transition:all .15s; }
+    .abtn:hover { border-color:var(--black); color:var(--black); background:var(--g50); }
+    .abtn.pr { background:var(--black); color:var(--white); border-color:var(--black); }
+    .abtn.pr:hover { background:#222; }
+
+    /* TASKS */
+    .task-list { display:flex; flex-direction:column; gap:8px; }
+    .ti { background:var(--white); border-radius:8px; border:1px solid var(--g100); padding:11px 14px; display:flex; align-items:center; gap:12px; }
+    .ts-btn { width:28px; height:28px; border-radius:50%; border:2px solid var(--g200); flex-shrink:0; transition:all .15s; display:flex; align-items:center; justify-content:center; font-size:13px; }
+    .ts-btn:hover { transform:scale(1.12); }
+    .ts-btn.todo { border-color:var(--g200); }
+    .ts-btn.pagar { border-color:#fb923c; background:#fff7ed; color:#c2410c; }
+    .ts-btn.ferdig { border-color:#22c55e; background:#f0fdf4; color:#166534; }
+    .tc { flex:1; min-width:0; }
+    .tt { font-size:14px; font-weight:500; transition:color .15s; }
+    .tt.done { text-decoration:line-through; color:var(--g400); }
+    .tdb { width:28px; height:28px; border-radius:6px; color:var(--g400); font-size:18px; flex-shrink:0; display:flex; align-items:center; justify-content:center; transition:all .15s; }
+    .tdb:hover { background:var(--red-bg); color:var(--red); }
+
+    /* ADD TASK */
+    .atr { display:flex; gap:8px; margin-top:10px; }
+    .ati { flex:1; padding:10px 12px; border:1px solid var(--g200); border-radius:8px; font-size:14px; outline:none; transition:border-color .15s; }
+    .ati:focus { border-color:var(--black); }
+    .ata { padding:10px 16px; background:var(--black); color:var(--white); border-radius:8px; font-size:13px; font-weight:600; transition:background .15s; white-space:nowrap; }
+    .ata:hover { background:#222; }
+
+    /* PHOTOS */
+    .pg { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-top:8px; }
+    .pi { aspect-ratio:1; border-radius:8px; overflow:hidden; position:relative; cursor:pointer; background:var(--g100); }
+    .pi img { width:100%; height:100%; object-fit:cover; display:block; }
+    .pdel { position:absolute; top:4px; right:4px; width:22px; height:22px; background:rgba(0,0,0,.6); color:#fff; border-radius:50%; font-size:12px; display:flex; align-items:center; justify-content:center; opacity:0; transition:opacity .15s; }
+    .pi:hover .pdel { opacity:1; }
+    .padd { aspect-ratio:1; border-radius:8px; border:2px dashed var(--g200); display:flex; flex-direction:column; align-items:center; justify-content:center; cursor:pointer; font-size:24px; color:var(--g400); transition:all .15s; }
+    .padd:hover { border-color:var(--black); color:var(--black); background:var(--g50); }
+    .padd span { font-size:11px; margin-top:4px; font-weight:500; }
+
+    /* BADGE */
+    .badge { display:inline-flex; align-items:center; padding:3px 9px; border-radius:99px; font-size:11px; font-weight:600; letter-spacing:.02em; }
+    .b-aktiv { background:var(--green-bg); color:var(--green); }
+    .b-ferdig { background:var(--blue-bg); color:var(--blue); }
+    .b-fakturert { background:var(--g50); color:var(--g500); }
+
+    /* PHOTO MODAL */
+    #pmodal { position:fixed; inset:0; background:rgba(0,0,0,.9); z-index:200; display:flex; align-items:center; justify-content:center; padding:20px; }
+    #pmodal.h { display:none; }
+    #pmodal img { max-width:100%; max-height:90vh; border-radius:8px; object-fit:contain; }
+    #pmc { position:absolute; top:16px; right:16px; width:40px; height:40px; background:rgba(255,255,255,.15); color:#fff; border-radius:50%; font-size:20px; display:flex; align-items:center; justify-content:center; }
+    #pmc:hover { background:rgba(255,255,255,.25); }
+
+    /* EMOJI PICKER */
+    .epick { display:grid; grid-template-columns:repeat(6,1fr); gap:8px; margin-top:8px; }
+    .eopt { font-size:24px; height:44px; border-radius:8px; display:flex; align-items:center; justify-content:center; cursor:pointer; border:2px solid transparent; transition:all .15s; }
+    .eopt:hover { background:var(--g50); }
+    .eopt.sel { border-color:var(--black); background:var(--g50); }
+
+    /* STATUS BUTTONS */
+    .sbtn-row { display:flex; gap:8px; flex-wrap:wrap; }
+    .sbtn { padding:8px 12px; border-radius:8px; font-size:13px; font-weight:600; border:1px solid var(--g200); color:var(--g700); background:var(--white); transition:all .15s; }
+    .sbtn:hover { border-color:var(--black); color:var(--black); }
+    .sbtn.active-aktiv { border-color:var(--green); color:var(--green); background:var(--green-bg); }
+    .sbtn.active-ferdig { border-color:var(--blue); color:var(--blue); background:var(--blue-bg); }
+    .sbtn.active-fakturert { border-color:var(--g400); color:var(--g500); background:var(--g50); }
+
+    /* DANGER */
+    .danger-z { margin-top:32px; padding-top:20px; border-top:1px solid var(--g100); }
+    .btn-d { width:100%; padding:12px; background:var(--white); color:var(--red); border-radius:8px; font-size:14px; font-weight:600; border:1px solid #fecaca; transition:all .15s; }
+    .btn-d:hover { background:var(--red-bg); border-color:var(--red); }
+
+    /* TOAST */
+    #toast { position:fixed; bottom:88px; left:50%; transform:translateX(-50%) translateY(10px); background:var(--black); color:var(--white); padding:10px 20px; border-radius:99px; font-size:13px; font-weight:500; opacity:0; transition:opacity .2s,transform .2s; pointer-events:none; z-index:300; white-space:nowrap; }
+    #toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+
+    /* PRINT */
+    @media print {
+      body > * { display:none !important; }
+      #prtview { display:block !important; }
+    }
+    #prtview { display:none; }
+
+    /* DIVIDER */
+    .dv { height:1px; background:var(--g100); margin:16px 0; }
+    .spacer { height:80px; }
+  </style>
+</head>
+<body>
+
+<div id="pmodal" class="h">
+  <button id="pmc" onclick="closePm()">×</button>
+  <img id="pmimg" src="" alt="">
+</div>
+
+<div id="toast"></div>
+
+<header id="hdr">
+  <button id="back-btn" class="hidden" onclick="goBack()">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+  </button>
+  <div id="page-title"><span class="logo-hl">Handly <em>by Placely</em></span></div>
+  <button id="hdr-action" class="hidden"></button>
+</header>
+
+<button class="fab" id="fab" onclick="nav('new-job')">+</button>
+
+<main>
+  <div id="screen-home" class="screen active">
+    <div class="pad" id="home-content"></div>
+  </div>
+
+  <div id="screen-new-job" class="screen">
+    <div class="pad">
+      <div class="fg"><label class="fl">Oppdragsnavn</label><input class="fi" id="nj-navn" placeholder="f.eks. Oppussing Solvangveien 3"></div>
+      <div class="fg"><label class="fl">Adresse</label><input class="fi" id="nj-adresse" placeholder="f.eks. Solvangveien 3, Oslo"></div>
+      <div class="frow">
+        <div class="fg"><label class="fl">Kunde</label><input class="fi" id="nj-kunde" placeholder="Ola Nordmann"></div>
+        <div class="fg"><label class="fl">Telefon</label><input type="tel" class="fi" id="nj-tlf" placeholder="900 00 000"></div>
+      </div>
+      <div class="fg"><label class="fl">Startdato</label><input type="date" class="fi" id="nj-dato"></div>
+      <button class="btn-p" onclick="createJob()">Opprett oppdrag</button>
+      <button class="btn-s" onclick="goBack()">Avbryt</button>
+    </div>
+  </div>
+
+  <div id="screen-job" class="screen">
+    <div class="pad" id="job-content"></div>
+  </div>
+
+  <div id="screen-new-room" class="screen">
+    <div class="pad">
+      <div class="fg"><label class="fl">Romnavn</label><input class="fi" id="nr-navn" placeholder="f.eks. Stue, Bad, Kjøkken"></div>
+      <div class="fg"><label class="fl">Ikon</label><div class="epick" id="epick"></div></div>
+      <button class="btn-p" onclick="createRoom()">Legg til rom</button>
+      <button class="btn-s" onclick="goBack()">Avbryt</button>
+    </div>
+  </div>
+
+  <div id="screen-room" class="screen">
+    <div class="pad" id="room-content"></div>
+  </div>
+</main>
+
+<div id="prtview"></div>
+
+<script>
+const SK = 'handly_jobs';
+const EMOJIS = ['🏠','🛋️','🛏️','🚿','🚽','🍳','🧺','🗄️','🪟','🚪','🪜','🏗️','🔧','🎨','💡','⚡','🧱','🪵'];
+
+function uid() { return Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
+function load() { try { return JSON.parse(localStorage.getItem(SK)||'[]'); } catch { return []; } }
+function save(d) { localStorage.setItem(SK,JSON.stringify(d)); }
+function getJob(id) { return load().find(j=>j.id===id); }
+function getRoom(jid,rid) { return getJob(jid)?.rom?.find(r=>r.id===rid); }
+
+let stack = ['home'];
+let cjid = null, crid = null, emoji = '🏠';
+
+function nav(s, d={}) {
+  if (d.jid!==undefined) cjid=d.jid;
+  if (d.rid!==undefined) crid=d.rid;
+  stack.push(s);
+  renderS(s);
+  showS(s);
+}
+
+function goBack() {
+  if (stack.length<=1) return;
+  stack.pop();
+  const p = stack[stack.length-1];
+  renderS(p);
+  showS(p);
+}
+
+function showS(s) {
+  document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));
+  document.getElementById('screen-'+s)?.classList.add('active');
+  const bb = document.getElementById('back-btn');
+  const pt = document.getElementById('page-title');
+  const ha = document.getElementById('hdr-action');
+  const fab = document.getElementById('fab');
+  bb.className = stack.length>1 ? '' : 'hidden';
+  fab.className = s==='home' ? 'fab' : 'fab hidden';
+  const cfgs = {
+    'home':     { t:'<span class="logo-hl">Handly <em>by Placely</em></span>', a:null },
+    'new-job':  { t:'Nytt oppdrag', a:null },
+    'new-room': { t:'Nytt rom', a:null },
+    'job':      { t: cjid ? esc(getJob(cjid)?.navn||'Oppdrag') : 'Oppdrag', a:{l:'📄 Rapport', fn:'printReport()'} },
+    'room':     { t: (cjid&&crid) ? esc(getRoom(cjid,crid)?.navn||'Rom') : 'Rom', a:null },
+  };
+  const c = cfgs[s]||{t:s,a:null};
+  pt.innerHTML = c.t;
+  if (c.a) {
+    ha.textContent = c.a.l;
+    ha.setAttribute('onclick', c.a.fn);
+    ha.className = 'ghost';
+  } else {
+    ha.className = 'hidden';
+  }
+}
+
+function renderS(s) {
+  ({ home:renderHome, job:renderJob, room:renderRoom, 'new-room':renderEmojiPick, 'new-job':clearNewJob })[s]?.();
+}
+
+/* ── HOME ── */
+function renderHome() {
+  const jobs = load();
+  const el = document.getElementById('home-content');
+  if (!jobs.length) {
+    el.innerHTML = `<div class="empty"><div class="empty-icon">🔨</div><div class="empty-title">Ingen oppdrag ennå</div><div class="empty-sub">Trykk + for å opprette ditt første oppdrag</div></div>`;
+    return;
+  }
+  el.innerHTML = `
+    <div style="font-size:11px;font-weight:700;color:var(--g500);letter-spacing:.07em;text-transform:uppercase;margin-bottom:12px">${jobs.length} OPPDRAG</div>
+    <div class="job-list">${jobs.map(j=>{
+      const s=jStats(j);
+      return `<div class="job-card" onclick="nav('job',{jid:'${j.id}'})">
+        <div class="jc-icon">🏗️</div>
+        <div class="jc-info">
+          <div class="jc-name">${esc(j.navn)}</div>
+          <div class="jc-meta">${esc(j.adresse||j.kunde||'–')}</div>
+          <div class="jc-prog">
+            <div class="pb"><div class="pb-fill" style="width:${s.pct}%"></div></div>
+            <div class="pb-txt">${s.done}/${s.total} oppgaver ferdig</div>
+          </div>
+        </div>
+        <div class="status-dot sd-${j.status||'aktiv'}"></div>
+      </div>`;
+    }).join('')}</div>`;
+}
+
+/* ── JOB DETAIL ── */
+function renderJob() {
+  const job = getJob(cjid);
+  if (!job) { goBack(); return; }
+  const s = jStats(job);
+  document.getElementById('job-content').innerHTML = `
+    <div class="jhc">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:4px">
+        <div class="jh-name">${esc(job.navn)}</div>
+        <span class="badge b-${job.status||'aktiv'}">${sLbl(job.status)}</span>
+      </div>
+      <div class="jh-addr">${esc(job.adresse||'')}${job.kunde?' · '+esc(job.kunde):''}</div>
+      <div class="jh-stats">
+        <div><div class="jhs-v">${(job.rom||[]).length}</div><div class="jhs-l">Rom</div></div>
+        <div><div class="jhs-v">${s.total}</div><div class="jhs-l">Oppgaver</div></div>
+        <div><div class="jhs-v">${s.done}</div><div class="jhs-l">Ferdig</div></div>
+        <div><div class="jhs-v">${(job.rom||[]).reduce((n,r)=>n+(r.bilder||[]).length,0)}</div><div class="jhs-l">Bilder</div></div>
+      </div>
+      <div class="jh-pb"><div class="jh-pb-fill" style="width:${s.pct}%"></div></div>
+    </div>
+
+    <div class="arow">
+      <button class="abtn pr" onclick="nav('new-room')">+ Legg til rom</button>
+      <button class="abtn" onclick="printReport()">📄 Rapport</button>
+    </div>
+
+    <div class="sec-ttl">ROM (${(job.rom||[]).length})</div>
+    ${(job.rom||[]).length
+      ? job.rom.map(r=>rCard(r)).join('')
+      : `<div style="text-align:center;padding:32px;color:var(--g500);font-size:14px">Ingen rom ennå.</div>`}
+
+    <div class="danger-z">
+      <div class="sec-ttl" style="margin-top:0">STATUS</div>
+      <div class="sbtn-row">
+        ${['aktiv','ferdig','fakturert'].map(st=>`<button class="sbtn${(job.status||'aktiv')===st?' active-'+st:''}" onclick="setStatus('${st}')">${{aktiv:'● Aktiv',ferdig:'✓ Ferdig',fakturert:'kr Fakturert'}[st]}</button>`).join('')}
+      </div>
+      <button class="btn-d" style="margin-top:14px" onclick="deleteJob()">Slett oppdrag</button>
+    </div>
+    <div class="spacer"></div>`;
+}
+
+function rCard(r) {
+  const s=rStats(r);
+  return `<div class="rc" onclick="nav('room',{rid:'${r.id}'})">
+    <div class="rc-icon">${r.emoji||'🏠'}</div>
+    <div class="rc-info">
+      <div class="rc-name">${esc(r.navn)}</div>
+      <div class="rc-meta">${s.total} oppgaver · ${(r.bilder||[]).length} bilder</div>
+    </div>
+    <div class="rc-prog">
+      <div class="rc-pct">${s.pct}%</div>
+      <div class="mpb"><div class="mpb-f" style="width:${s.pct}%"></div></div>
+    </div>
+  </div>`;
+}
+
+/* ── ROOM DETAIL ── */
+function renderRoom() {
+  const room = getRoom(cjid, crid);
+  if (!room) { goBack(); return; }
+  const s = rStats(room);
+  document.getElementById('room-content').innerHTML = `
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px">
+      <span style="font-size:36px">${room.emoji||'🏠'}</span>
+      <div>
+        <div style="font-size:20px;font-weight:800;letter-spacing:-.02em">${esc(room.navn)}</div>
+        <div id="room-sub" style="font-size:13px;color:var(--g500)">${s.done}/${s.total} oppgaver · ${(room.bilder||[]).length} bilder</div>
+      </div>
+    </div>
+
+    <div class="sec-ttl">OPPGAVER</div>
+    <div class="task-list" id="tlist">${(room.oppgaver||[]).map(t=>tItem(t)).join('')}</div>
+    <div class="atr">
+      <input class="ati" id="nti" placeholder="Legg til oppgave..." onkeydown="if(event.key==='Enter')addTask()">
+      <button class="ata" onclick="addTask()">Legg til</button>
+    </div>
+
+    <div style="height:24px"></div>
+    <div class="sec-ttl">BILDER</div>
+    <div class="pg" id="pgrid">
+      ${(room.bilder||[]).map(b=>pItem(b)).join('')}
+      <div class="padd" onclick="document.getElementById('ph-inp').click()">
+        <div>📷</div><span>Legg til</span>
+      </div>
+    </div>
+    <input type="file" id="ph-inp" accept="image/*" capture="environment" style="display:none" onchange="handlePhoto(this)">
+
+    <div style="height:24px"></div>
+    <button class="btn-d" onclick="deleteRoom()">Slett rom</button>
+    <div class="spacer"></div>`;
+}
+
+function tItem(t) {
+  const ic = {todo:'',pagar:'↻',ferdig:'✓'}[t.status||'todo'];
+  return `<div class="ti" id="ti-${t.id}">
+    <button class="ts-btn ${t.status||'todo'}" onclick="cycleTask('${t.id}')">${ic}</button>
+    <div class="tc"><div class="tt${t.status==='ferdig'?' done':''}">${esc(t.tekst)}</div></div>
+    <button class="tdb" onclick="delTask('${t.id}')">×</button>
+  </div>`;
+}
+
+function pItem(b) {
+  return `<div class="pi" onclick="openPm('${b.id}')">
+    <img src="${b.data}" alt="">
+    <button class="pdel" onclick="event.stopPropagation();delPhoto('${b.id}')">×</button>
+  </div>`;
+}
+
+/* ── EMOJI PICKER ── */
+function renderEmojiPick() {
+  emoji = '🏠';
+  document.getElementById('nr-navn').value = '';
+  document.getElementById('epick').innerHTML = EMOJIS.map(e=>
+    `<div class="eopt${e===emoji?' sel':''}" onclick="pickEmoji('${e}',this)">${e}</div>`
+  ).join('');
+}
+function pickEmoji(e, el) {
+  emoji = e;
+  document.querySelectorAll('.eopt').forEach(x=>x.classList.remove('sel'));
+  el.classList.add('sel');
+}
+
+/* ── CLEAR FORM ── */
+function clearNewJob() {
+  ['navn','adresse','kunde','tlf'].forEach(f=>{ const el=document.getElementById('nj-'+f); if(el)el.value=''; });
+  const d=document.getElementById('nj-dato'); if(d) d.value=new Date().toISOString().slice(0,10);
+}
+
+/* ── CRUD ── */
+function createJob() {
+  const navn = document.getElementById('nj-navn').value.trim();
+  if (!navn) { document.getElementById('nj-navn').focus(); return; }
+  const jobs = load();
+  const job = {
+    id:uid(), navn,
+    adresse: document.getElementById('nj-adresse').value.trim(),
+    kunde:   document.getElementById('nj-kunde').value.trim(),
+    tlf:     document.getElementById('nj-tlf').value.trim(),
+    startdato: document.getElementById('nj-dato').value,
+    status:'aktiv', rom:[],
+    opprettet: new Date().toISOString(),
+  };
+  jobs.push(job); save(jobs);
+  stack.pop();
+  nav('job',{jid:job.id});
+  toast('Oppdrag opprettet');
+}
+
+function createRoom() {
+  const navn = document.getElementById('nr-navn').value.trim();
+  if (!navn) { document.getElementById('nr-navn').focus(); return; }
+  const jobs=load(), job=jobs.find(j=>j.id===cjid); if(!job) return;
+  const room = { id:uid(), navn, emoji, oppgaver:[], bilder:[], opprettet:new Date().toISOString() };
+  job.rom.push(room); save(jobs);
+  stack.pop();
+  nav('room',{rid:room.id});
+  toast('Rom lagt til');
+}
+
+function addTask() {
+  const inp=document.getElementById('nti');
+  const tekst=inp.value.trim(); if(!tekst) return;
+  const jobs=load(), job=jobs.find(j=>j.id===cjid), room=job?.rom.find(r=>r.id===crid); if(!room) return;
+  const t={id:uid(),tekst,status:'todo',dato:new Date().toISOString()};
+  room.oppgaver.push(t); save(jobs); inp.value='';
+  document.getElementById('tlist').insertAdjacentHTML('beforeend',tItem(t));
+  updRoomSub();
+}
+
+function cycleTask(tid) {
+  const jobs=load(), job=jobs.find(j=>j.id===cjid), room=job?.rom.find(r=>r.id===crid), t=room?.oppgaver.find(x=>x.id===tid); if(!t) return;
+  t.status={todo:'pagar',pagar:'ferdig',ferdig:'todo'}[t.status||'todo'];
+  save(jobs);
+  const el=document.getElementById('ti-'+tid); if(!el) return;
+  const ic={todo:'',pagar:'↻',ferdig:'✓'};
+  el.querySelector('.ts-btn').className='ts-btn '+t.status;
+  el.querySelector('.ts-btn').textContent=ic[t.status];
+  el.querySelector('.tt').className='tt'+(t.status==='ferdig'?' done':'');
+  updRoomSub();
+}
+
+function delTask(tid) {
+  const jobs=load(), job=jobs.find(j=>j.id===cjid), room=job?.rom.find(r=>r.id===crid); if(!room) return;
+  room.oppgaver=room.oppgaver.filter(t=>t.id!==tid); save(jobs);
+  document.getElementById('ti-'+tid)?.remove();
+  updRoomSub();
+}
+
+function handlePhoto(input) {
+  const file=input.files[0]; if(!file) return;
+  const reader=new FileReader();
+  reader.onload=e=>resizeImg(e.target.result,900,data=>{
+    const jobs=load(), job=jobs.find(j=>j.id===cjid), room=job?.rom.find(r=>r.id===crid); if(!room) return;
+    const b={id:uid(),data,tittel:file.name,dato:new Date().toISOString()};
+    room.bilder.push(b); save(jobs);
+    document.querySelector('.padd')?.insertAdjacentHTML('beforebegin',pItem(b));
+    updRoomSub(); toast('Bilde lagt til'); input.value='';
+  });
+  reader.readAsDataURL(file);
+}
+
+function resizeImg(url,maxW,cb) {
+  const img=new Image();
+  img.onload=()=>{
+    const sc=Math.min(1,maxW/img.width);
+    const c=document.createElement('canvas');
+    c.width=img.width*sc; c.height=img.height*sc;
+    c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+    cb(c.toDataURL('image/jpeg',0.78));
+  };
+  img.src=url;
+}
+
+function delPhoto(bid) {
+  if(!confirm('Slett bildet?')) return;
+  const jobs=load(), job=jobs.find(j=>j.id===cjid), room=job?.rom.find(r=>r.id===crid); if(!room) return;
+  room.bilder=room.bilder.filter(b=>b.id!==bid); save(jobs);
+  renderRoom(); toast('Bilde slettet');
+}
+
+function openPm(bid) {
+  const b=getRoom(cjid,crid)?.bilder.find(x=>x.id===bid); if(!b) return;
+  document.getElementById('pmimg').src=b.data;
+  document.getElementById('pmodal').classList.remove('h');
+}
+function closePm() { document.getElementById('pmodal').classList.add('h'); document.getElementById('pmimg').src=''; }
+document.getElementById('pmodal').addEventListener('click',e=>{ if(e.target===document.getElementById('pmodal')) closePm(); });
+
+function deleteRoom() {
+  if(!confirm('Slett rommet? Dette kan ikke angres.')) return;
+  const jobs=load(), job=jobs.find(j=>j.id===cjid); if(!job) return;
+  job.rom=job.rom.filter(r=>r.id!==crid); save(jobs);
+  goBack(); toast('Rom slettet');
+}
+
+function deleteJob() {
+  const job=getJob(cjid);
+  if(!confirm(`Slett "${job?.navn}"? Dette kan ikke angres.`)) return;
+  save(load().filter(j=>j.id!==cjid));
+  stack=['home']; renderHome(); showS('home'); toast('Oppdrag slettet');
+}
+
+function setStatus(st) {
+  const jobs=load(), job=jobs.find(j=>j.id===cjid); if(!job) return;
+  job.status=st; save(jobs); renderJob(); toast('Status oppdatert');
+}
+
+function updRoomSub() {
+  const room=getRoom(cjid,crid); if(!room) return;
+  const s=rStats(room);
+  const el=document.getElementById('room-sub');
+  if(el) el.textContent=`${s.done}/${s.total} oppgaver · ${(room.bilder||[]).length} bilder`;
+}
+
+/* ── STATS ── */
+function jStats(job) {
+  let tot=0,done=0;
+  (job.rom||[]).forEach(r=>(r.oppgaver||[]).forEach(t=>{tot++;if(t.status==='ferdig')done++;}));
+  return {total:tot,done,pct:tot?Math.round(done/tot*100):0};
+}
+function rStats(room) {
+  const tot=(room.oppgaver||[]).length, done=(room.oppgaver||[]).filter(t=>t.status==='ferdig').length;
+  return {total:tot,done,pct:tot?Math.round(done/tot*100):0};
+}
+
+/* ── REPORT ── */
+function printReport() {
+  const job=getJob(cjid); if(!job) return;
+  const s=jStats(job);
+  const today=new Date().toLocaleDateString('nb-NO',{day:'numeric',month:'long',year:'numeric'});
+  document.getElementById('prtview').innerHTML=`
+    <div style="font-family:'Inter',sans-serif;max-width:800px;margin:0 auto;padding:36px;color:#0d0d0d;font-size:14px">
+      <div style="background:#0d0d0d;color:#fff;padding:28px 32px;border-radius:12px;margin-bottom:28px">
+        <div style="font-size:10px;letter-spacing:.1em;text-transform:uppercase;opacity:.4;margin-bottom:8px">Handly · Arbeidsrapport</div>
+        <div style="font-size:26px;font-weight:800;letter-spacing:-.03em;margin-bottom:4px">${esc(job.navn)}</div>
+        <div style="opacity:.5;font-size:13px">${esc(job.adresse||'')}${job.kunde?' · '+esc(job.kunde):''}</div>
+        <div style="display:flex;gap:24px;margin-top:18px">
+          ${[['Rom',(job.rom||[]).length],['Oppgaver ferdig',s.done+'/'+s.total],['Fremdrift',s.pct+'%']].map(([l,v])=>`<div><div style="font-size:22px;font-weight:700">${v}</div><div style="font-size:10px;opacity:.4;text-transform:uppercase;letter-spacing:.05em">${l}</div></div>`).join('')}
+        </div>
+      </div>
+      <div style="font-size:12px;color:#999;margin-bottom:24px">Rapport generert: ${today}</div>
+      ${(job.rom||[]).map(room=>{
+        const rs=rStats(room);
+        return `<div style="margin-bottom:28px;break-inside:avoid">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;padding-bottom:10px;border-bottom:2px solid #f0ede9">
+            <span style="font-size:22px">${room.emoji||'🏠'}</span>
+            <div><div style="font-size:17px;font-weight:700">${esc(room.navn)}</div><div style="font-size:12px;color:#999">${rs.done}/${rs.total} oppgaver · ${(room.bilder||[]).length} bilder</div></div>
+          </div>
+          ${(room.oppgaver||[]).length?`<div style="margin-bottom:14px">${room.oppgaver.map(t=>`
+            <div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid #f5f3f0;font-size:13px">
+              <span style="width:18px;height:18px;border-radius:50%;border:2px solid ${t.status==='ferdig'?'#22c55e':t.status==='pagar'?'#fb923c':'#ccc'};background:${t.status==='ferdig'?'#f0fdf4':t.status==='pagar'?'#fff7ed':'#fff'};display:inline-flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0">${t.status==='ferdig'?'✓':t.status==='pagar'?'↻':''}</span>
+              <span style="${t.status==='ferdig'?'text-decoration:line-through;color:#999':''}">${esc(t.tekst)}</span>
+            </div>`).join('')}</div>`:'<div style="font-size:13px;color:#999;margin-bottom:12px">Ingen oppgaver registrert.</div>'}
+          ${(room.bilder||[]).length?`<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px">${room.bilder.map(b=>`<div style="aspect-ratio:1;border-radius:6px;overflow:hidden"><img src="${b.data}" style="width:100%;height:100%;object-fit:cover" alt=""></div>`).join('')}</div>`:''}
+        </div>`;
+      }).join('')}
+      <div style="margin-top:28px;padding-top:16px;border-top:1px solid #eee;font-size:11px;color:#bbb;display:flex;justify-content:space-between"><span>Handly av Placely · placely.no</span><span>${today}</span></div>
+    </div>`;
+  window.print();
+}
+
+/* ── STATUS LABEL ── */
+function sLbl(s) { return {aktiv:'Aktiv',ferdig:'Ferdig',fakturert:'Fakturert'}[s||'aktiv']||s; }
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+/* ── TOAST ── */
+function toast(msg) {
+  const el=document.getElementById('toast'); el.textContent=msg; el.classList.add('show');
+  clearTimeout(el._t); el._t=setTimeout(()=>el.classList.remove('show'),2200);
+}
+
+/* ── INIT ── */
+clearNewJob();
+renderHome();
+showS('home');
+</script>
+</body>
+</html>

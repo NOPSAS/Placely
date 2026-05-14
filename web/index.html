@@ -128,6 +128,13 @@
     }
     .nav-cta:hover { background: #1a1a1a; transform: translateY(-1px); }
 
+    /* ── PRINT ── */
+    @media print {
+      body > *:not(.print-wrap) { display: none !important; }
+      .print-wrap { display: block !important; }
+    }
+    .print-wrap { display: none; }
+
     /* ── HERO ── */
     .hero-wrap {
       position: relative;
@@ -592,6 +599,8 @@
   <nav>
     <a class="nav-link" href="#produkter">Produkter</a>
     <a class="nav-link" href="#priser">Priser</a>
+    <a class="nav-link" href="/floorplanner.html">Plantegning</a>
+    <a class="nav-link" href="/handly.html">Handly</a>
     <button class="nav-cta" onclick="document.getElementById('verktoy').scrollIntoView({behavior:'smooth'})">Prøv nå</button>
   </nav>
 </header>
@@ -882,6 +891,25 @@ function saveKey() {
 function clearKey() { localStorage.removeItem(KEY_STORE); location.reload(); }
 function getKey()   { return localStorage.getItem(KEY_STORE) || ''; }
 
+function printResult(containerId) {
+  const el = document.getElementById(containerId);
+  if (!el || !el.innerHTML.trim()) return;
+  const pw = document.createElement('div');
+  pw.className = 'print-wrap';
+  pw.innerHTML = `
+    <div style="font-family:'Inter',sans-serif;max-width:720px;margin:0 auto;padding:32px;color:#0d0d0d">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;padding-bottom:16px;border-bottom:2px solid #0d0d0d">
+        <div style="font-size:20px;font-weight:800;letter-spacing:-.04em">Placely</div>
+        <div style="font-size:11px;color:#999">${new Date().toLocaleDateString('nb-NO',{day:'numeric',month:'long',year:'numeric'})}</div>
+      </div>
+      ${el.innerHTML}
+      <div style="margin-top:32px;padding-top:16px;border-top:1px solid #eee;font-size:11px;color:#bbb">Generert med Placely · placely.no</div>
+    </div>`;
+  document.body.appendChild(pw);
+  window.print();
+  document.body.removeChild(pw);
+}
+
 /* ── TABS ── */
 function switchTab(n) {
   document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', ['romplan','byggesjekk'][i] === n));
@@ -947,6 +975,9 @@ function renderRomplan(d) {
       ${rooms.map(r => `<tr><td class="bold">${r.navn || '–'}</td><td>${rtl(r.type)}</td><td>${r.etasje || 1}. etg</td><td class="bold">${r.areal_m2 ? r.areal_m2.toFixed(1) + ' m²' : '–'}</td></tr>`).join('')}
       </tbody></table>` : ''}
       ${d.merknad ? `<p style="margin-top:16px;font-size:13px;color:var(--g500)">${d.merknad}</p>` : ''}
+      <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--g100)">
+        <button onclick="printResult('result-romplan')" style="padding:9px 18px;background:var(--black);color:var(--white);border:none;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:background .15s" onmouseover="this.style.background='#222'" onmouseout="this.style.background='var(--black)'">↓ Last ned PDF</button>
+      </div>
     </div>`;
 }
 
@@ -990,6 +1021,9 @@ function renderByggesjekk(d) {
         `<p style="font-size:14px;color:var(--green);font-weight:500;padding:4px 0">Ingen vesentlige avvik funnet.</p>`}
       ${d.anbefaling ? `<div class="r-label">Anbefaling</div><div class="anbefaling-box">${d.anbefaling}</div>` : ''}
       ${d.usikkerhet ? `<p style="margin-top:14px;font-size:13px;color:var(--g500)">${d.usikkerhet}</p>` : ''}
+      <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--g100)">
+        <button onclick="printResult('result-byggesjekk')" style="padding:9px 18px;background:var(--black);color:var(--white);border:none;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:background .15s" onmouseover="this.style.background='#222'" onmouseout="this.style.background='var(--black)'">↓ Last ned PDF</button>
+      </div>
     </div>`;
 }
 
