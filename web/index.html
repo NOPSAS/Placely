@@ -4,385 +4,501 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Placely – AI-drevet byggeanalyse</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
     :root {
-      --blue:    #0066cc;
-      --green:   #1a7f4b;
-      --orange:  #c05c00;
-      --red:     #c0392b;
-      --dark:    #111;
-      --mid:     #555;
-      --light:   #f4f5f7;
-      --border:  #e0e0e0;
-      --white:   #ffffff;
+      --black:    #0d0d0d;
+      --white:    #ffffff;
+      --gray-50:  #f7f7f7;
+      --gray-100: #efefef;
+      --gray-300: #d4d4d4;
+      --gray-500: #737373;
+      --gray-700: #404040;
+      --green:    #1c4a2e;
+      --red:      #b91c1c;
+      --orange:   #c2410c;
     }
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 14px; color: var(--dark); background: var(--white); }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 15px;
+      color: var(--black);
+      background: var(--white);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a { color: inherit; text-decoration: none; }
 
     /* ── HEADER ── */
-    header { padding: 16px 40px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); background: white; position: sticky; top: 0; z-index: 100; }
-    .logo { font-size: 22px; font-weight: 800; letter-spacing: -.04em; }
-    .logo span { color: var(--blue); }
-    nav { display: flex; gap: 8px; align-items: center; }
-    .nav-link { padding: 7px 14px; font-size: 13px; font-weight: 500; color: var(--mid); border-radius: 6px; cursor: pointer; text-decoration: none; }
-    .nav-link:hover { background: var(--light); color: var(--dark); }
-    .btn-start { padding: 8px 18px; background: var(--blue); color: white; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; }
-    .btn-start:hover { background: #0055b0; }
+    header {
+      padding: 20px 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--gray-100);
+    }
+    .logo {
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: -.04em;
+      color: var(--black);
+    }
+    nav { display: flex; align-items: center; gap: 6px; }
+    .nav-link {
+      padding: 8px 14px;
+      font-size: 14px;
+      color: var(--gray-500);
+      border-radius: 6px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+    .nav-link:hover { color: var(--black); background: var(--gray-50); }
+    .nav-cta {
+      padding: 8px 18px;
+      background: var(--black);
+      color: var(--white);
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+    }
+    .nav-cta:hover { background: #222; }
 
     /* ── HERO ── */
-    .hero { text-align: center; padding: 80px 20px 60px; background: linear-gradient(180deg, #f0f6ff 0%, white 100%); }
-    .hero-badge { display: inline-block; background: #e8f0fb; color: var(--blue); font-size: 12px; font-weight: 600; padding: 4px 12px; border-radius: 99px; margin-bottom: 20px; letter-spacing: .04em; text-transform: uppercase; }
-    .hero h1 { font-size: 46px; font-weight: 800; letter-spacing: -.03em; line-height: 1.1; margin-bottom: 18px; max-width: 680px; margin-left: auto; margin-right: auto; }
-    .hero h1 span { color: var(--blue); }
-    .hero p { font-size: 18px; color: var(--mid); max-width: 520px; margin: 0 auto 32px; line-height: 1.6; }
-    .hero-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
-    .btn-primary { padding: 13px 28px; background: var(--blue); color: white; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; border: none; }
-    .btn-primary:hover { background: #0055b0; }
-    .btn-secondary { padding: 13px 28px; background: white; color: var(--dark); border: 1.5px solid var(--border); border-radius: 8px; font-size: 15px; font-weight: 500; cursor: pointer; }
-    .btn-secondary:hover { border-color: #aaa; }
-
-    /* ── PRODUKTER ── */
-    .section { padding: 72px 20px; max-width: 1000px; margin: 0 auto; }
-    .section-label { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--blue); margin-bottom: 10px; }
-    .section h2 { font-size: 34px; font-weight: 800; letter-spacing: -.02em; margin-bottom: 10px; }
-    .section .sub { font-size: 16px; color: var(--mid); max-width: 520px; line-height: 1.6; margin-bottom: 48px; }
-
-    .product-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-    .product-card { background: var(--light); border-radius: 14px; padding: 32px; border: 1px solid var(--border); }
-    .product-card.featured { background: white; border-color: var(--blue); box-shadow: 0 0 0 3px #ddeeff; }
-    .product-icon { font-size: 36px; margin-bottom: 16px; }
-    .product-title { font-size: 20px; font-weight: 700; margin-bottom: 8px; }
-    .product-desc { font-size: 14px; color: var(--mid); line-height: 1.6; margin-bottom: 20px; }
-    .product-points { list-style: none; display: flex; flex-direction: column; gap: 8px; margin-bottom: 24px; }
-    .product-points li { font-size: 13px; display: flex; align-items: flex-start; gap: 8px; }
-    .product-points li::before { content: '✓'; color: var(--green); font-weight: 700; flex-shrink: 0; }
-    .product-tag { display: inline-block; background: #e8f0fb; color: var(--blue); font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 99px; }
-
-    /* ── PRISER ── */
-    .pricing-section { background: var(--light); padding: 72px 20px; }
-    .pricing-inner { max-width: 800px; margin: 0 auto; text-align: center; }
-    .pricing-inner h2 { font-size: 34px; font-weight: 800; margin-bottom: 8px; letter-spacing: -.02em; }
-    .pricing-inner .sub { font-size: 16px; color: var(--mid); margin-bottom: 48px; }
-    .pricing-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; text-align: left; }
-    .price-card { background: white; border-radius: 14px; padding: 32px; border: 1px solid var(--border); }
-    .price-card.popular { border-color: var(--blue); box-shadow: 0 0 0 3px #ddeeff; position: relative; }
-    .popular-badge { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: var(--blue); color: white; font-size: 11px; font-weight: 700; padding: 3px 14px; border-radius: 99px; white-space: nowrap; }
-    .price-name { font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--mid); margin-bottom: 10px; }
-    .price-amount { font-size: 40px; font-weight: 800; letter-spacing: -.03em; margin-bottom: 4px; }
-    .price-amount span { font-size: 16px; font-weight: 400; color: var(--mid); }
-    .price-desc { font-size: 13px; color: var(--mid); margin-bottom: 24px; }
-    .price-features { list-style: none; display: flex; flex-direction: column; gap: 10px; margin-bottom: 28px; }
-    .price-features li { font-size: 13px; display: flex; gap: 8px; align-items: flex-start; }
-    .price-features li::before { content: '✓'; color: var(--green); font-weight: 700; flex-shrink: 0; }
-    .btn-price { display: block; width: 100%; padding: 11px; text-align: center; border-radius: 7px; font-size: 14px; font-weight: 600; cursor: pointer; border: none; }
-    .btn-price.primary { background: var(--blue); color: white; }
-    .btn-price.secondary { background: var(--light); color: var(--dark); }
-    .btn-price:hover { opacity: .9; }
+    .hero {
+      padding: 100px 48px 80px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .hero-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--gray-50);
+      border: 1px solid var(--gray-100);
+      border-radius: 99px;
+      padding: 5px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--gray-700);
+      letter-spacing: .02em;
+      margin-bottom: 32px;
+    }
+    .hero h1 {
+      font-size: clamp(40px, 6vw, 72px);
+      font-weight: 800;
+      letter-spacing: -.04em;
+      line-height: 1.05;
+      color: var(--black);
+      max-width: 800px;
+      margin-bottom: 24px;
+    }
+    .hero p {
+      font-size: 18px;
+      color: var(--gray-500);
+      max-width: 520px;
+      line-height: 1.65;
+      margin-bottom: 40px;
+      font-weight: 400;
+    }
+    .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+    .btn-black {
+      padding: 13px 26px;
+      background: var(--black);
+      color: var(--white);
+      border-radius: 6px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      letter-spacing: -.01em;
+    }
+    .btn-black:hover { background: #222; }
+    .btn-outline {
+      padding: 13px 26px;
+      background: var(--white);
+      color: var(--black);
+      border: 1.5px solid var(--gray-300);
+      border-radius: 6px;
+      font-size: 15px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+    .btn-outline:hover { border-color: #aaa; }
 
     /* ── DIVIDER ── */
-    hr.divider { border: none; border-top: 1px solid var(--border); }
+    .divider { border: none; border-top: 1px solid var(--gray-100); }
 
-    /* ── APP-SEKSJON ── */
-    .app-section { padding: 72px 20px; max-width: 860px; margin: 0 auto; }
-    .app-section h2 { font-size: 28px; font-weight: 800; margin-bottom: 6px; }
-    .app-section .sub { color: var(--mid); margin-bottom: 28px; }
+    /* ── SECTION ── */
+    .section {
+      padding: 80px 48px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .section-eyebrow {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      color: var(--gray-500);
+      margin-bottom: 14px;
+    }
+    .section h2 {
+      font-size: clamp(28px, 4vw, 42px);
+      font-weight: 800;
+      letter-spacing: -.03em;
+      line-height: 1.1;
+      margin-bottom: 14px;
+    }
+    .section-sub {
+      font-size: 17px;
+      color: var(--gray-500);
+      max-width: 500px;
+      line-height: 1.6;
+      margin-bottom: 52px;
+    }
 
-    /* API-nøkkel banner */
-    .key-banner { background: #fffbea; border: 1px solid #f5dfa0; border-radius: 10px; padding: 16px 20px; display: flex; align-items: center; gap: 14px; margin-bottom: 28px; }
-    .key-banner.valid { background: #f0fdf5; border-color: #a0d8b4; }
-    .key-banner-icon { font-size: 22px; flex-shrink: 0; }
-    .key-banner-text { flex: 1; }
-    .key-banner-text strong { display: block; font-size: 14px; margin-bottom: 3px; }
-    .key-banner-text p { font-size: 12px; color: var(--mid); }
-    .key-input-row { display: flex; gap: 8px; margin-top: 10px; }
-    .key-input { flex: 1; padding: 7px 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 13px; font-family: monospace; }
-    .key-input:focus { outline: none; border-color: var(--blue); }
-    .btn-key { padding: 7px 14px; background: var(--blue); color: white; border: none; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; }
-    .btn-key.clear { background: var(--light); color: var(--mid); }
+    /* ── PRODUCT CARDS ── */
+    .product-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--gray-100); border: 1px solid var(--gray-100); border-radius: 10px; overflow: hidden; }
+    .product-card { background: var(--white); padding: 40px; }
+    .product-number { font-size: 12px; font-weight: 700; color: var(--gray-300); letter-spacing: .1em; margin-bottom: 24px; }
+    .product-title { font-size: 22px; font-weight: 700; letter-spacing: -.02em; margin-bottom: 12px; }
+    .product-desc { font-size: 15px; color: var(--gray-500); line-height: 1.65; margin-bottom: 28px; }
+    .product-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .product-list li { font-size: 14px; color: var(--gray-700); display: flex; align-items: flex-start; gap: 10px; }
+    .product-list li::before { content: '—'; color: var(--gray-300); flex-shrink: 0; font-weight: 300; }
+    .product-tag { display: inline-block; margin-top: 28px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--gray-500); border: 1px solid var(--gray-100); border-radius: 4px; padding: 4px 10px; }
+
+    /* ── PRICING ── */
+    .pricing-bg { background: var(--gray-50); border-top: 1px solid var(--gray-100); border-bottom: 1px solid var(--gray-100); }
+    .pricing-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .price-card { background: var(--white); border: 1px solid var(--gray-100); border-radius: 10px; padding: 36px; }
+    .price-card.featured { border-color: var(--black); }
+    .price-label { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--gray-500); margin-bottom: 20px; }
+    .price-amount { font-size: 44px; font-weight: 800; letter-spacing: -.04em; line-height: 1; margin-bottom: 6px; }
+    .price-per { font-size: 14px; color: var(--gray-500); margin-bottom: 20px; }
+    .price-desc { font-size: 14px; color: var(--gray-500); line-height: 1.6; padding-bottom: 20px; margin-bottom: 20px; border-bottom: 1px solid var(--gray-100); }
+    .price-list { list-style: none; display: flex; flex-direction: column; gap: 12px; margin-bottom: 28px; }
+    .price-list li { font-size: 14px; color: var(--gray-700); display: flex; gap: 10px; align-items: flex-start; }
+    .price-list li::before { content: '✓'; font-weight: 700; color: var(--black); flex-shrink: 0; }
+    .btn-price-black { display: block; width: 100%; padding: 12px; text-align: center; background: var(--black); color: var(--white); border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; border: none; }
+    .btn-price-black:hover { background: #222; }
+    .btn-price-outline { display: block; width: 100%; padding: 12px; text-align: center; background: var(--white); color: var(--black); border: 1.5px solid var(--gray-300); border-radius: 6px; font-size: 14px; font-weight: 500; cursor: pointer; }
+    .btn-price-outline:hover { border-color: #aaa; }
+
+    /* ── TOOL SECTION ── */
+    .tool-section { padding: 80px 48px; max-width: 860px; margin: 0 auto; }
+    .tool-section h2 { font-size: 32px; font-weight: 800; letter-spacing: -.03em; margin-bottom: 8px; }
+    .tool-section .sub { font-size: 16px; color: var(--gray-500); margin-bottom: 36px; line-height: 1.6; }
+
+    /* API-nøkkel */
+    .key-box { border: 1px solid var(--gray-100); border-radius: 8px; padding: 20px 24px; margin-bottom: 32px; display: flex; align-items: center; gap: 16px; }
+    .key-box.active { border-color: var(--black); }
+    .key-icon { font-size: 20px; flex-shrink: 0; }
+    .key-content { flex: 1; }
+    .key-content strong { display: block; font-size: 14px; font-weight: 600; margin-bottom: 3px; }
+    .key-content p { font-size: 13px; color: var(--gray-500); }
+    .key-row { display: flex; gap: 8px; margin-top: 10px; }
+    .key-input { flex: 1; padding: 8px 11px; border: 1px solid var(--gray-100); border-radius: 6px; font-size: 13px; font-family: 'Inter', monospace; color: var(--black); }
+    .key-input:focus { outline: none; border-color: var(--black); }
+    .btn-key { padding: 8px 16px; background: var(--black); color: var(--white); border: none; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; }
+    .btn-key.ghost { background: var(--gray-50); color: var(--gray-500); border: 1px solid var(--gray-100); }
 
     /* Tabs */
-    .tabs { display: flex; border-bottom: 2px solid var(--border); margin-bottom: 28px; }
-    .tab { padding: 11px 22px; font-size: 14px; font-weight: 500; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; color: var(--mid); }
-    .tab.active { color: var(--blue); border-bottom-color: var(--blue); }
+    .tabs { display: flex; border-bottom: 1px solid var(--gray-100); margin-bottom: 32px; }
+    .tab { padding: 12px 20px; font-size: 14px; font-weight: 500; cursor: pointer; color: var(--gray-500); border-bottom: 2px solid transparent; margin-bottom: -1px; }
+    .tab.active { color: var(--black); border-bottom-color: var(--black); font-weight: 600; }
 
     /* Upload */
-    .upload-grid { display: grid; gap: 14px; }
+    .upload-grid { display: grid; gap: 12px; }
     .upload-grid.two { grid-template-columns: 1fr 1fr; }
-    .upload-box { border: 2px dashed var(--border); border-radius: 10px; padding: 28px 16px; text-align: center; cursor: pointer; transition: all .15s; background: white; }
-    .upload-box:hover, .upload-box.drag-over { border-color: var(--blue); background: #f0f6ff; }
-    .upload-box.has-file { border-color: var(--green); background: #f0fdf5; border-style: solid; }
+    .upload-box { border: 1px solid var(--gray-100); border-radius: 8px; padding: 32px 20px; text-align: center; cursor: pointer; transition: border-color .15s; background: var(--white); }
+    .upload-box:hover, .upload-box.drag-over { border-color: var(--black); }
+    .upload-box.has-file { border-color: var(--black); background: var(--gray-50); }
     .upload-box input { display: none; }
-    .upload-icon { font-size: 28px; margin-bottom: 6px; }
-    .upload-label { font-size: 13px; font-weight: 600; margin-bottom: 3px; }
-    .upload-hint  { font-size: 11px; color: var(--mid); }
-    .upload-file-name { font-size: 12px; color: var(--green); font-weight: 600; margin-top: 6px; }
-    .field-label { display: block; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; color: var(--mid); margin-bottom: 6px; }
-    input[type=text] { width: 100%; padding: 9px 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 14px; }
-    input[type=text]:focus { outline: none; border-color: var(--blue); }
-    .btn-analyse { display: block; width: 100%; padding: 13px; background: var(--blue); color: white; font-size: 15px; font-weight: 600; border: none; border-radius: 8px; cursor: pointer; margin-top: 18px; }
-    .btn-analyse:hover { background: #0055b0; }
-    .btn-analyse:disabled { background: #aaa; cursor: not-allowed; }
+    .upload-label { font-size: 14px; font-weight: 600; margin-bottom: 4px; color: var(--black); }
+    .upload-hint  { font-size: 12px; color: var(--gray-500); }
+    .upload-filename { font-size: 12px; color: var(--black); font-weight: 500; margin-top: 8px; }
+
     .field { margin-bottom: 14px; }
+    .field-label { display: block; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--gray-500); margin-bottom: 6px; }
+    input[type=text] { width: 100%; padding: 9px 12px; border: 1px solid var(--gray-100); border-radius: 6px; font-size: 14px; font-family: 'Inter', sans-serif; }
+    input[type=text]:focus { outline: none; border-color: var(--black); }
+
+    .btn-run { display: block; width: 100%; padding: 13px; background: var(--black); color: var(--white); font-size: 15px; font-weight: 600; border: none; border-radius: 6px; cursor: pointer; margin-top: 20px; letter-spacing: -.01em; }
+    .btn-run:hover { background: #222; }
+    .btn-run:disabled { background: var(--gray-300); cursor: not-allowed; }
 
     /* Loading */
-    .loading { text-align: center; padding: 40px 0; }
-    .spinner { display: inline-block; width: 32px; height: 32px; border: 3px solid #ddd; border-top-color: var(--blue); border-radius: 50%; animation: spin .7s linear infinite; margin-bottom: 10px; }
+    .loading { text-align: center; padding: 48px 0; }
+    .spinner { display: inline-block; width: 28px; height: 28px; border: 2px solid var(--gray-100); border-top-color: var(--black); border-radius: 50%; animation: spin .6s linear infinite; margin-bottom: 12px; }
     @keyframes spin { to { transform: rotate(360deg); } }
-    .loading p { color: var(--mid); font-size: 13px; }
+    .loading p { font-size: 14px; color: var(--gray-500); }
 
-    /* Resultater */
-    .result-card { background: white; border-radius: 10px; padding: 22px; margin-top: 20px; border: 1px solid var(--border); }
-    .result-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; flex-wrap: wrap; gap: 10px; }
-    .result-title { font-size: 16px; font-weight: 700; }
-    .bra-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 10px; margin-bottom: 18px; }
-    .bra-item { background: var(--light); border-radius: 8px; padding: 12px; text-align: center; }
-    .bra-value { font-size: 24px; font-weight: 800; color: var(--blue); line-height: 1; }
-    .bra-unit  { font-size: 11px; color: var(--mid); }
-    .bra-label { font-size: 10px; color: var(--mid); margin-top: 3px; text-transform: uppercase; letter-spacing: .04em; }
-    table { width: 100%; border-collapse: collapse; font-size: 13px; }
-    th { text-align: left; padding: 7px 9px; background: var(--light); font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--mid); }
-    td { padding: 7px 9px; border-bottom: 1px solid var(--border); }
+    /* Results */
+    .result-card { border: 1px solid var(--gray-100); border-radius: 8px; padding: 28px; margin-top: 24px; }
+    .result-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
+    .result-title { font-size: 18px; font-weight: 700; letter-spacing: -.02em; }
+    .result-subtitle { font-size: 13px; color: var(--gray-500); margin-top: 2px; }
+
+    .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 1px; background: var(--gray-100); border: 1px solid var(--gray-100); border-radius: 8px; overflow: hidden; margin-bottom: 24px; }
+    .stat { background: var(--white); padding: 16px; }
+    .stat-value { font-size: 28px; font-weight: 800; letter-spacing: -.03em; line-height: 1; color: var(--black); }
+    .stat-unit  { font-size: 12px; color: var(--gray-500); display: inline; }
+    .stat-label { font-size: 11px; color: var(--gray-500); text-transform: uppercase; letter-spacing: .06em; margin-top: 4px; }
+
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th { text-align: left; padding: 8px 0; border-bottom: 1px solid var(--gray-100); font-size: 11px; text-transform: uppercase; letter-spacing: .07em; color: var(--gray-500); font-weight: 600; }
+    td { padding: 10px 0; border-bottom: 1px solid var(--gray-100); color: var(--gray-700); }
     tr:last-child td { border-bottom: none; }
-    .s-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--mid); margin: 18px 0 8px; }
-    .risiko-badge { padding: 5px 14px; border-radius: 99px; font-size: 12px; font-weight: 700; }
-    .risiko-HØY    { background: #fde8e8; color: var(--red); }
-    .risiko-MIDDELS { background: #fff3e0; color: var(--orange); }
-    .risiko-LAV    { background: #e8f5ee; color: var(--green); }
-    .risiko-INGEN  { background: #e8f5ee; color: var(--green); }
-    .funn-list { display: flex; flex-direction: column; gap: 10px; }
-    .funn-item { border-left: 3px solid; border-radius: 0 7px 7px 0; padding: 11px 13px; background: var(--light); }
-    .funn-item.HØY    { border-color: var(--red); }
-    .funn-item.MIDDELS { border-color: var(--orange); }
-    .funn-item.LAV    { border-color: var(--green); }
-    .funn-type  { font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--mid); margin-bottom: 3px; }
-    .funn-tekst { font-size: 13px; margin-bottom: 5px; }
-    .funn-handling { font-size: 12px; color: var(--mid); font-style: italic; }
-    .funn-pbl { font-size: 11px; color: var(--blue); margin-top: 3px; }
-    .sammendrag { background: var(--light); border-radius: 7px; padding: 12px 14px; font-size: 14px; line-height: 1.6; margin-bottom: 14px; }
-    .anbefaling { border-left: 3px solid var(--blue); padding: 10px 14px; font-size: 13px; line-height: 1.6; }
-    .error-box { background: #fde8e8; border: 1px solid #f5c6c6; border-radius: 8px; padding: 14px; color: var(--red); font-size: 13px; margin-top: 14px; }
+    td.bold { font-weight: 600; color: var(--black); }
+
+    .r-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--gray-500); margin: 20px 0 10px; }
+
+    .risk-badge { display: inline-block; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 700; letter-spacing: .04em; }
+    .risk-HØY    { background: #fef2f2; color: var(--red); border: 1px solid #fecaca; }
+    .risk-MIDDELS { background: #fff7ed; color: var(--orange); border: 1px solid #fed7aa; }
+    .risk-LAV    { background: #f0fdf4; color: var(--green); border: 1px solid #bbf7d0; }
+    .risk-INGEN  { background: #f0fdf4; color: var(--green); border: 1px solid #bbf7d0; }
+
+    .funn-list { display: flex; flex-direction: column; gap: 8px; }
+    .funn { border: 1px solid var(--gray-100); border-radius: 6px; padding: 14px 16px; }
+    .funn-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+    .funn-type { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--gray-700); }
+    .funn-tekst { font-size: 14px; color: var(--black); line-height: 1.55; margin-bottom: 6px; }
+    .funn-handling { font-size: 13px; color: var(--gray-500); }
+    .funn-pbl { font-size: 12px; color: var(--gray-500); margin-top: 4px; }
+
+    .sammendrag { background: var(--gray-50); border-radius: 6px; padding: 14px 16px; font-size: 14px; line-height: 1.6; color: var(--black); margin-bottom: 16px; }
+    .anbefaling-box { border-left: 2px solid var(--black); padding: 12px 16px; font-size: 14px; line-height: 1.6; }
+
+    .error-box { background: #fef2f2; border: 1px solid #fecaca; border-radius: 6px; padding: 14px 16px; color: var(--red); font-size: 14px; margin-top: 16px; }
 
     /* ── FOOTER ── */
-    footer { background: var(--dark); color: #aaa; padding: 40px; text-align: center; font-size: 13px; }
-    footer strong { color: white; }
-    footer a { color: #aaa; }
+    footer { border-top: 1px solid var(--gray-100); padding: 40px 48px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+    .footer-logo { font-size: 16px; font-weight: 800; letter-spacing: -.03em; }
+    .footer-right { font-size: 13px; color: var(--gray-500); }
+    .footer-right a { color: var(--gray-500); }
+    .footer-right a:hover { color: var(--black); }
 
-    @media (max-width: 640px) {
-      .hero h1 { font-size: 32px; }
+    @media (max-width: 680px) {
+      header { padding: 16px 20px; }
+      .hero { padding: 60px 20px 48px; }
+      .section, .tool-section { padding: 56px 20px; }
       .product-grid, .pricing-grid, .upload-grid.two { grid-template-columns: 1fr; }
-      header { padding: 14px 20px; }
-      nav .nav-link { display: none; }
+      footer { padding: 28px 20px; }
     }
   </style>
 </head>
 <body>
 
-<!-- ── HEADER ── -->
+<!-- HEADER -->
 <header>
-  <div class="logo">Place<span>ly</span></div>
+  <div class="logo">Placely</div>
   <nav>
     <a class="nav-link" href="#produkter">Produkter</a>
     <a class="nav-link" href="#priser">Priser</a>
-    <a class="nav-link" href="#verktoy">Prøv gratis</a>
-    <button class="btn-start" onclick="document.getElementById('verktoy').scrollIntoView({behavior:'smooth'})">Kom i gang</button>
+    <button class="nav-cta" onclick="document.getElementById('verktoy').scrollIntoView({behavior:'smooth'})">Prøv nå</button>
   </nav>
 </header>
 
-<!-- ── HERO ── -->
+<!-- HERO -->
 <section class="hero">
-  <div class="hero-badge">AI-drevet · Norsk plan- og bygningslov</div>
-  <h1>Analyser bygninger på <span>sekunder</span></h1>
-  <p>Last opp en plantegning og få BRA, romplan og kalkyle automatisk. Eller sammenlign godkjent tegning med Finn.no-annonse for å avdekke ulovlige endringer.</p>
-  <div class="hero-btns">
-    <button class="btn-primary" onclick="document.getElementById('verktoy').scrollIntoView({behavior:'smooth'})">Prøv nå</button>
-    <button class="btn-secondary" onclick="document.getElementById('priser').scrollIntoView({behavior:'smooth'})">Se priser</button>
+  <div class="hero-tag">AI · Plan- og bygningsloven · Norge</div>
+  <h1>Analyser bygninger på sekunder</h1>
+  <p>Last opp en plantegning og få BRA, romplan og kalkyle automatisk. Avdekk potensielt ulovlige tiltak før kjøp.</p>
+  <div class="hero-actions">
+    <button class="btn-black" onclick="document.getElementById('verktoy').scrollIntoView({behavior:'smooth'})">Prøv gratis</button>
+    <button class="btn-outline" onclick="document.getElementById('priser').scrollIntoView({behavior:'smooth'})">Se priser</button>
   </div>
 </section>
 
 <hr class="divider">
 
-<!-- ── PRODUKTER ── -->
-<section class="section" id="produkter">
-  <div class="section-label">To verktøy</div>
-  <h2>Alt du trenger for byggeanalyse</h2>
-  <p class="sub">Drevet av AI og tilpasset norske regler. Ingen installasjon, ingen teknisk kunnskap nødvendig.</p>
+<!-- PRODUKTER -->
+<div id="produkter">
+  <div class="section">
+    <div class="section-eyebrow">To verktøy</div>
+    <h2>Alt du trenger for byggeanalyse</h2>
+    <p class="section-sub">Drevet av AI og tilpasset norske regler. Ingen installasjon nødvendig.</p>
 
-  <div class="product-grid">
-    <div class="product-card featured">
-      <div class="product-icon">📐</div>
-      <div class="product-title">Romplan-analyse</div>
-      <p class="product-desc">Last opp en plantegning – håndtegnet, kommunal eller fra annonse – og få ut strukturert data på sekunder.</p>
-      <ul class="product-points">
-        <li>BRA og BYA beregnet automatisk</li>
-        <li>Komplett romtabell med arealer</li>
-        <li>Antall soverom, bad og etasjer</li>
-        <li>Grovkalkyle basert på areal</li>
-        <li>Støtter PDF, PNG og JPG</li>
-      </ul>
-      <span class="product-tag">Romplan-analyse</span>
-    </div>
+    <div class="product-grid">
+      <div class="product-card">
+        <div class="product-number">01</div>
+        <div class="product-title">Romplan-analyse</div>
+        <p class="product-desc">Last opp en plantegning og få ut strukturert data på sekunder. Fungerer med håndtegnede skisser, kommunale tegninger og bilder fra annonser.</p>
+        <ul class="product-list">
+          <li>BRA og BYA beregnet automatisk</li>
+          <li>Komplett romtabell med arealer</li>
+          <li>Antall soverom, bad og etasjer</li>
+          <li>Grovkalkyle basert på areal</li>
+          <li>Støtter PDF, PNG og JPG</li>
+        </ul>
+        <div class="product-tag">Analyse</div>
+      </div>
 
-    <div class="product-card">
-      <div class="product-icon">🔍</div>
-      <div class="product-title">Byggesjekk</div>
-      <p class="product-desc">Sammenlign godkjent tegning fra kommunen med nåværende plantegning og identifiser potensielt ulovlige tiltak.</p>
-      <ul class="product-points">
-        <li>Risikovurdering: HØY / MIDDELS / LAV</li>
-        <li>Konkrete funn med PBL-paragraf</li>
-        <li>Identifiserer bruksendringer</li>
-        <li>Avdekker ulovlige tilbygg</li>
-        <li>Anbefaling til kjøper og megler</li>
-      </ul>
-      <span class="product-tag">Byggesjekk</span>
+      <div class="product-card">
+        <div class="product-number">02</div>
+        <div class="product-title">Byggesjekk</div>
+        <p class="product-desc">Sammenlign godkjent tegning fra kommunen med nåværende plantegning og identifiser potensielt ulovlige tiltak etter PBL.</p>
+        <ul class="product-list">
+          <li>Risikovurdering HØY / MIDDELS / LAV</li>
+          <li>Konkrete funn med PBL-paragraf</li>
+          <li>Identifiserer bruksendringer</li>
+          <li>Avdekker ulovlige tilbygg</li>
+          <li>Anbefaling til kjøper og megler</li>
+        </ul>
+        <div class="product-tag">Compliance</div>
+      </div>
     </div>
   </div>
-</section>
+</div>
 
 <hr class="divider">
 
-<!-- ── PRISER ── -->
-<section class="pricing-section" id="priser">
-  <div class="pricing-inner">
-    <div class="section-label" style="text-align:center">Enkle priser</div>
-    <h2>Velg det som passer deg</h2>
-    <p class="sub">Ingen bindingstid på enkeltanalyser. Abonnement gir ubegrenset bruk av begge verktøy.</p>
+<!-- PRISER -->
+<div class="pricing-bg" id="priser">
+  <div class="section">
+    <div class="section-eyebrow">Priser</div>
+    <h2>Enkelt og forutsigbart</h2>
+    <p class="section-sub">Ingen bindingstid. Avbestill når du vil.</p>
 
     <div class="pricing-grid">
       <div class="price-card">
-        <div class="price-name">Per analyse</div>
-        <div class="price-amount">150 <span>kr</span></div>
-        <div class="price-desc">Betal per rapport. Ingen abonnement.</div>
-        <ul class="price-features">
-          <li>Én romplan-analyse eller én byggesjekk</li>
-          <li>PDF-rapport med alle funn</li>
+        <div class="price-label">Per analyse</div>
+        <div class="price-amount">150</div>
+        <div class="price-per">kr per rapport</div>
+        <div class="price-desc">Betal per analyse. Ingen abonnement.</div>
+        <ul class="price-list">
+          <li>Én romplan-analyse eller byggesjekk</li>
           <li>Støtter PDF, PNG og JPG</li>
-          <li>Resultat på under 30 sekunder</li>
+          <li>Resultat under 30 sekunder</li>
         </ul>
-        <a href="mailto:jakob@tegnebua.no?subject=Placely enkeltanalyse&body=Hei, jeg ønsker å kjøpe en enkeltanalyse på Placely." class="btn-price secondary">Bestill via e-post</a>
+        <a href="mailto:jakob@tegnebua.no?subject=Placely enkeltanalyse&body=Hei, jeg ønsker å kjøpe en enkeltanalyse på Placely." class="btn-price-outline">Bestill via e-post</a>
       </div>
 
-      <div class="price-card popular">
-        <div class="popular-badge">Mest populær</div>
-        <div class="price-name">Månedlig abonnement</div>
-        <div class="price-amount">500 <span>kr/mnd</span></div>
-        <div class="price-desc">Ubegrenset bruk. Faktura én gang i måneden.</div>
-        <ul class="price-features">
+      <div class="price-card featured">
+        <div class="price-label">Månedlig</div>
+        <div class="price-amount">500</div>
+        <div class="price-per">kr per måned</div>
+        <div class="price-desc">Ubegrenset bruk av begge verktøy. Faktura én gang i måneden.</div>
+        <ul class="price-list">
           <li>Ubegrenset romplan-analyser</li>
           <li>Ubegrenset byggesjekker</li>
           <li>Personlig API-nøkkel</li>
           <li>Prioritert support</li>
-          <li>Avbestill når som helst</li>
         </ul>
-        <a href="mailto:jakob@tegnebua.no?subject=Placely abonnement&body=Hei, jeg ønsker å bestille månedlig abonnement på Placely (500 kr/mnd)." class="btn-price primary">Bestill abonnement</a>
+        <a href="mailto:jakob@tegnebua.no?subject=Placely abonnement&body=Hei, jeg ønsker å bestille månedlig abonnement på Placely (500 kr/mnd)." class="btn-price-black">Bestill abonnement</a>
       </div>
     </div>
-
-    <p style="margin-top:24px;font-size:12px;color:var(--mid)">Faktura på e-post · Ingen bindingstid · Betaling via Vipps eller faktura</p>
+    <p style="margin-top:20px;font-size:13px;color:var(--gray-500)">Betaling via Vipps eller faktura · Ingen bindingstid</p>
   </div>
-</section>
+</div>
 
 <hr class="divider">
 
-<!-- ── VERKTØY ── -->
-<section class="app-section" id="verktoy">
-  <h2>Prøv verktøyene</h2>
-  <p class="sub">Du trenger en API-nøkkel for å bruke verktøyene. Bestill abonnement eller enkeltanalyse ovenfor – du får nøkkelen på e-post.</p>
+<!-- VERKTØY -->
+<div id="verktoy">
+  <div class="tool-section">
+    <h2>Prøv verktøyene</h2>
+    <p class="sub">Du trenger en API-nøkkel. Bestill ovenfor – du får nøkkelen på e-post.</p>
 
-  <!-- API-nøkkel -->
-  <div class="key-banner" id="key-banner">
-    <div class="key-banner-icon">🔑</div>
-    <div class="key-banner-text">
-      <strong>Lim inn din API-nøkkel</strong>
-      <p>Nøkkelen sendes til deg etter bestilling. Den lagres lokalt i nettleseren.</p>
-      <div class="key-input-row">
-        <input type="text" class="key-input" id="key-input" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx">
-        <button class="btn-key" onclick="saveKey()">Lagre</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Tabs -->
-  <div class="tabs">
-    <div class="tab active" onclick="switchTab('romplan')">📐 Romplan-analyse</div>
-    <div class="tab" onclick="switchTab('byggesjekk')">🔍 Byggesjekk</div>
-  </div>
-
-  <!-- ROMPLAN -->
-  <div class="panel active" id="panel-romplan">
-    <div class="upload-grid">
-      <div class="upload-box" id="drop-romplan" onclick="document.getElementById('file-romplan').click()">
-        <div class="upload-icon">📐</div>
-        <div class="upload-label">Last opp plantegning</div>
-        <div class="upload-hint">PDF, PNG eller JPG – dra og slipp eller klikk</div>
-        <div class="upload-file-name" id="name-romplan"></div>
-        <input type="file" id="file-romplan" accept=".pdf,.png,.jpg,.jpeg">
-      </div>
-    </div>
-    <div class="field" style="margin-top:14px">
-      <label class="field-label">Adresse (valgfritt)</label>
-      <input type="text" id="addr-romplan" placeholder="f.eks. Birkeveien 3A, Oslo">
-    </div>
-    <button class="btn-analyse" id="btn-romplan" onclick="runRomplan()">Analyser plantegning</button>
-    <div id="loading-romplan" style="display:none" class="loading"><div class="spinner"></div><p>Analyserer med AI – tar 10–30 sekunder…</p></div>
-    <div id="result-romplan"></div>
-  </div>
-
-  <!-- BYGGESJEKK -->
-  <div class="panel" id="panel-byggesjekk" style="display:none">
-    <div class="upload-grid two">
-      <div>
-        <label class="field-label">Godkjent tegning (kommunen)</label>
-        <div class="upload-box" id="drop-godkjent" onclick="document.getElementById('file-godkjent').click()">
-          <div class="upload-icon">🏛️</div>
-          <div class="upload-label">Kommunens tegning</div>
-          <div class="upload-hint">PDF eller bilde</div>
-          <div class="upload-file-name" id="name-godkjent"></div>
-          <input type="file" id="file-godkjent" accept=".pdf,.png,.jpg,.jpeg">
-        </div>
-      </div>
-      <div>
-        <label class="field-label">Nåværende situasjon (Finn.no)</label>
-        <div class="upload-box" id="drop-navarende" onclick="document.getElementById('file-navarende').click()">
-          <div class="upload-icon">🏠</div>
-          <div class="upload-label">Finn.no-tegning</div>
-          <div class="upload-hint">Skjermbilde, PNG eller JPG</div>
-          <div class="upload-file-name" id="name-navarende"></div>
-          <input type="file" id="file-navarende" accept=".pdf,.png,.jpg,.jpeg">
+    <!-- API-nøkkel -->
+    <div class="key-box" id="key-box">
+      <div class="key-icon">⌥</div>
+      <div class="key-content">
+        <strong>API-nøkkel</strong>
+        <p>Lim inn nøkkelen du mottok på e-post. Den lagres lokalt i nettleseren.</p>
+        <div class="key-row">
+          <input type="text" class="key-input" id="key-input" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" spellcheck="false">
+          <button class="btn-key" onclick="saveKey()">Lagre</button>
         </div>
       </div>
     </div>
-    <div class="field" style="margin-top:14px">
-      <label class="field-label">Adresse (valgfritt)</label>
-      <input type="text" id="addr-byggesjekk" placeholder="f.eks. Birkeveien 3A, Oslo">
-    </div>
-    <button class="btn-analyse" id="btn-byggesjekk" onclick="runByggesjekk()">Kjør byggesjekk</button>
-    <div id="loading-byggesjekk" style="display:none" class="loading"><div class="spinner"></div><p>Sammenligner tegninger – tar 15–40 sekunder…</p></div>
-    <div id="result-byggesjekk"></div>
-  </div>
-</section>
 
-<!-- ── FOOTER ── -->
+    <!-- Tabs -->
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('romplan')">Romplan-analyse</div>
+      <div class="tab" onclick="switchTab('byggesjekk')">Byggesjekk</div>
+    </div>
+
+    <!-- ROMPLAN -->
+    <div id="panel-romplan">
+      <div class="upload-grid">
+        <div class="upload-box" id="drop-romplan" onclick="document.getElementById('file-romplan').click()">
+          <div class="upload-label">Last opp plantegning</div>
+          <div class="upload-hint">PDF, PNG eller JPG · dra og slipp eller klikk</div>
+          <div class="upload-filename" id="name-romplan"></div>
+          <input type="file" id="file-romplan" accept=".pdf,.png,.jpg,.jpeg">
+        </div>
+      </div>
+      <div class="field" style="margin-top:14px">
+        <label class="field-label">Adresse</label>
+        <input type="text" id="addr-romplan" placeholder="f.eks. Birkeveien 3A, Oslo">
+      </div>
+      <button class="btn-run" id="btn-romplan" onclick="runRomplan()">Analyser</button>
+      <div id="loading-romplan" style="display:none" class="loading"><div class="spinner"></div><p>Analyserer – tar 10–30 sekunder</p></div>
+      <div id="result-romplan"></div>
+    </div>
+
+    <!-- BYGGESJEKK -->
+    <div id="panel-byggesjekk" style="display:none">
+      <div class="upload-grid two">
+        <div>
+          <label class="field-label" style="margin-bottom:8px">Godkjent tegning</label>
+          <div class="upload-box" id="drop-godkjent" onclick="document.getElementById('file-godkjent').click()">
+            <div class="upload-label">Kommunens tegning</div>
+            <div class="upload-hint">PDF eller bilde</div>
+            <div class="upload-filename" id="name-godkjent"></div>
+            <input type="file" id="file-godkjent" accept=".pdf,.png,.jpg,.jpeg">
+          </div>
+        </div>
+        <div>
+          <label class="field-label" style="margin-bottom:8px">Nåværende situasjon</label>
+          <div class="upload-box" id="drop-navarende" onclick="document.getElementById('file-navarende').click()">
+            <div class="upload-label">Finn.no-tegning</div>
+            <div class="upload-hint">Skjermbilde, PNG eller JPG</div>
+            <div class="upload-filename" id="name-navarende"></div>
+            <input type="file" id="file-navarende" accept=".pdf,.png,.jpg,.jpeg">
+          </div>
+        </div>
+      </div>
+      <div class="field" style="margin-top:14px">
+        <label class="field-label">Adresse</label>
+        <input type="text" id="addr-byggesjekk" placeholder="f.eks. Birkeveien 3A, Oslo">
+      </div>
+      <button class="btn-run" id="btn-byggesjekk" onclick="runByggesjekk()">Kjør byggesjekk</button>
+      <div id="loading-byggesjekk" style="display:none" class="loading"><div class="spinner"></div><p>Sammenligner tegninger – tar 15–40 sekunder</p></div>
+      <div id="result-byggesjekk"></div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
 <footer>
-  <strong>Placely</strong> · Et produkt av <strong>NOPS AS / Konsepthus AS</strong><br><br>
-  Spørsmål? <a href="mailto:jakob@tegnebua.no">jakob@tegnebua.no</a>
+  <div class="footer-logo">Placely</div>
+  <div class="footer-right">
+    Et produkt av NOPS AS &nbsp;·&nbsp;
+    <a href="mailto:jakob@tegnebua.no">jakob@tegnebua.no</a>
+  </div>
 </footer>
 
 <script>
 const XDI = 'https://xdi-production.up.railway.app';
 const KEY_STORE = 'placely_api_key';
 
-// ── API-nøkkel ────────────────────────────────────────────────────────────────
 function loadKey() {
   const k = localStorage.getItem(KEY_STORE);
-  if (k) {
-    document.getElementById('key-input').value = k;
-    document.getElementById('key-banner').classList.add('valid');
-    document.querySelector('#key-banner strong').textContent = '✓ Nøkkel lagret';
-    document.querySelector('#key-banner p').textContent = 'Du er klar til å bruke verktøyene. ' + k.substring(0,8) + '…';
-    document.querySelector('.key-input-row').innerHTML =
-      '<span style="font-size:12px;color:var(--green);font-weight:500;flex:1">' + k.substring(0,8) + '–…</span>' +
-      '<button class="btn-key clear" onclick="clearKey()">Bytt nøkkel</button>';
-  }
+  if (!k) return;
+  document.getElementById('key-box').classList.add('active');
+  const c = document.getElementById('key-box').querySelector('.key-content');
+  c.innerHTML = `<strong>API-nøkkel aktiv</strong>
+    <p>${k.substring(0,8)}–… &nbsp;<button class="btn-key ghost" onclick="clearKey()" style="padding:4px 10px;font-size:12px">Bytt</button></p>`;
 }
 function saveKey() {
   const v = document.getElementById('key-input').value.trim();
@@ -390,27 +506,20 @@ function saveKey() {
   localStorage.setItem(KEY_STORE, v);
   loadKey();
 }
-function clearKey() {
-  localStorage.removeItem(KEY_STORE);
-  location.reload();
-}
+function clearKey() { localStorage.removeItem(KEY_STORE); location.reload(); }
 function getKey() { return localStorage.getItem(KEY_STORE) || ''; }
 
-// ── Tabs ──────────────────────────────────────────────────────────────────────
-function switchTab(name) {
-  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', ['romplan','byggesjekk'][i]===name));
-  ['romplan','byggesjekk'].forEach(n => {
-    document.getElementById('panel-'+n).style.display = n===name ? 'block' : 'none';
-  });
+function switchTab(n) {
+  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', ['romplan','byggesjekk'][i]===n));
+  ['romplan','byggesjekk'].forEach(id => document.getElementById('panel-'+id).style.display = id===n?'block':'none');
 }
 
-// ── File uploads ──────────────────────────────────────────────────────────────
 function setupUpload(inputId, boxId, nameId) {
   const input = document.getElementById(inputId);
   const box   = document.getElementById(boxId);
   const name  = document.getElementById(nameId);
   input.addEventListener('change', () => {
-    if (input.files[0]) { name.textContent = '✓ ' + input.files[0].name; box.classList.add('has-file'); }
+    if (input.files[0]) { name.textContent = input.files[0].name; box.classList.add('has-file'); }
   });
   box.addEventListener('dragover',  e => { e.preventDefault(); box.classList.add('drag-over'); });
   box.addEventListener('dragleave', () => box.classList.remove('drag-over'));
@@ -418,120 +527,111 @@ function setupUpload(inputId, boxId, nameId) {
     e.preventDefault(); box.classList.remove('drag-over');
     if (e.dataTransfer.files[0]) {
       const dt = new DataTransfer(); dt.items.add(e.dataTransfer.files[0]);
-      input.files = dt.files;
-      name.textContent = '✓ ' + e.dataTransfer.files[0].name;
-      box.classList.add('has-file');
+      input.files = dt.files; name.textContent = e.dataTransfer.files[0].name; box.classList.add('has-file');
     }
   });
 }
-setupUpload('file-romplan',   'drop-romplan',   'name-romplan');
-setupUpload('file-godkjent',  'drop-godkjent',  'name-godkjent');
-setupUpload('file-navarende', 'drop-navarende', 'name-navarende');
+setupUpload('file-romplan','drop-romplan','name-romplan');
+setupUpload('file-godkjent','drop-godkjent','name-godkjent');
+setupUpload('file-navarende','drop-navarende','name-navarende');
 
-// ── Romplan ───────────────────────────────────────────────────────────────────
 async function runRomplan() {
   const file = document.getElementById('file-romplan').files[0];
   if (!file) { alert('Velg en plantegning først.'); return; }
   setLoading('romplan', true);
   const fd = new FormData();
   fd.append('file', file);
-  const addr = document.getElementById('addr-romplan').value.trim();
-  if (addr) fd.append('address', addr);
+  const a = document.getElementById('addr-romplan').value.trim();
+  if (a) fd.append('address', a);
   try {
-    const res  = await fetch(XDI + '/analyse/romplan', { method:'POST', headers:{'X-API-Key': getKey()}, body:fd });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.detail || JSON.stringify(data));
-    renderRomplan(data);
+    const r = await fetch(XDI+'/analyse/romplan', {method:'POST', headers:{'X-API-Key':getKey()}, body:fd});
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.detail||JSON.stringify(d));
+    renderRomplan(d);
   } catch(e) { showError('result-romplan', e.message); }
   finally { setLoading('romplan', false); }
 }
 
 function renderRomplan(d) {
-  const k = d.kalkyle || {};
+  const k = d.kalkyle||{};
   const rooms = (d.rom||[]).sort((a,b)=>(b.areal_m2||0)-(a.areal_m2||0));
-  const verdi = k.estimert_verdi_nok ? 'ca. '+(k.estimert_verdi_nok/1e6).toFixed(1)+' mill.' : '–';
+  const verdi = k.estimert_verdi_nok ? 'ca. '+(k.estimert_verdi_nok/1e6).toFixed(1)+' mill. kr' : '–';
   document.getElementById('result-romplan').innerHTML = `
     <div class="result-card">
       <div class="result-header">
-        <div class="result-title">${d.adresse||'Analysert plantegning'}</div>
-        <span style="font-size:12px;color:var(--mid)">${d.bygningstype||''}</span>
+        <div><div class="result-title">${d.adresse||'Analysert'}</div><div class="result-subtitle">${d.bygningstype||''}</div></div>
       </div>
-      <div class="bra-grid">
-        <div class="bra-item"><div class="bra-value">${d.bra_total_m2?d.bra_total_m2.toFixed(0):'–'}</div><div class="bra-unit">m²</div><div class="bra-label">BRA</div></div>
-        <div class="bra-item"><div class="bra-value">${d.soverom??'–'}</div><div class="bra-label">Soverom</div></div>
-        <div class="bra-item"><div class="bra-value">${d.bad??'–'}</div><div class="bra-label">Bad</div></div>
-        <div class="bra-item"><div class="bra-value">${d.etasjer??'–'}</div><div class="bra-label">Etasjer</div></div>
-        <div class="bra-item"><div class="bra-value" style="font-size:16px">${verdi}</div><div class="bra-label">Est. verdi</div></div>
+      <div class="stat-grid">
+        <div class="stat"><div class="stat-value">${d.bra_total_m2?d.bra_total_m2.toFixed(0):'–'}<span class="stat-unit"> m²</span></div><div class="stat-label">BRA</div></div>
+        <div class="stat"><div class="stat-value">${d.soverom??'–'}</div><div class="stat-label">Soverom</div></div>
+        <div class="stat"><div class="stat-value">${d.bad??'–'}</div><div class="stat-label">Bad</div></div>
+        <div class="stat"><div class="stat-value">${d.etasjer??'–'}</div><div class="stat-label">Etasjer</div></div>
+        <div class="stat"><div class="stat-value" style="font-size:18px">${verdi}</div><div class="stat-label">Est. verdi</div></div>
       </div>
-      ${rooms.length?`<div class="s-title">Rom (${rooms.length})</div>
-      <table><thead><tr><th>Rom</th><th>Type</th><th>Etasje</th><th>Areal</th></tr></thead><tbody>
-      ${rooms.map(r=>`<tr><td>${r.navn||'–'}</td><td>${rtl(r.type)}</td><td>${r.etasje||1}. etg</td><td style="font-weight:600">${r.areal_m2?r.areal_m2.toFixed(1)+' m²':'–'}</td></tr>`).join('')}
+      ${rooms.length?`<div class="r-label">Rom</div>
+      <table><thead><tr><th>Navn</th><th>Type</th><th>Etasje</th><th>Areal</th></tr></thead><tbody>
+      ${rooms.map(r=>`<tr><td class="bold">${r.navn||'–'}</td><td>${rtl(r.type)}</td><td>${r.etasje||1}. etg</td><td class="bold">${r.areal_m2?r.areal_m2.toFixed(1)+' m²':'–'}</td></tr>`).join('')}
       </tbody></table>`:''}
-      ${d.merknad?`<p style="margin-top:12px;font-size:12px;color:var(--mid);font-style:italic">${d.merknad}</p>`:''}
-      <p style="margin-top:10px;font-size:11px;color:#bbb">Konfidensgrad ${Math.round((d.confidence||0.8)*100)}% · ${k.merknad_verdi||''}</p>
+      ${d.merknad?`<p style="margin-top:16px;font-size:13px;color:var(--gray-500)">${d.merknad}</p>`:''}
     </div>`;
 }
 
-// ── Byggesjekk ────────────────────────────────────────────────────────────────
 async function runByggesjekk() {
   const fG = document.getElementById('file-godkjent').files[0];
   const fN = document.getElementById('file-navarende').files[0];
   if (!fG||!fN) { alert('Last opp begge tegningene.'); return; }
   setLoading('byggesjekk', true);
   const fd = new FormData();
-  fd.append('godkjent', fG);
-  fd.append('navarende', fN);
-  const addr = document.getElementById('addr-byggesjekk').value.trim();
-  if (addr) fd.append('address', addr);
+  fd.append('godkjent', fG); fd.append('navarende', fN);
+  const a = document.getElementById('addr-byggesjekk').value.trim();
+  if (a) fd.append('address', a);
   try {
-    const res  = await fetch(XDI + '/analyse/byggesjekk', { method:'POST', headers:{'X-API-Key': getKey()}, body:fd });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.detail || JSON.stringify(data));
-    renderByggesjekk(data);
+    const r = await fetch(XDI+'/analyse/byggesjekk', {method:'POST', headers:{'X-API-Key':getKey()}, body:fd});
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.detail||JSON.stringify(d));
+    renderByggesjekk(d);
   } catch(e) { showError('result-byggesjekk', e.message); }
   finally { setLoading('byggesjekk', false); }
 }
 
 function renderByggesjekk(d) {
-  const funn = d.funn||[]; const risiko = d.risiko_totalt||'LAV';
+  const funn = d.funn||[]; const r = d.risiko_totalt||'LAV';
   document.getElementById('result-byggesjekk').innerHTML = `
     <div class="result-card">
       <div class="result-header">
-        <div class="result-title">Byggesjekk-rapport</div>
-        <div class="risiko-badge risiko-${risiko}">Risiko: ${risiko}</div>
+        <div><div class="result-title">Byggesjekk-rapport</div>${d.adresse?`<div class="result-subtitle">${d.adresse}</div>`:''}</div>
+        <div class="risk-badge risk-${r}">Risiko: ${r}</div>
       </div>
       ${d.sammendrag?`<div class="sammendrag">${d.sammendrag}</div>`:''}
-      ${funn.length?`<div class="s-title">${funn.length} funn</div>
+      ${funn.length?`<div class="r-label">${funn.length} funn</div>
       <div class="funn-list">${funn.map(f=>`
-        <div class="funn-item ${f.risiko}">
-          <div class="funn-type">${f.type||''} &nbsp;<span class="risiko-badge risiko-${f.risiko}" style="padding:2px 8px;font-size:10px">${f.risiko}</span></div>
+        <div class="funn">
+          <div class="funn-top"><span class="funn-type">${f.type||''}</span><span class="risk-badge risk-${f.risiko}" style="font-size:11px">${f.risiko}</span></div>
           <div class="funn-tekst">${f.beskrivelse||''}</div>
           ${f.handling?`<div class="funn-handling">→ ${f.handling}</div>`:''}
           ${f.pbl_paragraf?`<div class="funn-pbl">PBL ${f.pbl_paragraf}</div>`:''}
         </div>`).join('')}</div>`
-      :`<p style="color:var(--green);font-weight:500;padding:8px 0">✓ Ingen vesentlige avvik funnet</p>`}
-      ${d.anbefaling?`<div class="s-title">Anbefaling</div><div class="anbefaling">${d.anbefaling}</div>`:''}
-      ${d.usikkerhet?`<p style="margin-top:12px;font-size:12px;color:var(--mid);font-style:italic">${d.usikkerhet}</p>`:''}
+      :`<p style="font-size:14px;color:var(--green);font-weight:500;padding:4px 0">Ingen vesentlige avvik funnet.</p>`}
+      ${d.anbefaling?`<div class="r-label">Anbefaling</div><div class="anbefaling-box">${d.anbefaling}</div>`:''}
+      ${d.usikkerhet?`<p style="margin-top:14px;font-size:13px;color:var(--gray-500)">${d.usikkerhet}</p>`:''}
     </div>`;
 }
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
 function setLoading(n, on) {
   document.getElementById('loading-'+n).style.display = on?'block':'none';
   document.getElementById('btn-'+n).disabled = on;
   if (on) document.getElementById('result-'+n).innerHTML='';
 }
 function showError(id, msg) {
-  const isAuth = msg.includes('401') || msg.includes('nøkkel');
+  const isAuth = msg.includes('401')||msg.includes('nøkkel');
   document.getElementById(id).innerHTML = `<div class="error-box">${isAuth
-    ? '🔑 Ugyldig eller manglende API-nøkkel. <a href="mailto:jakob@tegnebua.no">Bestill tilgang her.</a>'
-    : 'Feil: '+msg}</div>`;
+    ? 'Ugyldig eller manglende API-nøkkel. <a href="mailto:jakob@tegnebua.no" style="color:inherit;text-decoration:underline">Bestill tilgang.</a>'
+    : msg}</div>`;
 }
 function rtl(t) {
-  return {living_room:'Stue',kitchen:'Kjøkken',bedroom:'Soverom',bathroom:'Bad',
-    toilet:'WC',hallway:'Gang',utility:'Vaskerom',storage:'Bod',garage:'Garasje',office:'Kontor'}[t]||t||'–';
+  return {living_room:'Stue',kitchen:'Kjøkken',bedroom:'Soverom',bathroom:'Bad',toilet:'WC',
+    hallway:'Gang',utility:'Vaskerom',storage:'Bod',garage:'Garasje',office:'Kontor'}[t]||t||'–';
 }
-
 loadKey();
 </script>
 </body>
