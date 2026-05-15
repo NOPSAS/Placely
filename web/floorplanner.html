@@ -31,11 +31,12 @@
     .hbtn-b:hover{background:#222}
 
     /* WORKSPACE */
-    .workspace{flex:1;display:flex;overflow:hidden;min-height:0}
+    .workspace{flex:1;display:flex;overflow:hidden;min-height:0;height:calc(100vh - 46px)}
 
     /* 2D */
-    #view2d{position:relative;width:44%;min-width:280px;background:#f5f0e8;overflow:hidden;flex-shrink:0}
-    #canvas2d{display:block;width:100%;height:100%;cursor:crosshair}
+    #view2d{position:relative;width:44%;min-width:280px;background:#f5f0e8;overflow:hidden;flex-shrink:0;height:100%}
+    /* Canvas fills view2d absolutely — no reliance on % height inheritance */
+    #canvas2d{position:absolute;top:0;left:0;right:0;bottom:28px;touch-action:none;cursor:crosshair;display:block}
 
     /* TOOLBOX */
     #toolbox{position:absolute;top:12px;left:12px;background:rgba(255,255,255,.95);backdrop-filter:blur(10px);border:1px solid var(--g100);border-radius:11px;padding:8px;display:flex;flex-direction:column;gap:3px;box-shadow:0 4px 24px rgba(0,0,0,.1);z-index:10;user-select:none}
@@ -302,12 +303,17 @@ const ctx  = cv.getContext('2d');
 const v2d  = document.getElementById('view2d');
 
 function resize2D() {
-  // Use canvas's own bounding rect — guarantees bitmap matches CSS display size
-  const r = cv.getBoundingClientRect();
-  const w = Math.round(r.width);
-  const h = Math.round(r.height);
-  if (w > 0 && h > 0) { cv.width = w; cv.height = h; }
-  else { cv.width = cv.offsetWidth || v2d.offsetWidth || 640; cv.height = cv.offsetHeight || v2d.offsetHeight || 500; }
+  // Canvas is position:absolute — clientWidth/Height read actual rendered size
+  const w = cv.clientWidth;
+  const h = cv.clientHeight;
+  if (w > 0 && h > 0) {
+    cv.width  = w;
+    cv.height = h;
+  } else {
+    // Fallback: read from parent if canvas not yet rendered
+    cv.width  = v2d.clientWidth  || 640;
+    cv.height = (v2d.clientHeight || 528) - 28;
+  }
   redraw();
 }
 
@@ -778,7 +784,11 @@ cv.addEventListener('mousemove', e => {
   redraw();
 });
 
-cv.addEventListener('mousedown', e => {
+// Unified pointer handler — works for both mouse and touch
+let _ptrDragged = false;
+
+cv.addEventListener('pointerdown', e => {
+  _ptrDragged = false;
   if (e.button === 1 || (e.button === 0 && state.tool === 'pan')) {
     panStart = { x:e.clientX, y:e.clientY };
     cv.style.cursor = 'grabbing';
@@ -786,16 +796,22 @@ cv.addEventListener('mousedown', e => {
   }
 });
 
-cv.addEventListener('mouseup', () => {
-  panStart = null;
-  if (state.tool === 'pan') cv.style.cursor = 'grab';
+cv.addEventListener('pointermove', e => {
+  if (panStart) { _ptrDragged = true; }
+  // standard mousemove handling below handles redraw
 });
 
-cv.addEventListener('click', e => {
-  if (e.button !== 0 || panStart) return;
-  const r  = cv.getBoundingClientRect();
+cv.addEventListener('pointerup', e => {
+  const wasPan = !!panStart;
+  panStart = null;
+  if (state.tool === 'pan') cv.style.cursor = 'grab';
+
+  // Treat as click only if not dragging and primary button
+  if (wasPan || _ptrDragged || e.button !== 0) return;
+
+  const r   = cv.getBoundingClientRect();
   const raw = s2w(e.clientX - r.left, e.clientY - r.top);
-  let pt = snapPt(raw.x, raw.y);
+  let pt    = snapPt(raw.x, raw.y);
   const near = nearEndpoint(pt.x, pt.y);
   pt = near || pt;
   if (state.lockAxis && state.chainStart) {
@@ -805,7 +821,7 @@ cv.addEventListener('click', e => {
   if (state.tool === 'wall') {
     if (!state.chainStart) {
       state.chainStart = {...pt};
-      document.getElementById('sb-tool').textContent = 'Klikk for å avslutte veggen';
+      document.getElementById('sb-tool').textContent = 'Klikk for å avslutte veggen – Esc avbryter';
     } else {
       const w = createWall(state.chainStart, pt);
       if (w) state.chainStart = {...pt};
@@ -816,10 +832,33 @@ cv.addEventListener('click', e => {
   if (state.tool === 'select') {
     let found = null;
     for (const wall of state.walls) {
-      if (segDist(raw, wall.start, wall.end) < 0.28) { found = wall.id; break; }
+      if (segDist(raw, wall.start, wall.end) < 0.3) { found = wall.id; break; }
     }
     state.selected = found;
     renderPropBar();
+    if (window._update3D) window._update3D(state.walls, state.rooms);
+    redraw();
+  }
+});
+
+// Keep legacy click for browsers that don't fully support pointer events
+cv.addEventListener('click', e => {
+  // Only handle if pointerup didn't already handle it (non-pointer browsers)
+  if (window.PointerEvent) return; // already handled above
+  if (e.button !== 0 || panStart) return;
+  const r   = cv.getBoundingClientRect();
+  const raw = s2w(e.clientX - r.left, e.clientY - r.top);
+  let pt    = snapPt(raw.x, raw.y);
+  const near = nearEndpoint(pt.x, pt.y);
+  pt = near || pt;
+  if (state.tool === 'wall') {
+    if (!state.chainStart) { state.chainStart = {...pt}; document.getElementById('sb-tool').textContent = 'Klikk for å avslutte veggen'; }
+    else { const w = createWall(state.chainStart, pt); if (w) state.chainStart = {...pt}; }
+    redraw();
+  } else if (state.tool === 'select') {
+    let found = null;
+    for (const wall of state.walls) { if (segDist(raw, wall.start, wall.end) < 0.3) { found = wall.id; break; } }
+    state.selected = found; renderPropBar();
     if (window._update3D) window._update3D(state.walls, state.rooms);
     redraw();
   }
