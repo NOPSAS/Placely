@@ -130,8 +130,10 @@
 
     /* ── PRINT ── */
     @media print {
+      @page { size: A4; margin: 0; }
       body > *:not(.print-wrap) { display: none !important; }
       .print-wrap { display: block !important; }
+      .print-wrap .btn-black, .print-wrap button { display: none !important; }
     }
     .print-wrap { display: none; }
 
@@ -896,16 +898,33 @@ function getKey()   { return localStorage.getItem(KEY_STORE) || ''; }
 function printResult(containerId) {
   const el = document.getElementById(containerId);
   if (!el || !el.innerHTML.trim()) return;
+  const date = new Date().toLocaleDateString('nb-NO',{day:'numeric',month:'long',year:'numeric'});
+  const type = containerId.includes('romplan') ? 'Romplan-analyse' : 'Byggesjekk-rapport';
   const pw = document.createElement('div');
   pw.className = 'print-wrap';
   pw.innerHTML = `
-    <div style="font-family:'Inter',sans-serif;max-width:720px;margin:0 auto;padding:32px;color:#0d0d0d">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;padding-bottom:16px;border-bottom:2px solid #0d0d0d">
-        <div style="font-size:20px;font-weight:800;letter-spacing:-.04em">Placely</div>
-        <div style="font-size:11px;color:#999">${new Date().toLocaleDateString('nb-NO',{day:'numeric',month:'long',year:'numeric'})}</div>
+    <div style="font-family:'Inter',sans-serif;max-width:680px;margin:0 auto;padding:40px 32px;color:#0d0d0d;font-size:13px;line-height:1.6">
+      <!-- Header -->
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:28px;padding-bottom:20px;border-bottom:2.5px solid #0d0d0d">
+        <div>
+          <div style="font-size:22px;font-weight:800;letter-spacing:-.04em;margin-bottom:2px">Placely</div>
+          <div style="font-size:11px;color:#888;letter-spacing:.04em;text-transform:uppercase">${type}</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:12px;color:#555">${date}</div>
+          <div style="font-size:11px;color:#aaa;margin-top:2px">placely.no</div>
+        </div>
       </div>
-      ${el.innerHTML}
-      <div style="margin-top:32px;padding-top:16px;border-top:1px solid #eee;font-size:11px;color:#bbb">Generert med Placely · placely.no</div>
+      <!-- Content -->
+      <div style="margin-bottom:32px">${el.innerHTML}</div>
+      <!-- Footer -->
+      <div style="padding-top:16px;border-top:1px solid #eee;display:flex;justify-content:space-between;align-items:center">
+        <div style="font-size:11px;color:#bbb">Generert av Placely AI · placely.no · NOPS AS</div>
+        <div style="font-size:11px;color:#bbb">${date}</div>
+      </div>
+      <div style="margin-top:8px;font-size:10px;color:#ccc;line-height:1.5">
+        Denne rapporten er automatisk generert av AI og er ment som veiledning. Placely og NOPS AS tar ikke ansvar for feil i beregninger. Kontakt en godkjent takstmann for bindende arealvurdering.
+      </div>
     </div>`;
   document.body.appendChild(pw);
   window.print();

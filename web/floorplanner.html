@@ -302,8 +302,12 @@ const ctx  = cv.getContext('2d');
 const v2d  = document.getElementById('view2d');
 
 function resize2D() {
-  cv.width  = v2d.clientWidth  || 600;
-  cv.height = v2d.clientHeight || 500;
+  // Use canvas's own bounding rect — guarantees bitmap matches CSS display size
+  const r = cv.getBoundingClientRect();
+  const w = Math.round(r.width);
+  const h = Math.round(r.height);
+  if (w > 0 && h > 0) { cv.width = w; cv.height = h; }
+  else { cv.width = cv.offsetWidth || v2d.offsetWidth || 640; cv.height = cv.offsetHeight || v2d.offsetHeight || 500; }
   redraw();
 }
 
@@ -717,10 +721,10 @@ function closePropBar() {
 // ── TOOLS / UI ────────────────────────────────────────────────────
 function setTool(t) {
   state.tool = t;
-  if (t !== 'wall') state.chainStart = null;
+  if (t !== 'wall') { state.chainStart = null; }
   document.querySelectorAll('.tbtn').forEach(b => b.classList.remove('active'));
   document.getElementById('tb-'+t)?.classList.add('active');
-  document.getElementById('sb-tool').textContent = {wall:'Tegn vegg',select:'Velg objekt',pan:'Pan/flytt'}[t]||t;
+  document.getElementById('sb-tool').textContent = {wall:'Klikk for å starte vegg',select:'Klikk vegg for å velge',pan:'Dra for å flytte'}[t]||t;
   cv.style.cursor = t==='wall'?'crosshair':t==='select'?'default':'grab';
   redraw();
 }
@@ -799,8 +803,13 @@ cv.addEventListener('click', e => {
   }
 
   if (state.tool === 'wall') {
-    if (!state.chainStart) { state.chainStart = {...pt}; }
-    else { const w = createWall(state.chainStart, pt); if (w) state.chainStart = {...pt}; }
+    if (!state.chainStart) {
+      state.chainStart = {...pt};
+      document.getElementById('sb-tool').textContent = 'Klikk for å avslutte veggen';
+    } else {
+      const w = createWall(state.chainStart, pt);
+      if (w) state.chainStart = {...pt};
+    }
     redraw(); return;
   }
 
@@ -844,6 +853,7 @@ window.addEventListener('keydown', e => {
     case 'Delete': case 'Backspace': deleteSelected(); break;
     case 'Escape':
       state.chainStart = null; state.selected = null;
+      document.getElementById('sb-tool').textContent = 'Tegn vegg';
       document.getElementById('propbar').classList.remove('open');
       redraw();
       if (window._update3D) window._update3D(state.walls, state.rooms);
@@ -1057,12 +1067,20 @@ function loadDemoHouse() {
   state.walls[7].type = 'interior';
 }
 
-window.addEventListener('resize', () => { resize2D(); if(window._resize3D) window._resize3D(); });
+// ResizeObserver is most reliable for flex-layout containers
+if (typeof ResizeObserver !== 'undefined') {
+  new ResizeObserver(() => { resize2D(); if (window._resize3D) window._resize3D(); }).observe(v2d);
+} else {
+  window.addEventListener('resize', () => { resize2D(); if (window._resize3D) window._resize3D(); });
+}
 
-resize2D();
-loadDemoHouse();
-fitView();
-afterWallChange();
+// Double-RAF ensures flex layout is fully computed before we read dimensions
+requestAnimationFrame(() => requestAnimationFrame(() => {
+  resize2D();
+  loadDemoHouse();
+  fitView();
+  afterWallChange();
+}));
 </script>
 
 <!-- ═══════════════════════════════════════════════════════════════
