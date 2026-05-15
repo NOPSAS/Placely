@@ -489,7 +489,9 @@ function drawPreview2D() {
   ctx.font = 'bold 12px Inter';
   const tw = ctx.measureText(txt).width + 12;
   ctx.fillStyle = '#2563eb'; ctx.beginPath();
-  ctx.roundRect(-tw/2, -tk/2-18, tw, 18, 4); ctx.fill();
+  if (ctx.roundRect) ctx.roundRect(-tw/2, -tk/2-18, tw, 18, 4);
+  else ctx.rect(-tw/2, -tk/2-18, tw, 18);
+  ctx.fill();
   ctx.fillStyle = '#fff'; ctx.textAlign = 'center';
   ctx.fillText(txt, 0, -tk/2 - 5);
   ctx.restore();
@@ -884,7 +886,7 @@ function renderPropBar() {
     <label class="pf-chk pf"><input type="checkbox" ${wall.roofDriver?'checked':''} onchange="sp('roofDriver',this.checked)"> Takdriver</label>
     <div class="pf" style="color:var(--g500);font-size:11px">Lengde: ${ptDist(wall.start,wall.end).toFixed(2)} m</div>
     <button class="prop-del" onclick="deleteSelected()">Slett</button>
-    <button class="prop-close" onclick="state.selected=null;renderPropBar();redraw();update3D()">✕</button>`;
+    <button class="prop-close" onclick="closePropBar()">✕</button>`;
 }
 
 window.sp = (key, val) => {
@@ -1260,6 +1262,11 @@ function init() {
 }
 
 init();
+
+// Expose module-scoped functions needed by HTML onclick attributes
+window.undo           = undo;
+window.deleteSelected = deleteSelected;
+window.closePropBar   = () => { state.selected = null; renderPropBar(); redraw(); update3D(); };
 </script>
 </body>
 </html>
