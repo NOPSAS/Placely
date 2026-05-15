@@ -19,6 +19,10 @@ from parsers.pdf_parser import PDFParser
 from analyzers.floor_plan_analyzer import FloorPlanAnalyzer
 from analyzers.compliance_checker import ComplianceChecker
 from analyzers.soknadssjekk_analyzer import SoknadssjekKAnalyzer
+from analyzers.arkivly_analyzer import ArkivlyAnalyzer
+from analyzers.productly_analyzer import ProductlyAnalyzer
+from analyzers.estly_analyzer import EstlyAnalyzer
+from analyzers.finansly_analyzer import FinanslyAnalyzer
 
 try:
     from parsers.ifc_parser import IfcParser
@@ -289,6 +293,115 @@ async def analyse_soknadssjekk(
         result   = analyzer.analyze(beskrivelse, adresse)
     except Exception as e:
         raise HTTPException(500, f"Søknadssjekk feilet: {str(e)}")
+    return result
+
+
+# ── Analyse: Estly ───────────────────────────────────────────────────────────
+
+@app.post("/analyse/estly", tags=["analyse"])
+async def analyse_estly(
+    file1:       UploadFile = File(..., description="Fasadebilde 1"),
+    file2:       Optional[UploadFile] = File(None, description="Fasadebilde 2"),
+    file3:       Optional[UploadFile] = File(None, description="Fasadebilde 3"),
+    file4:       Optional[UploadFile] = File(None, description="Fasadebilde 4"),
+    beskrivelse: Optional[str] = Form(None, description="Prosjektbeskrivelse"),
+    municipality: Optional[str] = Form(None, description="Kommune"),
+    bygningstype: Optional[str] = Form(None, description="Bygningstype"),
+    _key:         str = Depends(require_api_key),
+):
+    """Estetisk vurdering mot §29.2 plan- og bygningsloven."""
+    api_key = _require_api_key()
+    images, types = [], []
+    for f in [file1, file2, file3, file4]:
+        if f:
+            images.append(await f.read())
+            types.append(f.content_type or "image/jpeg")
+    try:
+        result = EstlyAnalyzer(api_key=api_key).analyze(
+            images, types, beskrivelse, municipality, bygningstype
+        )
+    except Exception as e:
+        raise HTTPException(500, f"Estly-analyse feilet: {str(e)}")
+    return result
+
+
+# ── Analyse: Finansly ────────────────────────────────────────────────────────
+
+@app.post("/analyse/finansly", tags=["analyse"])
+async def analyse_finansly(
+    file:         UploadFile = File(..., description="Plantegning (PDF/PNG/JPG)"),
+    address:      Optional[str] = Form(None),
+    year:         Optional[int] = Form(None, description="Byggeår"),
+    bygningstype: Optional[str] = Form(None),
+    tilstand:     Optional[str] = Form(None),
+    _key:         str = Depends(require_api_key),
+):
+    """Generer bankdokumentasjon og verdiestimat fra plantegning."""
+    api_key = _require_api_key()
+    raw = await file.read()
+    if file.content_type == "application/pdf":
+        from parsers.pdf_parser import PDFParser
+        img_bytes = PDFParser(api_key=api_key)._pdf_page_to_image(raw)
+        mime = "image/png"
+    else:
+        img_bytes, mime = raw, file.content_type or "image/jpeg"
+    try:
+        result = FinanslyAnalyzer(api_key=api_key).analyze(
+            img_bytes, mime, address, year, bygningstype, tilstand
+        )
+    except Exception as e:
+        raise HTTPException(500, f"Finansly-analyse feilet: {str(e)}")
+    return result
+
+
+# ── Analyse: Arkivly ─────────────────────────────────────────────────────────
+
+@app.post("/analyse/arkivly", tags=["analyse"])
+async def analyse_arkivly(
+    file:    UploadFile = File(..., description="Skannet arkivdokument (PDF, PNG, JPG)"),
+    address: Optional[str] = Form(None),
+    context: Optional[str] = Form(None, description="Tilleggskontekst om bygget"),
+    _key:    str = Depends(require_api_key),
+):
+    """Analyser skannede kommunale arkivdokumenter og historiske byggetegninger."""
+    api_key = _require_api_key()
+    raw = await file.read()
+
+    if file.content_type == "application/pdf":
+        from parsers.pdf_parser import PDFParser
+        img_bytes = PDFParser(api_key=api_key)._pdf_page_to_image(raw)
+        mime = "image/png"
+    else:
+        img_bytes, mime = raw, file.content_type or "image/jpeg"
+
+    try:
+        result = ArkivlyAnalyzer(api_key=api_key).analyze(img_bytes, mime, address, context)
+    except Exception as e:
+        raise HTTPException(500, f"Arkivly-analyse feilet: {str(e)}")
+    return result
+
+
+# ── Analyse: Productly ────────────────────────────────────────────────────────
+
+@app.post("/analyse/productly", tags=["analyse"])
+async def analyse_productly(
+    address:      Optional[str] = Form(None),
+    byggeaar:     Optional[int] = Form(None),
+    bygningstype: Optional[str] = Form(None),
+    etasjer:      Optional[int] = Form(None),
+    bra_m2:       Optional[float] = Form(None),
+    tilstand:     Optional[str] = Form(None),
+    _key:         str = Depends(require_api_key),
+):
+    """Generer FDV-register og produktspesifikasjoner for en bygning."""
+    api_key = _require_api_key()
+    try:
+        result = ProductlyAnalyzer(api_key=api_key).analyze(
+            address=address, byggeaar=byggeaar, bygningstype=bygningstype,
+            etasjer=etasjer, bra_m2=bra_m2, tilstand=tilstand,
+        )
+    except Exception as e:
+        raise HTTPException(500, f"Productly-analyse feilet: {str(e)}")
     return result
 
 

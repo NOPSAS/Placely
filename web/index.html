@@ -718,25 +718,21 @@
   <div class="logo">Placely</div>
   <nav>
     <a class="nav-link" href="#produkter">Produkter</a>
-    <a class="nav-link" href="#hvem">Hvem</a>
     <a class="nav-link" href="#priser">Priser</a>
-    <a class="nav-link" href="/soknadssjekk.html">Soknadssjekk</a>
-    <a class="nav-link" href="/capture.html">Capture</a>
-    <a class="nav-link" href="/floorplanner.html">Plantegning</a>
-    <a class="nav-link" href="/handly.html">Handly</a>
-    <button class="nav-cta" onclick="document.getElementById('verktoy').scrollIntoView({behavior:'smooth'})">Prov na</button>
+    <a class="nav-link" href="/visjon.html">Visjon</a>
+    <button class="nav-cta" onclick="document.getElementById('verktoy').scrollIntoView({behavior:'smooth'})">Prøv nå</button>
   </nav>
 </header>
 
 <!-- HERO -->
 <div class="hero-wrap">
   <section class="hero">
-    <div class="hero-tag"><div class="hero-tag-dot"></div>Claude AI &middot; Plan- og bygningsloven &middot; Norge</div>
-    <h1 id="hero-h1">Placely gjor bygninger <span class="hero-key">maskinlesbare</span></h1>
-    <p>6 AI-verktoy for eiendomsmeglere, takstmenn, handverkere og arkitekter &ndash; drevet av Claude AI og tilpasset norsk lovverk.</p>
+    <div class="hero-tag"><div class="hero-tag-dot"></div>Plan- og bygningsloven · NS 3940 · Norge</div>
+    <h1 id="hero-h1">Forstå bygget. Finn avvik. <span class="hero-key">Dokumenter alt.</span></h1>
+    <p>6 verktøy for eiendomsmeglere, takstmenn, håndverkere og arkitekter – fra romplan og byggesjekk til søknadshjelp og FDV-dokumentasjon.</p>
     <div class="hero-actions">
-      <button class="btn-black" onclick="document.getElementById('verktoy').scrollIntoView({behavior:'smooth'})">Prov Romplan-analyse</button>
-      <button class="btn-outline" onclick="document.getElementById('produkter').scrollIntoView({behavior:'smooth'})">Se alle verktoy</button>
+      <button class="btn-black" onclick="document.getElementById('verktøy').scrollIntoView({behavior:'smooth'})">Prøv Romplan-analyse-analyse</button>
+      <button class="btn-outline" onclick="document.getElementById('produkter').scrollIntoView({behavior:'smooth'})">Se alle verktøy</button>
     </div>
   </section>
 </div>
@@ -746,63 +742,86 @@
 <!-- PRODUKTER -->
 <div id="produkter">
   <div class="section">
-    <div class="section-eyebrow reveal">6 verktoy</div>
-    <h2 class="reveal reveal-d1">Alt i en plattform</h2>
-    <p class="section-sub reveal reveal-d2">Drevet av AI og tilpasset norske regler. Ingen installasjon nodvendig.</p>
+    <div class="section-eyebrow reveal">11 verktøy</div>
+    <h2 class="reveal reveal-d1">Alt i én plattform</h2>
+    <p class="section-sub reveal reveal-d2">Tilpasset norsk lovverk og byggestandarder. Ingen installasjon nødvendig.</p>
     <div class="product-grid-6">
 
       <div class="product-card-6 reveal reveal-d1">
-        <div class="card-icon">&#127968;</div>
+        <div class="card-icon">🏠</div>
         <div class="card-title">Romplan-analyse</div>
-        <p class="card-desc">Last opp plantegning, fa BRA, romplan og kalkyle pa sekunder.</p>
-        <a class="card-link" href="#verktoy" onclick="event.preventDefault();document.getElementById('verktoy').scrollIntoView({behavior:'smooth'});switchTab('romplan')">
-          Prov na <span class="arrow">&#8594;</span>
-        </a>
+        <p class="card-desc">Last opp plantegning, få BRA, romplan og kalkyle på sekunder.</p>
+        <a class="card-link" href="#verktoy" onclick="event.preventDefault();document.getElementById('verktoy').scrollIntoView({behavior:'smooth'});switchTab('romplan')">Prøv nå <span class="arrow">→</span></a>
       </div>
 
       <div class="product-card-6 reveal reveal-d2">
-        <div class="card-icon">&#9878;&#65039;</div>
+        <div class="card-icon">⚖️</div>
         <div class="card-title">Byggesjekk</div>
-        <p class="card-desc">Sammenlign godkjent kommunetegning med navarende. Avdekk ulovlige tiltak.</p>
-        <a class="card-link" href="#verktoy" onclick="event.preventDefault();document.getElementById('verktoy').scrollIntoView({behavior:'smooth'});switchTab('byggesjekk')">
-          Prov na <span class="arrow">&#8594;</span>
-        </a>
+        <p class="card-desc">Sammenlign godkjent kommunetegning med nåværende. Avdekk ulovlige tiltak.</p>
+        <a class="card-link" href="#verktoy" onclick="event.preventDefault();document.getElementById('verktoy').scrollIntoView({behavior:'smooth'});switchTab('byggesjekk')">Prøv nå <span class="arrow">→</span></a>
       </div>
 
       <div class="product-card-6 reveal reveal-d3">
-        <div class="card-icon">&#128203;</div>
-        <div class="card-title">Soknadssjekk</div>
-        <p class="card-desc">Beskriv planlagte arbeider. AI sjekker om du trenger a soke kommunen.</p>
-        <a class="card-link" href="/soknadssjekk.html">
-          Apne verktoy <span class="arrow">&#8594;</span>
-        </a>
+        <div class="card-icon">📋</div>
+        <div class="card-title">Søknadssjekk</div>
+        <p class="card-desc">Beskriv planlagte arbeider. AI sjekker om du trenger å søke kommunen.</p>
+        <a class="card-link" href="/soknadssjekk.html">Åpne verktøy <span class="arrow">→</span></a>
+      </div>
+
+      <div class="product-card-6 reveal reveal-d1">
+        <div class="card-icon">🎨</div>
+        <div class="card-title">Estly</div>
+        <p class="card-desc">AI-vurdering av estetisk risiko mot §29.2. Unngå avslag på grunn av utforming.</p>
+        <a class="card-link" href="/estly.html">Åpne verktøy <span class="arrow">→</span></a>
       </div>
 
       <div class="product-card-6 reveal reveal-d2">
-        <div class="card-icon">&#128247;</div>
+        <div class="card-icon">🏦</div>
+        <div class="card-title">Finansly</div>
+        <p class="card-desc">Profesjonell eiendomsdokumentasjon for bank – BRA, tilstand og verdiestimat.</p>
+        <a class="card-link" href="/finansly.html">Åpne verktøy <span class="arrow">→</span></a>
+      </div>
+
+      <div class="product-card-6 reveal reveal-d3">
+        <div class="card-icon">🛡️</div>
+        <div class="card-title">Insurancely</div>
+        <p class="card-desc">Register og dokumenter rør, membran, elektro og alle installasjoner. Generer forsikringsrapport.</p>
+        <a class="card-link" href="/insurancely.html">Åpne verktøy <span class="arrow">→</span></a>
+      </div>
+
+      <div class="product-card-6 reveal reveal-d1">
+        <div class="card-icon">📂</div>
+        <div class="card-title">Arkivly</div>
+        <p class="card-desc">Analyser skannede kommunale arkivdokumenter. Finn hva som egentlig ble godkjent.</p>
+        <a class="card-link" href="/arkivly.html">Åpne verktøy <span class="arrow">→</span></a>
+      </div>
+
+      <div class="product-card-6 reveal reveal-d2">
+        <div class="card-icon">🔧</div>
+        <div class="card-title">Productly</div>
+        <p class="card-desc">FDV-register og produktspesifikasjoner. Veggen vet hva den er laget av.</p>
+        <a class="card-link" href="/productly.html">Åpne verktøy <span class="arrow">→</span></a>
+      </div>
+
+      <div class="product-card-6 reveal reveal-d3">
+        <div class="card-icon">📷</div>
         <div class="card-title">Capture</div>
         <p class="card-desc">iPhone-basert romscanning med semantisk tagging og SlimBIM-eksport.</p>
-        <a class="card-link" href="/capture.html">
-          Apne verktoy <span class="arrow">&#8594;</span>
-        </a>
-      </div>
-
-      <div class="product-card-6 reveal reveal-d3">
-        <div class="card-icon">&#9999;&#65039;</div>
-        <div class="card-title">Plantegning</div>
-        <p class="card-desc">Tegn 2D floorplan med live 3D-visning. Eksporter som SlimBIM JSON.</p>
-        <a class="card-link" href="/floorplanner.html">
-          Apne verktoy <span class="arrow">&#8594;</span>
-        </a>
+        <a class="card-link" href="/capture.html">Åpne verktøy <span class="arrow">→</span></a>
       </div>
 
       <div class="product-card-6 reveal reveal-d4">
-        <div class="card-icon">&#128296;</div>
+        <div class="card-icon">✏️</div>
+        <div class="card-title">Plantegning</div>
+        <p class="card-desc">Tegn floorplan i 2D med live 3D-visning. Eksporter som SlimBIM JSON.</p>
+        <a class="card-link" href="/floorplanner.html">Åpne verktøy <span class="arrow">→</span></a>
+      </div>
+
+      <div class="product-card-6 reveal reveal-d4">
+        <div class="card-icon">🔨</div>
         <div class="card-title">Handly</div>
-        <p class="card-desc">Digital arbeidsbok for handverkere. Oppdrag, rom, oppgaver, foto og PDF-rapport.</p>
-        <a class="card-link" href="/handly.html">
-          Apne verktoy <span class="arrow">&#8594;</span>
-        </a>
+        <p class="card-desc">Digital arbeidsbok for håndverkere. Oppdrag, rom, oppgaver, foto og PDF-rapport.</p>
+        <a class="card-link" href="/handly.html">Åpne verktøy <span class="arrow">→</span></a>
       </div>
 
     </div>
@@ -815,7 +834,7 @@
 <div id="hvem">
   <div class="section">
     <div class="section-eyebrow reveal">Hvem er det for</div>
-    <h2 class="reveal reveal-d1">Byggebransjens nye verktoyskasse</h2>
+    <h2 class="reveal reveal-d1">Byggebransjens nye verktøyskasse</h2>
     <p class="section-sub reveal reveal-d2">Placely er bygget for alle som jobber med bygninger &ndash; fra salg til dokumentasjon.</p>
     <div class="who-grid reveal reveal-d3">
       <div class="who-card">
@@ -849,7 +868,7 @@
   <div class="section">
     <div class="section-eyebrow reveal">SlimBIM</div>
     <h2 class="reveal reveal-d1">Et felles sprak for bygningsdata</h2>
-    <p class="section-sub reveal reveal-d2">Alle verktoy bruker SlimBIM &ndash; et apent JSON-format for bygningsdata som kobler sammen analyse, tegning og rapport.</p>
+    <p class="section-sub reveal reveal-d2">Alle verktøy bruker SlimBIM &ndash; et åpent JSON-format for bygningsdata som kobler sammen analyse, tegning og rapport.</p>
     <div class="slimbim-steps reveal reveal-d3">
       <div class="slimbim-step">
         <div class="step-num">01 &mdash; Importer</div>
@@ -859,12 +878,12 @@
       <div class="slimbim-step">
         <div class="step-num">02 &mdash; AI analyserer</div>
         <div class="step-title">Claude tolker bygningen</div>
-        <p class="step-desc">Claude AI identifiserer rom, arealer, bruksendringer og avvik mot plan- og bygningsloven pa sekunder.</p>
+        <p class="step-desc">AI identifiserer rom, arealer, bruksendringer og avvik mot plan- og bygningsloven på sekunder.</p>
       </div>
       <div class="slimbim-step">
         <div class="step-num">03 &mdash; SlimBIM JSON</div>
         <div class="step-title">Strukturert og maskinlesbar</div>
-        <p class="step-desc">Resultatet eksporteres som SlimBIM JSON &ndash; et apent format som kan brukes i andre systemer, rapporter og konfiguratorer.</p>
+        <p class="step-desc">Resultatet eksporteres som SlimBIM JSON &ndash; et åpent format som kan brukes i andre systemer, rapporter og konfiguratorer.</p>
       </div>
     </div>
   </div>
@@ -891,14 +910,14 @@
       </div>
       <div class="price-card featured reveal reveal-d3">
         <div class="price-label">Manedlig</div>
-        <div class="price-highlight">Alle 6 verktoy inkludert</div>
+        <div class="price-highlight">Alle 6 verktøy inkludert</div>
         <div class="price-amount" data-count="500">500</div>
         <div class="price-per">kr per maned</div>
         <div class="price-divider"></div>
         <ul class="price-list">
           <li>Ubegrenset romplan-analyser</li>
           <li>Ubegrenset byggesjekker</li>
-          <li>Soknadssjekk, Capture, Plantegning, Handly</li>
+          <li>Søknadssjekk, Capture, Plantegning, Handly</li>
           <li>Personlig API-nokkel</li>
           <li>Prioritert support</li>
         </ul>
@@ -912,9 +931,9 @@
 <hr class="divider">
 
 <!-- VERKTOY -->
-<div id="verktoy">
+<div id="verktøy">
   <div class="tool-section">
-    <h2 class="reveal">Prov verktoyene</h2>
+    <h2 class="reveal">Prøv verktøyene</h2>
     <p class="sub reveal reveal-d1">Du trenger en API-nokkel. Bestill ovenfor &ndash; du far nokkelen pa e-post.</p>
 
     <div class="key-box reveal reveal-d2" id="key-box">
@@ -979,7 +998,7 @@
         <label class="field-label">Adresse</label>
         <input type="text" id="addr-byggesjekk" placeholder="f.eks. Birkeveien 3A, Oslo">
       </div>
-      <button class="btn-run" id="btn-byggesjekk" onclick="runByggesjekk()">Kjor byggesjekk</button>
+      <button class="btn-run" id="btn-byggesjekk" onclick="runByggesjekk()">Kjør byggesjekk</button>
       <div id="loading-byggesjekk" style="display:none" class="loading"><div class="spinner"></div><p>Sammenligner tegninger &ndash; tar 15&ndash;40 sekunder</p></div>
       <div id="result-byggesjekk"></div>
     </div>
@@ -992,14 +1011,14 @@
     <div class="footer-top">
       <div class="footer-brand">
         <div class="footer-logo">Placely</div>
-        <p class="footer-tagline">6 AI-verktoy som gjor bygninger maskinlesbare. Drevet av Claude AI og tilpasset norsk lovverk.</p>
+        <p class="footer-tagline">Bygningens digitale hukommelse. Fra romplan og byggesjekk til søknad og dokumentasjon.</p>
       </div>
       <div>
-        <div class="footer-col-title">Verktoy</div>
+        <div class="footer-col-title">Verktøy</div>
         <ul class="footer-links">
-          <li><a href="#verktoy" onclick="event.preventDefault();document.getElementById('verktoy').scrollIntoView({behavior:'smooth'});switchTab('romplan')">Romplan-analyse</a></li>
-          <li><a href="#verktoy" onclick="event.preventDefault();document.getElementById('verktoy').scrollIntoView({behavior:'smooth'});switchTab('byggesjekk')">Byggesjekk</a></li>
-          <li><a href="/soknadssjekk.html">Soknadssjekk</a></li>
+          <li><a href="#verktøy" onclick="event.preventDefault();document.getElementById('verktøy').scrollIntoView({behavior:'smooth'});switchTab('romplan')">Romplan-analyse</a></li>
+          <li><a href="#verktøy" onclick="event.preventDefault();document.getElementById('verktøy').scrollIntoView({behavior:'smooth'});switchTab('byggesjekk')">Byggesjekk</a></li>
+          <li><a href="/søknadssjekk.html">Søknadssjekk</a></li>
           <li><a href="/capture.html">Capture</a></li>
           <li><a href="/floorplanner.html">Plantegning</a></li>
           <li><a href="/handly.html">Handly</a></li>
@@ -1016,7 +1035,7 @@
     </div>
     <div class="footer-bottom">
       <p class="footer-copy">&copy; 2025 <a href="https://nops.no" target="_blank" rel="noopener">NOPS AS</a> &nbsp;&middot;&nbsp; Et produkt av Konsepthus AS</p>
-      <p class="footer-copy">Drevet av <a href="https://anthropic.com" target="_blank" rel="noopener">Claude AI</a></p>
+      <p class="footer-copy">&copy; 2026 NOPS AS &middot; placely.no</p>
     </div>
   </div>
 </footer>

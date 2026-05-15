@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Placely – Finansly: Eiendomsdokumentasjon for bank</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --black:#0d0d0d;--white:#fff;--g50:#f7f7f5;--g100:#efefed;
+      --g200:#e0ddd8;--g300:#ccc9c2;--g500:#76736c;--g700:#404040;
+      --green:#166534;--green-bg:#dcfce7;--green-bd:#bbf7d0;
+      --orange:#9a3412;--orange-bg:#ffedd5;--orange-bd:#fed7aa;
+      --red:#991b1b;--red-bg:#fee2e2;--red-bd:#fecaca;
+      --yellow:#854d0e;--yellow-bg:#fef9c3;--yellow-bd:#fef08a;
+      --blue:#1e40af;--blue-bg:#dbeafe;
+      --ease:cubic-bezier(.22,.1,.22,1);
+    }
+    html{scroll-behavior:smooth}
+    body{font-family:'Inter',sans-serif;font-size:15px;color:var(--black);background:var(--white);-webkit-font-smoothing:antialiased}
+    a{color:inherit;text-decoration:none}
+
+    /* HEADER */
+    header{padding:18px 48px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--g100);position:sticky;top:0;background:rgba(255,255,255,.9);backdrop-filter:blur(12px);z-index:100}
+    .logo{font-size:17px;font-weight:800;letter-spacing:-.04em}
+    .logo em{font-style:normal;color:var(--g500);font-weight:500}
+    nav{display:flex;align-items:center;gap:4px}
+    .nav-link{padding:7px 13px;font-size:13px;color:var(--g500);border-radius:6px;font-weight:500;transition:all .15s}
+    .nav-link:hover{color:var(--black);background:var(--g50)}
+    .nav-link.active{color:var(--black);font-weight:600}
+
+    /* PAGE */
+    .page{max-width:760px;margin:0 auto;padding:56px 24px 80px}
+
+    /* HERO */
+    .hero{margin-bottom:44px}
+    .hero-tag{display:inline-flex;align-items:center;gap:8px;background:var(--white);border:1px solid var(--g100);border-radius:99px;padding:5px 14px 5px 10px;font-size:12px;font-weight:600;color:var(--g700);letter-spacing:.02em;margin-bottom:20px}
+    .hero-dot{width:6px;height:6px;background:#0ea5e9;border-radius:50%;animation:pulse 2s infinite}
+    @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.5);opacity:.6}}
+    h1{font-size:clamp(28px,5vw,48px);font-weight:800;letter-spacing:-.04em;line-height:1.06;margin-bottom:16px}
+    .hero-sub{font-size:17px;color:var(--g500);line-height:1.65;max-width:560px}
+
+    /* STEPS */
+    .steps{display:flex;gap:10px;margin:28px 0 44px;flex-wrap:wrap}
+    .step{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--g700);background:var(--g50);border:1px solid var(--g100);border-radius:8px;padding:8px 14px}
+    .step-num{width:20px;height:20px;border-radius:50%;background:var(--black);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+
+    /* CARD */
+    .card{background:var(--white);border:1px solid var(--g100);border-radius:14px;padding:32px;box-shadow:0 2px 16px rgba(0,0,0,.05);margin-bottom:28px}
+    .card-title{font-size:16px;font-weight:700;letter-spacing:-.02em;margin-bottom:20px}
+
+    .field{margin-bottom:18px}
+    .field-label{display:block;font-size:12px;font-weight:700;color:var(--g500);letter-spacing:.05em;text-transform:uppercase;margin-bottom:8px}
+    .field-hint{font-size:12px;color:var(--g500);margin-top:6px;line-height:1.5}
+    input.fi,select.fi{width:100%;padding:11px 14px;border:1.5px solid var(--g200);border-radius:8px;font-family:inherit;font-size:14px;outline:none;transition:border-color .15s;color:var(--black);background:var(--white)}
+    input.fi:focus,select.fi:focus{border-color:var(--black)}
+    input.fi::placeholder{color:var(--g300)}
+
+    /* TWO COL */
+    .two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    @media(max-width:520px){.two-col{grid-template-columns:1fr}}
+
+    /* UPLOAD */
+    .upload-zone{border:2px dashed var(--g200);border-radius:12px;padding:32px 24px;text-align:center;cursor:pointer;transition:all .2s;position:relative;background:var(--g50)}
+    .upload-zone:hover,.upload-zone.dragover{border-color:var(--black);background:var(--g100)}
+    .upload-zone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+    .upload-icon{font-size:32px;margin-bottom:10px;opacity:.5}
+    .upload-text{font-size:14px;font-weight:600;color:var(--g700);margin-bottom:4px}
+    .upload-sub{font-size:12px;color:var(--g500)}
+    .file-selected{margin-top:12px;display:flex;align-items:center;gap:10px;background:var(--white);border:1px solid var(--g100);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--g700)}
+    .file-name{flex:1;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .file-remove{background:none;border:none;color:var(--g500);cursor:pointer;font-size:16px;padding:0 4px;font-family:inherit}
+    .file-remove:hover{color:var(--red)}
+
+    /* API KEY */
+    .key-section{background:var(--g50);border:1px solid var(--g100);border-radius:10px;padding:16px 18px;margin-bottom:18px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+    .key-status{font-size:12px;font-weight:600;display:flex;align-items:center;gap:6px;flex:1}
+    .key-dot{width:7px;height:7px;border-radius:50%}
+    .key-dot.ok{background:#22c55e}
+    .key-dot.nok{background:#ef4444}
+    .key-input-wrap{display:flex;gap:8px;width:100%}
+    .key-input{flex:1;padding:8px 12px;border:1px solid var(--g200);border-radius:7px;font-family:inherit;font-size:13px;outline:none}
+    .key-input:focus{border-color:var(--black)}
+    .key-btn{padding:8px 16px;background:var(--black);color:#fff;border:none;border-radius:7px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap}
+    .key-btn:hover{background:#222}
+
+    /* SUBMIT */
+    .btn-run{width:100%;padding:14px;background:var(--black);color:#fff;border:none;border-radius:10px;font-family:inherit;font-size:15px;font-weight:700;letter-spacing:-.01em;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:10px}
+    .btn-run:hover{background:#1a1a1a;transform:translateY(-1px);box-shadow:0 6px 20px rgba(0,0,0,.15)}
+    .btn-run:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none}
+    .spinner{width:16px;height:16px;border:2.5px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    /* LOADING */
+    #loading{display:none;text-align:center;padding:32px;color:var(--g500)}
+    .loading-steps{display:flex;flex-direction:column;gap:8px;margin-top:16px;text-align:left;max-width:340px;margin-inline:auto}
+    .ls{font-size:13px;display:flex;align-items:center;gap:10px;opacity:.5;transition:opacity .3s}
+    .ls.active{opacity:1;font-weight:600;color:var(--black)}
+    .ls.done{opacity:.6}
+    .ls-icon{font-size:16px;width:22px;text-align:center}
+
+    /* RESULTS */
+    #results{display:none}
+
+    /* KEY METRICS */
+    .metrics-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:24px}
+    .metric-card{background:var(--white);border:1px solid var(--g100);border-radius:12px;padding:18px 20px}
+    .metric-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--g500);margin-bottom:6px}
+    .metric-value{font-size:26px;font-weight:800;letter-spacing:-.04em;color:var(--black);line-height:1}
+    .metric-sub{font-size:12px;color:var(--g500);margin-top:4px}
+    .metric-range{font-size:13px;font-weight:600;color:var(--g700);margin-top:4px}
+
+    /* DOC QUALITY */
+    .quality-card{background:var(--white);border:1px solid var(--g100);border-radius:12px;padding:20px 22px;margin-bottom:24px}
+    .quality-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--g500);margin-bottom:10px}
+    .quality-bar-wrap{background:var(--g100);border-radius:99px;height:8px;overflow:hidden;margin-bottom:8px}
+    .quality-bar{height:100%;border-radius:99px;transition:width .6s var(--ease)}
+    .qb-hoy{background:#22c55e}
+    .qb-middels{background:#f59e0b}
+    .qb-lav{background:#ef4444}
+    .quality-meta{display:flex;justify-content:space-between;align-items:center;font-size:13px}
+    .quality-score{font-weight:700}
+    .quality-nivaa{color:var(--g500)}
+    .quality-mangler{margin-top:10px;display:flex;flex-direction:column;gap:4px}
+    .quality-mangel{font-size:12px;color:var(--orange);display:flex;align-items:center;gap:6px}
+
+    /* VALUE ESTIMATE */
+    .value-card{background:var(--g50);border:1px solid var(--g100);border-radius:12px;padding:20px 22px;margin-bottom:24px}
+    .value-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--g500);margin-bottom:10px}
+    .value-range{font-size:28px;font-weight:800;letter-spacing:-.04em;color:var(--black)}
+    .value-pm2{font-size:13px;color:var(--g500);margin-top:4px}
+    .value-metodikk{font-size:12px;color:var(--g500);margin-top:8px;line-height:1.6;border-top:1px solid var(--g100);padding-top:10px}
+
+    /* BANK SECTION */
+    .section-group{display:flex;flex-direction:column;gap:12px;margin-bottom:24px}
+    .section-card{border:1.5px solid var(--g100);border-radius:12px;overflow:hidden}
+    .section-head{padding:14px 18px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none;background:var(--white)}
+    .section-head:hover{background:var(--g50)}
+    .section-head-left{display:flex;align-items:center;gap:10px}
+    .section-icon{font-size:18px;width:28px;text-align:center}
+    .section-title{font-size:15px;font-weight:700;letter-spacing:-.01em}
+    .section-count{font-size:12px;font-weight:600;background:var(--g100);color:var(--g700);padding:2px 9px;border-radius:99px}
+    .section-chevron{font-size:18px;color:var(--g500);transition:transform .2s}
+    .section-chevron.open{transform:rotate(180deg)}
+    .section-body{display:none;padding:0 18px 18px;border-top:1px solid var(--g100)}
+    .section-body.open{display:block}
+    .item-list{list-style:none;display:flex;flex-direction:column;gap:8px;margin-top:14px}
+    .item-list li{font-size:14px;line-height:1.6;padding-left:20px;position:relative;color:var(--g700)}
+    .item-list li::before{content:'';position:absolute;left:4px;top:8px;width:6px;height:6px;border-radius:50%}
+    .il-green li::before{background:#22c55e}
+    .il-orange li::before{background:#f97316}
+    .il-blue li::before{background:#3b82f6}
+
+    /* ROM TABLE */
+    .rom-table{width:100%;border-collapse:collapse;font-size:13px;margin-top:14px}
+    .rom-table th{text-align:left;padding:8px 12px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--g500);border-bottom:1.5px solid var(--g100)}
+    .rom-table td{padding:9px 12px;border-bottom:1px solid var(--g50);color:var(--g700)}
+    .rom-table tr:last-child td{border-bottom:none}
+    .rom-table tr:hover td{background:var(--g50)}
+    .rom-total td{font-weight:700;color:var(--black);border-top:1.5px solid var(--g200)!important}
+
+    /* TILSTAND BADGE */
+    .tilstand-badge{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:99px;font-size:12px;font-weight:700;border:1.5px solid}
+    .tb-god{background:var(--green-bg);border-color:var(--green-bd);color:var(--green)}
+    .tb-middels{background:var(--yellow-bg);border-color:var(--yellow-bd);color:var(--yellow)}
+    .tb-usikker{background:var(--orange-bg);border-color:var(--orange-bd);color:var(--orange)}
+
+    /* DISCLAIMER */
+    .disclaimer-box{background:var(--g50);border:1px solid var(--g100);border-radius:10px;padding:16px 18px;font-size:13px;color:var(--g500);line-height:1.65;margin-bottom:16px}
+    .disclaimer-box strong{color:var(--g700)}
+
+    /* ACTIONS */
+    .result-actions{display:flex;gap:10px;margin-bottom:28px;flex-wrap:wrap}
+    .btn-action{padding:10px 18px;border-radius:8px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;border:1px solid var(--g200);background:var(--white);color:var(--g700);transition:all .15s;display:flex;align-items:center;gap:7px}
+    .btn-action:hover{border-color:var(--black);color:var(--black)}
+    .btn-action.primary{background:var(--black);color:#fff;border-color:var(--black)}
+    .btn-action.primary:hover{background:#222}
+
+    /* ERROR */
+    .error-box{background:#fef2f2;border:1px solid var(--red-bd);border-radius:10px;padding:16px 18px;color:var(--red);font-size:14px;line-height:1.65;margin-top:16px}
+
+    /* PRINT */
+    @media print{
+      header,nav,.steps,.key-section,.btn-run,#loading,.result-actions,.upload-zone{display:none!important}
+      .card{border:none;padding:0;box-shadow:none}
+      .section-body{display:block!important}
+      .section-chevron{display:none}
+      body{font-size:12px}
+    }
+
+    /* FOOTER */
+    footer{border-top:1px solid var(--g100);padding:28px 48px;display:flex;align-items:center;justify-content:space-between;font-size:13px;color:var(--g500)}
+
+    @media(max-width:640px){
+      header{padding:14px 20px}
+      footer{padding:20px}
+      .page{padding:32px 16px 60px}
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <a href="index.html" class="logo">Placely</a>
+  <nav>
+    <a class="nav-link" href="index.html">← Hjem</a>
+    <a class="nav-link" href="soknadssjekk.html">Søknadssjekk</a>
+    <a class="nav-link" href="estly.html">Estly</a>
+    <a class="nav-link active" href="finansly.html">Finansly</a>
+  </nav>
+</header>
+
+<div class="page">
+  <div class="hero">
+    <div class="hero-tag"><div class="hero-dot"></div>Bank · Finansiering · Dokumentasjon</div>
+    <h1>Profesjonell eiendomsdokumentasjon for bank</h1>
+    <p class="hero-sub">Last opp plantegning og beskriv eiendommen. Få strukturert dokumentasjon klar for bankgodkjenning.</p>
+
+    <div class="steps">
+      <div class="step"><span class="step-num">1</span>Last opp plantegning</div>
+      <div class="step"><span class="step-num">2</span>Fyll inn bygningsinformasjon</div>
+      <div class="step"><span class="step-num">3</span>Motta bankdokumentasjon</div>
+    </div>
+  </div>
+
+  <!-- API KEY -->
+  <div class="key-section" id="key-section">
+    <div class="key-status" id="key-status">
+      <div class="key-dot nok" id="key-dot"></div>
+      <span id="key-text">Ingen API-nøkkel lagret</span>
+    </div>
+    <div class="key-input-wrap" id="key-input-wrap">
+      <input class="key-input" id="key-input" type="text" placeholder="Lim inn API-nøkkel">
+      <button class="key-btn" onclick="saveKey()">Lagre</button>
+    </div>
+  </div>
+
+  <!-- FORM -->
+  <div class="card">
+    <div class="card-title">Plantegning og eiendomsinformasjon</div>
+
+    <!-- FILE UPLOAD -->
+    <div class="field">
+      <label class="field-label">Plantegning <span style="color:var(--red)">*</span></label>
+      <div class="upload-zone" id="upload-zone">
+        <input type="file" id="file-input" accept="image/*,.pdf" onchange="handleFile(this.files[0])">
+        <div class="upload-icon">&#128196;</div>
+        <div class="upload-text">Dra og slipp plantegning her, eller klikk for å velge</div>
+        <div class="upload-sub">JPG, PNG, PDF – én plantegning</div>
+      </div>
+      <div id="file-selected" style="display:none" class="file-selected">
+        <span>&#128196;</span>
+        <span class="file-name" id="file-name"></span>
+        <button class="file-remove" onclick="removeFile()">&#10005;</button>
+      </div>
+    </div>
+
+    <!-- ADDRESS -->
+    <div class="field">
+      <label class="field-label">Adresse</label>
+      <input class="fi" id="adresse" type="text" placeholder="f.eks. Storgata 12, 7010 Trondheim">
+    </div>
+
+    <!-- YEAR + TYPE -->
+    <div class="two-col">
+      <div class="field">
+        <label class="field-label">Byggeår</label>
+        <input class="fi" id="byggeaar" type="number" placeholder="f.eks. 1985" min="1800" max="2030">
+      </div>
+      <div class="field">
+        <label class="field-label">Bygningstype</label>
+        <select class="fi" id="bygningstype">
+          <option value="enebolig">Enebolig</option>
+          <option value="rekkehus">Rekkehus</option>
+          <option value="leilighet">Leilighet</option>
+          <option value="tomannsbolig">Tomannsbolig</option>
+          <option value="hytte">Hytte / fritidseiendom</option>
+          <option value="næringsbygg">Næringsbygg</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- CONDITION -->
+    <div class="field">
+      <label class="field-label">Tilstand</label>
+      <select class="fi" id="tilstand">
+        <option value="god">God stand</option>
+        <option value="middels">Middels – noe slitasje</option>
+        <option value="trenger oppussing">Trenger oppussing</option>
+        <option value="ukjent">Ukjent tilstand</option>
+      </select>
+    </div>
+
+    <div id="error-form" style="display:none"></div>
+    <button class="btn-run" id="btn-run" onclick="runFinansly()">
+      <span id="btn-text">Generer bankdokumentasjon</span>
+    </button>
+  </div>
+
+  <!-- LOADING -->
+  <div id="loading">
+    <div class="spinner" style="width:28px;height:28px;border-width:3px;margin:0 auto 16px;border-color:rgba(0,0,0,.12);border-top-color:var(--black)"></div>
+    <div style="font-weight:600;font-size:15px;margin-bottom:4px">Analyserer plantegning og genererer dokumentasjon…</div>
+    <div style="font-size:13px;color:var(--g500)">Beregner BRA og verdiestimat – tar 15–30 sekunder</div>
+    <div class="loading-steps" id="loading-steps">
+      <div class="ls" id="ls1"><span class="ls-icon">&#128196;</span>Leser plantegning</div>
+      <div class="ls" id="ls2"><span class="ls-icon">&#128207;</span>Beregner BRA etter NS 3940</div>
+      <div class="ls" id="ls3"><span class="ls-icon">&#127968;</span>Identifiserer rom og funksjoner</div>
+      <div class="ls" id="ls4"><span class="ls-icon">&#128176;</span>Estimerer markedsverdi</div>
+      <div class="ls" id="ls5"><span class="ls-icon">&#128203;</span>Sammenstiller bankdokumentasjon</div>
+    </div>
+  </div>
+
+  <!-- RESULTS -->
+  <div id="results">
+    <div class="result-actions">
+      <button class="btn-action primary" onclick="window.print()">&#8595; Vis full dokumentasjon (PDF)</button>
+      <button class="btn-action" onclick="resetForm()">&#8592; Ny analyse</button>
+    </div>
+
+    <!-- KEY METRICS -->
+    <div class="metrics-row" id="metrics-row"></div>
+
+    <!-- DOCUMENTATION QUALITY -->
+    <div class="quality-card" id="quality-card"></div>
+
+    <!-- VALUE ESTIMATE -->
+    <div class="value-card" id="value-card"></div>
+
+    <!-- SECTIONS -->
+    <div class="section-group" id="section-group"></div>
+
+    <!-- DISCLAIMER -->
+    <div class="disclaimer-box" id="disclaimer-box"></div>
+  </div>
+</div>
+
+<footer>
+  <span>Finansly er AI-analyse og ikke offisiell verdivurdering. Kontakt godkjent takstmann for offisiell takst.</span>
+  <span>Placely · <a href="mailto:jakob@tegnebua.no" style="color:inherit">jakob@tegnebua.no</a></span>
+</footer>
+
+<script>
+const XDI = 'https://xdi-production.up.railway.app';
+const KEY_STORE = 'placely_api_key';
+
+let selectedFile = null;
+
+// ── FILE HANDLING ─────────────────────────────────────────────────
+function handleFile(file) {
+  if (!file) return;
+  selectedFile = file;
+  document.getElementById('file-name').textContent = file.name;
+  document.getElementById('file-selected').style.display = 'flex';
+  document.getElementById('upload-zone').style.display = 'none';
+}
+
+function removeFile() {
+  selectedFile = null;
+  document.getElementById('file-input').value = '';
+  document.getElementById('file-selected').style.display = 'none';
+  document.getElementById('upload-zone').style.display = 'block';
+}
+
+// Drag and drop
+const zone = document.getElementById('upload-zone');
+zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('dragover'); });
+zone.addEventListener('dragleave', () => zone.classList.remove('dragover'));
+zone.addEventListener('drop', e => {
+  e.preventDefault();
+  zone.classList.remove('dragover');
+  if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
+});
+
+// ── API KEY ───────────────────────────────────────────────────────
+function loadKey() {
+  const k = localStorage.getItem(KEY_STORE);
+  const dot  = document.getElementById('key-dot');
+  const txt  = document.getElementById('key-text');
+  const wrap = document.getElementById('key-input-wrap');
+  if (k) {
+    dot.className = 'key-dot ok';
+    txt.textContent = 'API-nøkkel aktiv: ' + k.substring(0,8) + '…';
+    wrap.innerHTML = `<button class="key-btn" onclick="clearKey()" style="background:var(--g200);color:var(--black)">Bytt nøkkel</button>`;
+  } else {
+    dot.className = 'key-dot nok';
+    txt.textContent = 'Ingen API-nøkkel lagret';
+    wrap.innerHTML = `<input class="key-input" id="key-input" type="text" placeholder="Lim inn API-nøkkel"><button class="key-btn" onclick="saveKey()">Lagre</button>`;
+  }
+}
+function saveKey() {
+  const v = document.getElementById('key-input')?.value.trim();
+  if (!v) return;
+  localStorage.setItem(KEY_STORE, v);
+  loadKey();
+}
+function clearKey() { localStorage.removeItem(KEY_STORE); loadKey(); }
+function getKey()   { return localStorage.getItem(KEY_STORE) || ''; }
+
+// ── LOADING ANIMATION ─────────────────────────────────────────────
+let loadingTimer = null;
+function startLoadingAnim() {
+  const steps = [1,2,3,4,5];
+  let i = 0;
+  steps.forEach(n => document.getElementById('ls'+n).className = 'ls');
+  loadingTimer = setInterval(() => {
+    if (i > 0) document.getElementById('ls'+steps[i-1]).className = 'ls done';
+    if (i < steps.length) { document.getElementById('ls'+steps[i]).className = 'ls active'; i++; }
+    else clearInterval(loadingTimer);
+  }, 4000);
+}
+function stopLoadingAnim() {
+  clearInterval(loadingTimer);
+  [1,2,3,4,5].forEach(n => { const el=document.getElementById('ls'+n); if(el) el.className='ls'; });
+}
+
+// ── MAIN RUN ──────────────────────────────────────────────────────
+async function runFinansly() {
+  if (!selectedFile) {
+    showError('Last opp en plantegning for å fortsette.');
+    return;
+  }
+  document.getElementById('error-form').style.display = 'none';
+
+  const btn = document.getElementById('btn-run');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner"></div> Analyserer…';
+
+  document.getElementById('loading').style.display = 'block';
+  document.getElementById('results').style.display = 'none';
+  document.getElementById('loading').scrollIntoView({ behavior:'smooth', block:'start' });
+
+  startLoadingAnim();
+
+  try {
+    const fd = new FormData();
+    fd.append('file', selectedFile);
+
+    const adresse   = document.getElementById('adresse').value.trim();
+    const byggeaar  = document.getElementById('byggeaar').value.trim();
+    const type      = document.getElementById('bygningstype').value;
+    const tilstand  = document.getElementById('tilstand').value;
+
+    if (adresse)  fd.append('adresse', adresse);
+    if (byggeaar) fd.append('year', byggeaar);
+    fd.append('bygningstype', type);
+    fd.append('tilstand', tilstand);
+
+    const r = await fetch(XDI + '/analyse/finansly', {
+      method: 'POST',
+      headers: { 'X-API-Key': getKey() },
+      body: fd,
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.detail || JSON.stringify(d));
+    renderResults(d);
+  } catch(e) {
+    document.getElementById('loading').style.display = 'none';
+    showError(e.message.includes('401') || e.message.toLowerCase().includes('key')
+      ? 'Ugyldig eller manglende API-nøkkel. <a href="mailto:jakob@tegnebua.no" style="color:inherit;text-decoration:underline">Bestill tilgang.</a>'
+      : esc(e.message));
+  } finally {
+    stopLoadingAnim();
+    btn.disabled = false;
+    btn.innerHTML = '<span id="btn-text">Generer bankdokumentasjon</span>';
+  }
+}
+
+// ── RENDER RESULTS ────────────────────────────────────────────────
+function renderResults(d) {
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('results').style.display = 'block';
+
+  const bra   = d.bra_m2 || 0;
+  const range = d.bra_range || {};
+  const til   = d.tilstand || {};
+
+  // Key metrics
+  const tilstandCls = { god:'tb-god', middels:'tb-middels', usikker:'tb-usikker' }[til.vurdering] || 'tb-usikker';
+  const tilstandLbl = { god:'God stand', middels:'Middels stand', usikker:'Usikker tilstand' }[til.vurdering] || til.vurdering;
+
+  document.getElementById('metrics-row').innerHTML = `
+    <div class="metric-card">
+      <div class="metric-label">BRA</div>
+      <div class="metric-value">${bra ? bra.toFixed(0) : '–'} <span style="font-size:16px;font-weight:500">m²</span></div>
+      ${range.min && range.max ? `<div class="metric-range">${range.min.toFixed(0)}–${range.max.toFixed(0)} m² (spenn)</div>` : ''}
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Soverom</div>
+      <div class="metric-value">${d.soverom ?? '–'}</div>
+      <div class="metric-sub">soverom</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Bad</div>
+      <div class="metric-value">${d.bad ?? '–'}</div>
+      <div class="metric-sub">bad/WC</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Tilstand</div>
+      <div style="margin-top:8px"><span class="tilstand-badge ${tilstandCls}">${tilstandLbl}</span></div>
+      ${til.kommentar ? `<div class="metric-sub" style="margin-top:8px">${esc(til.kommentar)}</div>` : ''}
+    </div>`;
+
+  // Documentation quality
+  const dq  = d.dokumentasjonskvalitet || {};
+  const score = dq.score || 0;
+  const pct   = Math.round(score * 100);
+  const nivaa = dq.nivaa || 'lav';
+  const qbCls = { høy:'qb-hoy', middels:'qb-middels', lav:'qb-lav' }[nivaa] || 'qb-lav';
+  const mangler = dq.mangler || [];
+
+  document.getElementById('quality-card').innerHTML = `
+    <div class="quality-label">Dokumentasjonskvalitet</div>
+    <div class="quality-bar-wrap">
+      <div class="quality-bar ${qbCls}" style="width:${pct}%"></div>
+    </div>
+    <div class="quality-meta">
+      <span class="quality-score">${pct}%</span>
+      <span class="quality-nivaa">${nivaa.charAt(0).toUpperCase()+nivaa.slice(1)} kvalitet</span>
+    </div>
+    ${mangler.length ? `
+      <div class="quality-mangler">
+        ${mangler.map(m=>`<div class="quality-mangel">&#9888; ${esc(m)}</div>`).join('')}
+      </div>` : ''}`;
+
+  // Value estimate
+  const ev  = d.estimert_verdi || {};
+  const fra = ev.fra ? formatKr(ev.fra) : '–';
+  const til2 = ev.til ? formatKr(ev.til) : '–';
+  const pm2 = ev.per_m2 ? formatKr(ev.per_m2) + '/m²' : '';
+
+  document.getElementById('value-card').innerHTML = `
+    <div class="value-label">Estimert markedsverdi</div>
+    <div class="value-range">${fra} – ${til2}</div>
+    ${pm2 ? `<div class="value-pm2">${pm2}</div>` : ''}
+    ${ev.metodikk ? `<div class="value-metodikk">${esc(ev.metodikk)}</div>` : ''}`;
+
+  // Bank documentation sections
+  const bd = d.bankdokumentasjon || {};
+  const sections = [];
+
+  if (bd.bekreftede_fakta?.length) {
+    sections.push(buildSection('&#9989;', 'Bekreftede fakta', bd.bekreftede_fakta.length, `
+      <ul class="item-list il-green">${bd.bekreftede_fakta.map(f=>`<li>${esc(f)}</li>`).join('')}</ul>`, true));
+  }
+  if (bd.usikre_punkter?.length) {
+    sections.push(buildSection('&#9888;&#65039;', 'Usikre punkter', bd.usikre_punkter.length, `
+      <ul class="item-list il-orange">${bd.usikre_punkter.map(u=>`<li>${esc(u)}</li>`).join('')}</ul>`, true));
+  }
+  if (bd.anbefalt_oppfolging?.length) {
+    sections.push(buildSection('&#128161;', 'Anbefalt oppfølging', bd.anbefalt_oppfolging.length, `
+      <ul class="item-list il-blue">${bd.anbefalt_oppfolging.map(a=>`<li>${esc(a)}</li>`).join('')}</ul>`));
+  }
+
+  // Room table
+  if (d.rom?.length) {
+    const totalBra = d.rom.reduce((s,r) => s+(r.areal_m2||0), 0);
+    sections.push(buildSection('&#127968;', 'Romplan', d.rom.length, `
+      <table class="rom-table">
+        <thead><tr><th>Rom</th><th>Etasje</th><th>Areal</th></tr></thead>
+        <tbody>
+          ${d.rom.map(r=>`
+            <tr>
+              <td>${esc(r.navn || r.type || '–')}</td>
+              <td>${r.etasje ? 'Etasje '+r.etasje : '–'}</td>
+              <td>${r.areal_m2 ? r.areal_m2.toFixed(1)+' m²' : '–'}</td>
+            </tr>`).join('')}
+          <tr class="rom-total">
+            <td colspan="2">Total BRA</td>
+            <td>${totalBra.toFixed(1)} m²</td>
+          </tr>
+        </tbody>
+      </table>`));
+  }
+
+  document.getElementById('section-group').innerHTML = sections.join('');
+
+  // Disclaimer
+  document.getElementById('disclaimer-box').innerHTML =
+    `<strong>&#9888; Forbehold</strong><br>${esc(d.disclaimer || '')}`;
+
+  document.getElementById('results').scrollIntoView({ behavior:'smooth' });
+}
+
+let sectionCount = 0;
+function buildSection(icon, title, count, bodyHtml, autoOpen) {
+  const id = 'sec-' + (sectionCount++);
+  const countBadge = count != null ? `<span class="section-count">${count}</span>` : '';
+  return `
+    <div class="section-card">
+      <div class="section-head" onclick="toggleSection('${id}')">
+        <div class="section-head-left">
+          <span class="section-icon">${icon}</span>
+          <span class="section-title">${title}</span>
+          ${countBadge}
+        </div>
+        <span class="section-chevron${autoOpen?' open':''}" id="chev-${id}">&#9662;</span>
+      </div>
+      <div class="section-body${autoOpen?' open':''}" id="${id}">${bodyHtml}</div>
+    </div>`;
+}
+
+function toggleSection(id) {
+  const body = document.getElementById(id);
+  const chev = document.getElementById('chev-' + id);
+  const open = body.classList.toggle('open');
+  if (chev) chev.classList.toggle('open', open);
+}
+
+function resetForm() {
+  document.getElementById('results').style.display = 'none';
+  document.getElementById('adresse').value = '';
+  document.getElementById('byggeaar').value = '';
+  removeFile();
+  sectionCount = 0;
+  window.scrollTo({ top: 0, behavior:'smooth' });
+}
+
+function showError(msg) {
+  const el = document.getElementById('error-form');
+  el.innerHTML = `<div class="error-box">${msg}</div>`;
+  el.style.display = 'block';
+}
+
+function formatKr(n) {
+  if (!n) return '–';
+  return new Intl.NumberFormat('nb-NO', { style:'currency', currency:'NOK', maximumFractionDigits:0 }).format(n);
+}
+
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/\n/g,'<br>');
+}
+
+loadKey();
+</script>
+</body>
+</html>

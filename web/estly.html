@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Placely – Estly: Estetisk vurdering §29.2</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --black:#0d0d0d;--white:#fff;--g50:#f7f7f5;--g100:#efefed;
+      --g200:#e0ddd8;--g300:#ccc9c2;--g500:#76736c;--g700:#404040;
+      --green:#166534;--green-bg:#dcfce7;--green-bd:#bbf7d0;
+      --orange:#9a3412;--orange-bg:#ffedd5;--orange-bd:#fed7aa;
+      --red:#991b1b;--red-bg:#fee2e2;--red-bd:#fecaca;
+      --yellow:#854d0e;--yellow-bg:#fef9c3;--yellow-bd:#fef08a;
+      --blue:#1e40af;--blue-bg:#dbeafe;
+      --ease:cubic-bezier(.22,.1,.22,1);
+    }
+    html{scroll-behavior:smooth}
+    body{font-family:'Inter',sans-serif;font-size:15px;color:var(--black);background:var(--white);-webkit-font-smoothing:antialiased}
+    a{color:inherit;text-decoration:none}
+
+    /* HEADER */
+    header{padding:18px 48px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--g100);position:sticky;top:0;background:rgba(255,255,255,.9);backdrop-filter:blur(12px);z-index:100}
+    .logo{font-size:17px;font-weight:800;letter-spacing:-.04em}
+    .logo em{font-style:normal;color:var(--g500);font-weight:500}
+    nav{display:flex;align-items:center;gap:4px}
+    .nav-link{padding:7px 13px;font-size:13px;color:var(--g500);border-radius:6px;font-weight:500;transition:all .15s}
+    .nav-link:hover{color:var(--black);background:var(--g50)}
+    .nav-link.active{color:var(--black);font-weight:600}
+
+    /* PAGE */
+    .page{max-width:760px;margin:0 auto;padding:56px 24px 80px}
+
+    /* HERO */
+    .hero{margin-bottom:44px}
+    .hero-tag{display:inline-flex;align-items:center;gap:8px;background:var(--white);border:1px solid var(--g100);border-radius:99px;padding:5px 14px 5px 10px;font-size:12px;font-weight:600;color:var(--g700);letter-spacing:.02em;margin-bottom:20px}
+    .hero-dot{width:6px;height:6px;background:#a855f7;border-radius:50%;animation:pulse 2s infinite}
+    @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.5);opacity:.6}}
+    h1{font-size:clamp(28px,5vw,48px);font-weight:800;letter-spacing:-.04em;line-height:1.06;margin-bottom:16px}
+    .hero-sub{font-size:17px;color:var(--g500);line-height:1.65;max-width:560px}
+
+    /* STEPS */
+    .steps{display:flex;gap:10px;margin:28px 0 44px;flex-wrap:wrap}
+    .step{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--g700);background:var(--g50);border:1px solid var(--g100);border-radius:8px;padding:8px 14px}
+    .step-num{width:20px;height:20px;border-radius:50%;background:var(--black);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+
+    /* CARD */
+    .card{background:var(--white);border:1px solid var(--g100);border-radius:14px;padding:32px;box-shadow:0 2px 16px rgba(0,0,0,.05);margin-bottom:28px}
+    .card-title{font-size:16px;font-weight:700;letter-spacing:-.02em;margin-bottom:20px}
+
+    .field{margin-bottom:18px}
+    .field-label{display:block;font-size:12px;font-weight:700;color:var(--g500);letter-spacing:.05em;text-transform:uppercase;margin-bottom:8px}
+    .field-hint{font-size:12px;color:var(--g500);margin-top:6px;line-height:1.5}
+    textarea.fi{width:100%;padding:14px 16px;border:1.5px solid var(--g200);border-radius:10px;font-family:'Inter',sans-serif;font-size:14px;line-height:1.6;resize:vertical;min-height:120px;outline:none;transition:border-color .15s;color:var(--black)}
+    textarea.fi:focus{border-color:var(--black)}
+    textarea.fi::placeholder{color:var(--g300)}
+    input.fi,select.fi{width:100%;padding:11px 14px;border:1.5px solid var(--g200);border-radius:8px;font-family:inherit;font-size:14px;outline:none;transition:border-color .15s;color:var(--black);background:var(--white)}
+    input.fi:focus,select.fi:focus{border-color:var(--black)}
+    input.fi::placeholder{color:var(--g300)}
+
+    /* DRAG AND DROP */
+    .upload-zone{border:2px dashed var(--g200);border-radius:12px;padding:32px 24px;text-align:center;cursor:pointer;transition:all .2s;position:relative;background:var(--g50)}
+    .upload-zone:hover,.upload-zone.dragover{border-color:var(--black);background:var(--g100)}
+    .upload-zone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+    .upload-icon{font-size:32px;margin-bottom:10px;opacity:.5}
+    .upload-text{font-size:14px;font-weight:600;color:var(--g700);margin-bottom:4px}
+    .upload-sub{font-size:12px;color:var(--g500)}
+    .preview-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-top:16px}
+    .preview-item{position:relative;border-radius:8px;overflow:hidden;aspect-ratio:4/3;border:1px solid var(--g100)}
+    .preview-item img{width:100%;height:100%;object-fit:cover}
+    .preview-remove{position:absolute;top:5px;right:5px;width:20px;height:20px;border-radius:50%;background:rgba(0,0,0,.6);color:#fff;border:none;cursor:pointer;font-size:11px;display:flex;align-items:center;justify-content:center;font-family:inherit}
+    .preview-remove:hover{background:var(--red)}
+    .preview-label{font-size:11px;text-align:center;margin-top:4px;color:var(--g500)}
+
+    /* TWO COL */
+    .two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    @media(max-width:520px){.two-col{grid-template-columns:1fr}}
+
+    /* API KEY */
+    .key-section{background:var(--g50);border:1px solid var(--g100);border-radius:10px;padding:16px 18px;margin-bottom:18px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+    .key-status{font-size:12px;font-weight:600;display:flex;align-items:center;gap:6px;flex:1}
+    .key-dot{width:7px;height:7px;border-radius:50%}
+    .key-dot.ok{background:#22c55e}
+    .key-dot.nok{background:#ef4444}
+    .key-input-wrap{display:flex;gap:8px;width:100%}
+    .key-input{flex:1;padding:8px 12px;border:1px solid var(--g200);border-radius:7px;font-family:inherit;font-size:13px;outline:none}
+    .key-input:focus{border-color:var(--black)}
+    .key-btn{padding:8px 16px;background:var(--black);color:#fff;border:none;border-radius:7px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap}
+    .key-btn:hover{background:#222}
+
+    /* SUBMIT */
+    .btn-run{width:100%;padding:14px;background:var(--black);color:#fff;border:none;border-radius:10px;font-family:inherit;font-size:15px;font-weight:700;letter-spacing:-.01em;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:10px}
+    .btn-run:hover{background:#1a1a1a;transform:translateY(-1px);box-shadow:0 6px 20px rgba(0,0,0,.15)}
+    .btn-run:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none}
+    .spinner{width:16px;height:16px;border:2.5px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    /* LOADING */
+    #loading{display:none;text-align:center;padding:32px;color:var(--g500)}
+    .loading-steps{display:flex;flex-direction:column;gap:8px;margin-top:16px;text-align:left;max-width:340px;margin-inline:auto}
+    .ls{font-size:13px;display:flex;align-items:center;gap:10px;opacity:.5;transition:opacity .3s}
+    .ls.active{opacity:1;font-weight:600;color:var(--black)}
+    .ls.done{opacity:.6}
+    .ls-icon{font-size:16px;width:22px;text-align:center}
+
+    /* RESULTS */
+    #results{display:none}
+
+    /* VERDICT BADGE */
+    .verdict-row{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:24px}
+    .verdict-badge{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border-radius:10px;font-size:15px;font-weight:700;border:2px solid}
+    .vb-god{background:var(--green-bg);border-color:var(--green-bd);color:var(--green)}
+    .vb-akseptabel{background:var(--yellow-bg);border-color:var(--yellow-bd);color:var(--yellow)}
+    .vb-utfordrende{background:var(--orange-bg);border-color:var(--orange-bd);color:var(--orange)}
+    .vb-risikofylt{background:var(--red-bg);border-color:var(--red-bd);color:var(--red)}
+    .risiko-badge{display:inline-flex;align-items:center;gap:7px;padding:9px 16px;border-radius:99px;font-size:13px;font-weight:700;border:1.5px solid}
+    .rb-lav{background:var(--green-bg);border-color:var(--green-bd);color:var(--green)}
+    .rb-middels{background:var(--yellow-bg);border-color:var(--yellow-bd);color:var(--yellow)}
+    .rb-hoy{background:var(--red-bg);border-color:var(--red-bd);color:var(--red)}
+
+    /* SUMMARY BOX */
+    .result-summary{background:var(--g50);border:1px solid var(--g100);border-radius:12px;padding:22px 24px;margin-bottom:24px}
+    .rs-label{font-size:11px;font-weight:700;color:var(--g500);letter-spacing:.07em;text-transform:uppercase;margin-bottom:8px}
+    .rs-text{font-size:15px;line-height:1.65;color:var(--g700)}
+
+    /* COLLAPSIBLE SECTIONS */
+    .section-group{display:flex;flex-direction:column;gap:12px;margin-bottom:24px}
+    .section-card{border:1.5px solid var(--g100);border-radius:12px;overflow:hidden}
+    .section-head{padding:14px 18px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none;background:var(--white)}
+    .section-head:hover{background:var(--g50)}
+    .section-head-left{display:flex;align-items:center;gap:10px}
+    .section-icon{font-size:18px;width:28px;text-align:center}
+    .section-title{font-size:15px;font-weight:700;letter-spacing:-.01em}
+    .section-count{font-size:12px;font-weight:600;background:var(--g100);color:var(--g700);padding:2px 9px;border-radius:99px}
+    .section-chevron{font-size:18px;color:var(--g500);transition:transform .2s}
+    .section-chevron.open{transform:rotate(180deg)}
+    .section-body{display:none;padding:0 18px 18px;border-top:1px solid var(--g100)}
+    .section-body.open{display:block}
+    .item-list{list-style:none;display:flex;flex-direction:column;gap:8px;margin-top:14px}
+    .item-list li{font-size:14px;line-height:1.6;padding-left:20px;position:relative;color:var(--g700)}
+    .item-list li::before{content:'';position:absolute;left:4px;top:8px;width:6px;height:6px;border-radius:50%}
+    .il-green li::before{background:var(--green)}
+    .il-red li::before{background:var(--red)}
+    .il-blue li::before{background:#3b82f6}
+    .sub-section{margin-top:16px}
+    .sub-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--g500);margin-bottom:6px}
+    .sub-text{font-size:14px;line-height:1.65;color:var(--g700)}
+    .lokal-box{background:var(--blue-bg);border:1px solid #bfdbfe;border-radius:8px;padding:14px 16px;font-size:14px;color:var(--blue);line-height:1.65;margin-top:14px}
+
+    /* DISCLAIMER */
+    .disclaimer-box{background:var(--g50);border:1px solid var(--g100);border-radius:10px;padding:16px 18px;font-size:13px;color:var(--g500);line-height:1.65;margin-bottom:16px}
+    .disclaimer-box strong{color:var(--g700)}
+
+    /* ACTIONS */
+    .result-actions{display:flex;gap:10px;margin-bottom:28px;flex-wrap:wrap}
+    .btn-action{padding:10px 18px;border-radius:8px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;border:1px solid var(--g200);background:var(--white);color:var(--g700);transition:all .15s;display:flex;align-items:center;gap:7px}
+    .btn-action:hover{border-color:var(--black);color:var(--black)}
+    .btn-action.primary{background:var(--black);color:#fff;border-color:var(--black)}
+    .btn-action.primary:hover{background:#222}
+
+    /* ERROR */
+    .error-box{background:#fef2f2;border:1px solid var(--red-bd);border-radius:10px;padding:16px 18px;color:var(--red);font-size:14px;line-height:1.65;margin-top:16px}
+
+    /* PRINT */
+    @media print{
+      header,nav,.steps,.key-section,.btn-run,#loading,.result-actions,.upload-zone,.preview-grid{display:none!important}
+      .card{border:none;padding:0;box-shadow:none}
+      .section-body{display:block!important}
+      .section-chevron{display:none}
+      body{font-size:12px}
+    }
+
+    /* FOOTER */
+    footer{border-top:1px solid var(--g100);padding:28px 48px;display:flex;align-items:center;justify-content:space-between;font-size:13px;color:var(--g500)}
+
+    @media(max-width:640px){
+      header{padding:14px 20px}
+      footer{padding:20px}
+      .page{padding:32px 16px 60px}
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <a href="index.html" class="logo">Placely</a>
+  <nav>
+    <a class="nav-link" href="index.html">← Hjem</a>
+    <a class="nav-link" href="soknadssjekk.html">Søknadssjekk</a>
+    <a class="nav-link active" href="estly.html">Estly</a>
+    <a class="nav-link" href="finansly.html">Finansly</a>
+  </nav>
+</header>
+
+<div class="page">
+  <div class="hero">
+    <div class="hero-tag"><div class="hero-dot"></div>Plan- og bygningsloven §29.2</div>
+    <h1>Vil prosjektet ditt bestå en §29.2-vurdering?</h1>
+    <p class="hero-sub">Last opp fasadebilder og beskriv prosjektet. Få en AI-vurdering av estetisk risiko mot lokal byggeskikk.</p>
+
+    <div class="steps">
+      <div class="step"><span class="step-num">1</span>Last opp fasadebilder</div>
+      <div class="step"><span class="step-num">2</span>Beskriv prosjektet</div>
+      <div class="step"><span class="step-num">3</span>Få §29.2-risikovurdering</div>
+    </div>
+  </div>
+
+  <!-- API KEY -->
+  <div class="key-section" id="key-section">
+    <div class="key-status" id="key-status">
+      <div class="key-dot nok" id="key-dot"></div>
+      <span id="key-text">Ingen API-nøkkel lagret</span>
+    </div>
+    <div class="key-input-wrap" id="key-input-wrap">
+      <input class="key-input" id="key-input" type="text" placeholder="Lim inn API-nøkkel">
+      <button class="key-btn" onclick="saveKey()">Lagre</button>
+    </div>
+  </div>
+
+  <!-- FORM -->
+  <div class="card">
+    <div class="card-title">Fasadebilder og prosjektinformasjon</div>
+
+    <!-- IMAGE UPLOAD -->
+    <div class="field">
+      <label class="field-label">Fasadebilder / skisser (opptil 4)</label>
+      <div class="upload-zone" id="upload-zone">
+        <input type="file" id="file-input" accept="image/*" multiple onchange="handleFiles(this.files)">
+        <div class="upload-icon">&#128247;</div>
+        <div class="upload-text">Dra og slipp bilder her, eller klikk for å velge</div>
+        <div class="upload-sub">JPG, PNG, WEBP – opptil 4 fasadebilder eller skisser</div>
+      </div>
+      <div class="preview-grid" id="preview-grid"></div>
+    </div>
+
+    <!-- PROJECT DESCRIPTION -->
+    <div class="field">
+      <label class="field-label">Beskriv prosjektet</label>
+      <textarea class="fi" id="beskrivelse" placeholder="Beskriv takform, materialer, endringer fra eksisterende bygg, nærliggende bebyggelse osv.
+
+Eksempel:
+– Enebolig med saltak 35°, stående trekledning i grå farge
+– Tilbygg på baksiden, flatt tak med tekket papp
+– Nærliggende bygg har bratte røde tegltak og lyse fasader"></textarea>
+      <p class="field-hint">Jo mer detaljer du gir om materialer og omgivelser, jo mer presis blir vurderingen.</p>
+    </div>
+
+    <!-- KOMMUNE + TYPE -->
+    <div class="two-col">
+      <div class="field">
+        <label class="field-label">Kommune <span style="color:var(--red)">*</span></label>
+        <input class="fi" id="kommune" type="text" placeholder="f.eks. Trondheim, Bergen, Oslo">
+      </div>
+      <div class="field">
+        <label class="field-label">Bygningstype</label>
+        <select class="fi" id="bygningstype">
+          <option value="enebolig">Enebolig</option>
+          <option value="rekkehus">Rekkehus</option>
+          <option value="leilighet">Leilighet / boligblokk</option>
+          <option value="næringsbygg">Næringsbygg</option>
+          <option value="tilbygg">Tilbygg</option>
+          <option value="anneks">Anneks / garasje</option>
+          <option value="annet">Annet</option>
+        </select>
+      </div>
+    </div>
+
+    <div id="error-form" style="display:none"></div>
+    <button class="btn-run" id="btn-run" onclick="runEstly()">
+      <span id="btn-text">Kjør estetisk vurdering</span>
+    </button>
+  </div>
+
+  <!-- LOADING -->
+  <div id="loading">
+    <div class="spinner" style="width:28px;height:28px;border-width:3px;margin:0 auto 16px;border-color:rgba(0,0,0,.12);border-top-color:var(--black)"></div>
+    <div style="font-weight:600;font-size:15px;margin-bottom:4px">Analyserer estetikk og §29.2…</div>
+    <div style="font-size:13px;color:var(--g500)">Vurderer mot lokal byggeskikk – tar 15–30 sekunder</div>
+    <div class="loading-steps" id="loading-steps">
+      <div class="ls" id="ls1"><span class="ls-icon">&#128247;</span>Analyserer fasadebilder</div>
+      <div class="ls" id="ls2"><span class="ls-icon">&#127968;</span>Identifiserer lokal byggeskikk</div>
+      <div class="ls" id="ls3"><span class="ls-icon">&#9878;&#65039;</span>Vurderer §29.2-krav</div>
+      <div class="ls" id="ls4"><span class="ls-icon">&#128064;</span>Sjekker materialer og proporsjoner</div>
+      <div class="ls" id="ls5"><span class="ls-icon">&#9999;&#65039;</span>Skriver anbefalinger</div>
+    </div>
+  </div>
+
+  <!-- RESULTS -->
+  <div id="results">
+    <div class="result-actions">
+      <button class="btn-action primary" onclick="window.print()">&#8595; Last ned PDF</button>
+      <button class="btn-action" onclick="resetForm()">&#8592; Ny vurdering</button>
+    </div>
+
+    <div id="verdict-row" class="verdict-row"></div>
+
+    <div class="result-summary" id="result-summary"></div>
+
+    <div class="section-group" id="section-group"></div>
+
+    <div id="lokal-container"></div>
+
+    <div class="disclaimer-box" id="disclaimer-box"></div>
+  </div>
+</div>
+
+<footer>
+  <span>Estly er AI-veiledning, ikke bindende §29.2-vedtak. Kommunen har siste ord.</span>
+  <span>Placely · <a href="mailto:jakob@tegnebua.no" style="color:inherit">jakob@tegnebua.no</a></span>
+</footer>
+
+<script>
+const XDI = 'https://xdi-production.up.railway.app';
+const KEY_STORE = 'placely_api_key';
+
+// ── STORED FILES ──────────────────────────────────────────────────
+let selectedFiles = [];
+
+function handleFiles(files) {
+  const remaining = 4 - selectedFiles.length;
+  const newFiles = Array.from(files).slice(0, remaining);
+  selectedFiles = [...selectedFiles, ...newFiles].slice(0, 4);
+  renderPreviews();
+}
+
+function removeFile(idx) {
+  selectedFiles.splice(idx, 1);
+  renderPreviews();
+}
+
+function renderPreviews() {
+  const grid = document.getElementById('preview-grid');
+  if (!selectedFiles.length) { grid.innerHTML = ''; return; }
+  grid.innerHTML = selectedFiles.map((f, i) => `
+    <div>
+      <div class="preview-item">
+        <img src="${URL.createObjectURL(f)}" alt="Bilde ${i+1}">
+        <button class="preview-remove" onclick="removeFile(${i})">&#10005;</button>
+      </div>
+      <div class="preview-label">Bilde ${i+1}</div>
+    </div>`).join('');
+
+  // Reset file input so same files can be re-added if removed
+  document.getElementById('file-input').value = '';
+}
+
+// Drag and drop
+const zone = document.getElementById('upload-zone');
+zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('dragover'); });
+zone.addEventListener('dragleave', () => zone.classList.remove('dragover'));
+zone.addEventListener('drop', e => {
+  e.preventDefault();
+  zone.classList.remove('dragover');
+  handleFiles(e.dataTransfer.files);
+});
+
+// ── API KEY ───────────────────────────────────────────────────────
+function loadKey() {
+  const k = localStorage.getItem(KEY_STORE);
+  const dot  = document.getElementById('key-dot');
+  const txt  = document.getElementById('key-text');
+  const wrap = document.getElementById('key-input-wrap');
+  if (k) {
+    dot.className = 'key-dot ok';
+    txt.textContent = 'API-nøkkel aktiv: ' + k.substring(0,8) + '…';
+    wrap.innerHTML = `<button class="key-btn" onclick="clearKey()" style="background:var(--g200);color:var(--black)">Bytt nøkkel</button>`;
+  } else {
+    dot.className = 'key-dot nok';
+    txt.textContent = 'Ingen API-nøkkel lagret';
+    wrap.innerHTML = `<input class="key-input" id="key-input" type="text" placeholder="Lim inn API-nøkkel"><button class="key-btn" onclick="saveKey()">Lagre</button>`;
+  }
+}
+function saveKey() {
+  const v = document.getElementById('key-input')?.value.trim();
+  if (!v) return;
+  localStorage.setItem(KEY_STORE, v);
+  loadKey();
+}
+function clearKey() { localStorage.removeItem(KEY_STORE); loadKey(); }
+function getKey()   { return localStorage.getItem(KEY_STORE) || ''; }
+
+// ── LOADING ANIMATION ─────────────────────────────────────────────
+let loadingTimer = null;
+function startLoadingAnim() {
+  const steps = [1,2,3,4,5];
+  let i = 0;
+  steps.forEach(n => document.getElementById('ls'+n).className = 'ls');
+  loadingTimer = setInterval(() => {
+    if (i > 0) document.getElementById('ls'+steps[i-1]).className = 'ls done';
+    if (i < steps.length) { document.getElementById('ls'+steps[i]).className = 'ls active'; i++; }
+    else clearInterval(loadingTimer);
+  }, 4000);
+}
+function stopLoadingAnim() {
+  clearInterval(loadingTimer);
+  [1,2,3,4,5].forEach(n => { const el=document.getElementById('ls'+n); if(el) el.className='ls'; });
+}
+
+// ── MAIN RUN ──────────────────────────────────────────────────────
+async function runEstly() {
+  const besk    = document.getElementById('beskrivelse').value.trim();
+  const kommune = document.getElementById('kommune').value.trim();
+  const type    = document.getElementById('bygningstype').value;
+
+  if (!kommune) {
+    showError('Kommune er påkrevd for lokal byggeskikk-vurdering.');
+    return;
+  }
+  document.getElementById('error-form').style.display = 'none';
+
+  const btn = document.getElementById('btn-run');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner"></div> Analyserer…';
+
+  document.getElementById('loading').style.display = 'block';
+  document.getElementById('results').style.display = 'none';
+  document.getElementById('loading').scrollIntoView({ behavior:'smooth', block:'start' });
+
+  startLoadingAnim();
+
+  try {
+    const fd = new FormData();
+    fd.append('beskrivelse', besk || 'Ingen beskrivelse oppgitt.');
+    fd.append('kommune', kommune);
+    fd.append('bygningstype', type);
+
+    // Append up to 4 images
+    for (let i = 0; i < selectedFiles.length; i++) {
+      fd.append('files', selectedFiles[i]);
+    }
+
+    const r = await fetch(XDI + '/analyse/estly', {
+      method: 'POST',
+      headers: { 'X-API-Key': getKey() },
+      body: fd,
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.detail || JSON.stringify(d));
+    renderResults(d);
+  } catch(e) {
+    document.getElementById('loading').style.display = 'none';
+    showError(e.message.includes('401') || e.message.toLowerCase().includes('key')
+      ? 'Ugyldig eller manglende API-nøkkel. <a href="mailto:jakob@tegnebua.no" style="color:inherit;text-decoration:underline">Bestill tilgang.</a>'
+      : esc(e.message));
+  } finally {
+    stopLoadingAnim();
+    btn.disabled = false;
+    btn.innerHTML = '<span id="btn-text">Kjør estetisk vurdering</span>';
+  }
+}
+
+// ── RENDER RESULTS ────────────────────────────────────────────────
+function renderResults(d) {
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('results').style.display = 'block';
+
+  // Verdict badges
+  const vurdering = (d.samlet_vurdering || 'utfordrende').toLowerCase();
+  const risiko    = (d.risiko_29_2 || 'MIDDELS').toUpperCase();
+
+  const vurdLabel = {
+    god:'God estetikk', akseptabel:'Akseptabel', utfordrende:'Utfordrende', risikofylt:'Risikofylt'
+  }[vurdering] || vurdering;
+
+  const risikoLabel = { LAV:'§29.2 Risiko: LAV', MIDDELS:'§29.2 Risiko: MIDDELS', HØY:'§29.2 Risiko: HØY' }[risiko] || risiko;
+
+  document.getElementById('verdict-row').innerHTML = `
+    <div class="verdict-badge vb-${vurdering}">${vurdLabel}</div>
+    <div class="risiko-badge rb-${risiko.toLowerCase().replace('ø','oy')}">${risikoLabel}</div>`;
+
+  // Summary
+  document.getElementById('result-summary').innerHTML = `
+    <div class="rs-label">Samlet vurdering – ${esc(d.kommune || '')} · ${esc(d.prosjekttype || '')}</div>
+    <div class="rs-text">${esc(d.sammendrag || '')}</div>`;
+
+  // Collapsible sections
+  const sections = [];
+
+  if (d.styrker?.length) {
+    sections.push(buildSection('&#9989;', 'Styrker', d.styrker.length, `
+      <ul class="item-list il-green">${d.styrker.map(s=>`<li>${esc(s)}</li>`).join('')}</ul>`, true));
+  }
+  if (d.utfordringer?.length) {
+    sections.push(buildSection('&#9888;&#65039;', 'Utfordringer', d.utfordringer.length, `
+      <ul class="item-list il-red">${d.utfordringer.map(u=>`<li>${esc(u)}</li>`).join('')}</ul>`, true));
+  }
+  if (d.anbefalinger?.length) {
+    sections.push(buildSection('&#128161;', 'Anbefalinger', d.anbefalinger.length, `
+      <ul class="item-list il-blue">${d.anbefalinger.map(a=>`<li>${esc(a)}</li>`).join('')}</ul>`));
+  }
+  if (d.materialer) {
+    sections.push(buildSection('&#127959;&#65039;', 'Materialer', null, `
+      <div class="sub-section">
+        <div class="sub-label">Vurdering</div>
+        <div class="sub-text">${esc(d.materialer.vurdering || '')}</div>
+      </div>
+      ${d.materialer.anbefalinger?.length ? `
+        <div class="sub-section">
+          <div class="sub-label">Anbefalinger</div>
+          <ul class="item-list il-blue">${d.materialer.anbefalinger.map(a=>`<li>${esc(a)}</li>`).join('')}</ul>
+        </div>` : ''}`));
+  }
+  if (d.volum_proporsjoner) {
+    sections.push(buildSection('&#128207;', 'Volum og proporsjoner', null, `
+      <div class="sub-section">
+        <div class="sub-label">Vurdering</div>
+        <div class="sub-text">${esc(d.volum_proporsjoner.vurdering || '')}</div>
+      </div>
+      ${d.volum_proporsjoner.anbefalinger?.length ? `
+        <div class="sub-section">
+          <div class="sub-label">Anbefalinger</div>
+          <ul class="item-list il-blue">${d.volum_proporsjoner.anbefalinger.map(a=>`<li>${esc(a)}</li>`).join('')}</ul>
+        </div>` : ''}`));
+  }
+  if (d.takform) {
+    sections.push(buildSection('&#127968;', 'Takform', null, `
+      <div class="sub-section">
+        <div class="sub-label">Vurdering</div>
+        <div class="sub-text">${esc(d.takform.vurdering || '')}</div>
+      </div>
+      ${d.takform.anbefalinger?.length ? `
+        <div class="sub-section">
+          <div class="sub-label">Anbefalinger</div>
+          <ul class="item-list il-blue">${d.takform.anbefalinger.map(a=>`<li>${esc(a)}</li>`).join('')}</ul>
+        </div>` : ''}`));
+  }
+
+  document.getElementById('section-group').innerHTML = sections.join('');
+
+  // Local tradition box
+  if (d.lokal_byggeskikk) {
+    document.getElementById('lokal-container').innerHTML = `
+      <div class="lokal-box" style="margin-bottom:24px">
+        <strong style="display:block;font-size:11px;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;opacity:.7">Lokal byggeskikk – ${esc(d.kommune || '')}</strong>
+        ${esc(d.lokal_byggeskikk)}
+      </div>`;
+  }
+
+  document.getElementById('disclaimer-box').innerHTML =
+    `<strong>&#9888; Forbehold</strong><br>${esc(d.disclaimer || '')}`;
+
+  document.getElementById('results').scrollIntoView({ behavior:'smooth' });
+
+  // Auto-open first two sections
+  openSection(0);
+  openSection(1);
+}
+
+let sectionCount = 0;
+function buildSection(icon, title, count, bodyHtml, autoOpen) {
+  const id = 'sec-' + (sectionCount++);
+  const countBadge = count != null ? `<span class="section-count">${count}</span>` : '';
+  return `
+    <div class="section-card">
+      <div class="section-head" onclick="toggleSection('${id}')">
+        <div class="section-head-left">
+          <span class="section-icon">${icon}</span>
+          <span class="section-title">${title}</span>
+          ${countBadge}
+        </div>
+        <span class="section-chevron" id="chev-${id}">&#9662;</span>
+      </div>
+      <div class="section-body${autoOpen?' open':''}" id="${id}">${bodyHtml}</div>
+    </div>`;
+}
+
+function openSection(idx) {
+  const body = document.getElementById('sec-' + idx);
+  const chev = document.getElementById('chev-sec-' + idx);
+  if (body) body.classList.add('open');
+  if (chev) chev.classList.add('open');
+}
+
+function toggleSection(id) {
+  const body = document.getElementById(id);
+  const chev = document.getElementById('chev-' + id);
+  const open = body.classList.toggle('open');
+  if (chev) chev.classList.toggle('open', open);
+}
+
+function resetForm() {
+  document.getElementById('results').style.display = 'none';
+  document.getElementById('beskrivelse').value = '';
+  document.getElementById('kommune').value = '';
+  selectedFiles = [];
+  renderPreviews();
+  sectionCount = 0;
+  window.scrollTo({ top: 0, behavior:'smooth' });
+}
+
+function showError(msg) {
+  const el = document.getElementById('error-form');
+  el.innerHTML = `<div class="error-box">${msg}</div>`;
+  el.style.display = 'block';
+}
+
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/\n/g,'<br>');
+}
+
+loadKey();
+</script>
+</body>
+</html>

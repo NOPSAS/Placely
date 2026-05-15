@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#ffffff">
+  <title>Placely – Insurancely</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--black:#0d0d0d;--white:#fff;--bg:#f7f5f2;--g50:#f0ede9;--g100:#e5e2dd;--g200:#ccc9c4;--g400:#999690;--g500:#706d68;--g700:#3d3a36;--green:#166534;--green-bg:#dcfce7;--orange:#c2410c;--orange-bg:#ffedd5;--red:#991b1b;--red-bg:#fee2e2;--blue:#1e40af;--blue-bg:#dbeafe;--ease:cubic-bezier(.22,.1,.22,1);--r:10px;--hh:56px}
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html,body{height:100%}
+    body{font-family:'Inter',-apple-system,sans-serif;font-size:14px;color:var(--black);background:var(--bg);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+    a{color:inherit;text-decoration:none}
+    button{font-family:inherit;cursor:pointer;border:none;background:none}
+    input,textarea,select{font-family:inherit;font-size:inherit}
+
+    #hdr{position:sticky;top:0;height:var(--hh);background:rgba(255,255,255,.94);backdrop-filter:blur(12px);border-bottom:1px solid var(--g100);display:flex;align-items:center;padding:0 16px;gap:10px;z-index:100}
+    #back-btn{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--black);transition:background .15s;flex-shrink:0}
+    #back-btn:hover{background:var(--g50)} #back-btn.hidden{visibility:hidden}
+    #page-title{flex:1;font-size:16px;font-weight:700;letter-spacing:-.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .logo-hl{font-weight:800;font-size:17px;letter-spacing:-.04em} .logo-hl em{font-style:normal;color:var(--g400);font-weight:500}
+    #hdr-action{padding:7px 14px;border-radius:7px;font-size:13px;font-weight:600;transition:all .15s;flex-shrink:0}
+    #hdr-action.primary{background:var(--black);color:var(--white)} #hdr-action.hidden{visibility:hidden}
+
+    main{min-height:calc(100vh - var(--hh))}
+    .screen{display:none;animation:sIn .18s var(--ease) both} .screen.active{display:block}
+    @keyframes sIn{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:none}}
+    .pad{padding:18px 16px;max-width:620px;margin:0 auto}
+
+    .landing{padding:24px 0 28px}
+    .landing-tag{display:inline-flex;align-items:center;gap:7px;background:var(--white);border:1px solid var(--g100);border-radius:99px;padding:4px 12px 4px 8px;font-size:11px;font-weight:700;color:var(--g700);letter-spacing:.02em;margin-bottom:18px}
+    .l-dot{width:5px;height:5px;background:#ef4444;border-radius:50%}
+    .landing h2{font-size:22px;font-weight:800;letter-spacing:-.03em;margin-bottom:8px;line-height:1.25}
+    .landing-sub{font-size:14px;color:var(--g500);line-height:1.6;margin-bottom:24px}
+    .feat-steps{display:flex;flex-direction:column;gap:10px;margin-bottom:24px}
+    .feat-step{display:flex;align-items:center;gap:12px;background:var(--white);border:1px solid var(--g100);border-radius:10px;padding:12px 14px}
+    .feat-icon{font-size:20px;width:32px;text-align:center;flex-shrink:0}
+    .feat-text{font-size:13px} .feat-text strong{display:block;font-size:14px;font-weight:700;margin-bottom:1px}
+    .btn-start{width:100%;padding:15px;background:var(--black);color:var(--white);border-radius:10px;font-size:15px;font-weight:700;letter-spacing:-.01em;transition:background .15s;margin-bottom:12px}
+    .btn-start:hover{background:#1a1a1a}
+
+    .job-list{display:flex;flex-direction:column;gap:10px}
+    .job-card{background:var(--white);border-radius:var(--r);padding:14px 16px;border:1px solid var(--g100);cursor:pointer;display:flex;align-items:center;gap:14px;transition:transform .12s,box-shadow .12s}
+    .job-card:active{background:var(--g50);transform:scale(.98)}
+    .jc-icon{width:40px;height:40px;border-radius:10px;background:#fef2f2;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+    .jc-info{flex:1;min-width:0}
+    .jc-name{font-size:15px;font-weight:600;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .jc-meta{font-size:12px;color:var(--g500);margin-top:3px}
+    .sc-stats{display:flex;gap:8px;margin-top:6px}
+    .sc-stat{font-size:11px;font-weight:600;color:var(--g700);background:var(--g50);padding:2px 7px;border-radius:99px}
+    .jc-arrow{color:var(--g400);font-size:16px}
+    .fab{position:fixed;bottom:24px;right:20px;width:56px;height:56px;background:var(--black);color:var(--white);border-radius:50%;font-size:26px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(0,0,0,.22);transition:transform .12s;z-index:90}
+    .fab:active{transform:scale(.92)} .fab.hidden{display:none}
+
+    .fg{margin-bottom:16px}
+    .fl{display:block;font-size:11px;font-weight:700;color:var(--g500);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px}
+    .fi{width:100%;padding:11px 14px;border:1px solid var(--g200);border-radius:8px;font-size:14px;color:var(--black);background:var(--white);outline:none;transition:border-color .15s}
+    .fi:focus{border-color:var(--black)} .fi::placeholder{color:var(--g400)}
+    .btn-p{width:100%;padding:13px;background:var(--black);color:var(--white);border-radius:8px;font-size:15px;font-weight:600;transition:background .15s;margin-top:8px}
+    .btn-p:hover{background:#1a1a1a}
+    .btn-s{width:100%;padding:12px;background:transparent;color:var(--g500);border-radius:8px;font-size:14px;font-weight:500;border:1px solid var(--g200);transition:all .15s;margin-top:8px}
+    .btn-s:hover{border-color:var(--black);color:var(--black)}
+
+    /* Dek */
+    .doc-header{padding:18px 20px;border-bottom:1px solid var(--g100)}
+    .doc-badge{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:99px;font-size:11px;font-weight:700;background:#fee2e2;color:#991b1b;margin-bottom:8px}
+    .doc-name{font-size:20px;font-weight:800;letter-spacing:-.02em;margin-bottom:3px}
+    .doc-sub{font-size:13px;color:var(--g500)}
+    .cat-list{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
+    .cat-card{background:var(--white);border:1px solid var(--g100);border-radius:10px;overflow:hidden;cursor:pointer;transition:box-shadow .12s}
+    .cat-head{padding:12px 14px;display:flex;align-items:center;gap:12px}
+    .cat-icon{font-size:20px;width:32px;text-align:center}
+    .cat-name{font-size:14px;font-weight:600;flex:1}
+    .cat-count{font-size:12px;font-weight:600;color:var(--g500)}
+    .cat-entries{padding:0 14px 12px;display:none}
+    .cat-entries.open{display:block}
+    .entry{padding:9px 0;border-bottom:1px solid var(--g100);font-size:13px;display:flex;justify-content:space-between;align-items:center}
+    .entry:last-child{border-bottom:none}
+    .entry-del{color:var(--g400);font-size:16px;padding:2px 6px;transition:color .12s}
+    .entry-del:hover{color:var(--red)}
+    .add-entry{display:flex;gap:8px;margin-top:8px}
+    .add-entry input{flex:1;padding:8px 10px;border:1px solid var(--g200);border-radius:7px;font-size:13px;outline:none}
+    .add-entry input:focus{border-color:var(--black)}
+    .add-entry button{padding:8px 14px;background:var(--black);color:#fff;border-radius:7px;font-size:12px;font-weight:600}
+
+    .doc-actions{padding:0 16px 16px;display:flex;flex-direction:column;gap:10px}
+    .doc-btn{width:100%;padding:14px;border-radius:10px;font-size:14px;font-weight:700;text-align:center;cursor:pointer;transition:all .12s}
+    .doc-btn-p{background:var(--black);color:var(--white)}
+    .doc-btn-s{background:var(--white);color:var(--black);border:1px solid var(--g100)}
+    .doc-btn-d{background:transparent;color:var(--red);border:1px solid #fecaca;font-size:13px;padding:11px}
+
+    #toast{position:fixed;bottom:88px;left:50%;transform:translateX(-50%) translateY(10px);background:rgba(0,0,0,.85);color:#fff;padding:9px 18px;border-radius:99px;font-size:13px;font-weight:500;opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;z-index:200;white-space:nowrap}
+    #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+    .spacer{height:80px}
+
+    @media print{
+      #hdr,.fab,#toast{display:none!important}
+      .screen{display:block!important}
+      #s-home,#s-new{display:none!important}
+      #s-doc{display:block!important}
+      .cat-entries{display:block!important}
+      .doc-actions,.add-entry,.cat-card .entry button{display:none!important}
+    }
+  </style>
+</head>
+<body>
+
+<div id="toast"></div>
+
+<header id="hdr">
+  <button id="back-btn" class="hidden" onclick="goBack()">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+  </button>
+  <div id="page-title"><span class="logo-hl">Insurancely <em>by Placely</em></span></div>
+  <button id="hdr-action" class="hidden"></button>
+</header>
+
+<button class="fab" id="fab" onclick="nav('new')">+</button>
+
+<main>
+  <div id="s-home" class="screen active">
+    <div class="pad" id="home-content"></div>
+  </div>
+
+  <div id="s-new" class="screen">
+    <div class="pad">
+      <div class="fg"><label class="fl">Navn / adresse</label><input class="fi" id="n-navn" placeholder="f.eks. Birkeveien 3A – forsikringsdok."></div>
+      <div class="fg"><label class="fl">Eier</label><input class="fi" id="n-eier" placeholder="Navn på huseier"></div>
+      <div class="fg"><label class="fl">Forsikringsselskap (valgfritt)</label><input class="fi" id="n-selskap" placeholder="f.eks. Gjensidige, If, Tryg"></div>
+      <button class="btn-p" onclick="createDoc()">Opprett dokumentasjon</button>
+      <button class="btn-s" onclick="goBack()">Avbryt</button>
+    </div>
+  </div>
+
+  <div id="s-doc" class="screen">
+    <div class="doc-header">
+      <div class="doc-badge">🛡️ Forsikringsdokumentasjon</div>
+      <div class="doc-name" id="doc-name"></div>
+      <div class="doc-sub" id="doc-sub"></div>
+    </div>
+    <div class="pad" style="padding-top:16px">
+      <div class="cat-list" id="cat-list"></div>
+    </div>
+    <div class="doc-actions">
+      <button class="doc-btn doc-btn-p" onclick="printDoc()">↓ Last ned forsikringsrapport</button>
+      <button class="doc-btn doc-btn-s" onclick="goHome()">← Tilbake til oversikt</button>
+      <button class="doc-btn doc-btn-d" onclick="deleteDoc()">Slett dokumentasjon</button>
+    </div>
+    <div class="spacer"></div>
+  </div>
+</main>
+
+<script>
+'use strict';
+const SK='insurancely_docs';
+const CATS=[
+  {id:'ror',icon:'🚰',name:'Røranlegg',fields:['Rørtype','Installert år','Leverandør/rørlegger','Merknad']},
+  {id:'membran',icon:'🧱',name:'Membran / tett sjikt',fields:['Rom','Type membran','Leverandør','Installert år','Merknad']},
+  {id:'el',icon:'⚡',name:'Elektrisk anlegg',fields:['Sikringsskap type','Siste inspeksjon','Elektriker','Merknad']},
+  {id:'tak',icon:'🏠',name:'Tak og taktekking',fields:['Takmateriale','Installert år','Siste service','Merknad']},
+  {id:'fasade',icon:'🏗️',name:'Fasade og kledning',fields:['Materiale','Siste maling/impregnering','Leverandør','Merknad']},
+  {id:'vvs',icon:'🌡️',name:'Varmeanlegg',fields:['Type','Modell','Installert år','Siste service']},
+  {id:'fukt',icon:'💧',name:'Fukt og drenering',fields:['Drenstype','Installert år','Siste inspeksjon','Merknad']},
+  {id:'andre',icon:'📋',name:'Andre installasjoner',fields:['Beskrivelse','Leverandør','Dato','Merknad']},
+];
+
+let docs=[], activeDocId=null, stack=['home'];
+
+function load(){try{return JSON.parse(localStorage.getItem(SK)||'[]');}catch{return[];}}
+function save(d){localStorage.setItem(SK,JSON.stringify(d));}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,5);}
+
+function nav(s){stack.push(s);render(s);show(s);}
+function goBack(){if(stack.length<=1)return;stack.pop();const p=stack[stack.length-1];render(p);show(p);}
+function goHome(){stack=['home'];render('home');show('home');}
+
+function show(s){
+  document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));
+  document.getElementById('s-'+s)?.classList.add('active');
+  const bb=document.getElementById('back-btn'),pt=document.getElementById('page-title'),ha=document.getElementById('hdr-action'),fab=document.getElementById('fab');
+  bb.className=stack.length>1?'':'hidden';
+  fab.className=s==='home'?'fab':'fab hidden';
+  const titles={home:'<span class="logo-hl">Insurancely <em>by Placely</em></span>',new:'Ny dokumentasjon',doc:activeDocId?esc(docs.find(d=>d.id===activeDocId)?.navn||'Dokumentasjon'):'Dokumentasjon'};
+  pt.innerHTML=titles[s]||s;
+  if(s==='doc'){ha.textContent='Skriv ut';ha.setAttribute('onclick','printDoc()');ha.className='primary';}
+  else ha.className='hidden';
+}
+
+function render(s){if(s==='home')renderHome();else if(s==='doc')renderDoc();}
+
+function renderHome(){
+  docs=load();
+  const el=document.getElementById('home-content');
+  if(!docs.length){
+    el.innerHTML=`<div class="landing">
+      <div class="landing-tag"><div class="l-dot"></div>Forsikringsdokumentasjon</div>
+      <h2>Insurancely er forsikringsdokumentasjonen din</h2>
+      <p class="landing-sub">Registrer rør, membran, elektro og alle installasjoner. Dokumenter alt som er gjort. Generer en forsikringsrapport med ett klikk.</p>
+      <div class="feat-steps">
+        <div class="feat-step"><div class="feat-icon">🏠</div><div class="feat-text"><strong>Opprett dokumentasjon</strong>For én bolig eller ett bygg</div></div>
+        <div class="feat-step"><div class="feat-icon">📝</div><div class="feat-text"><strong>Registrer installasjoner</strong>Rør, membran, elektro, tak og mer</div></div>
+        <div class="feat-step"><div class="feat-icon">📄</div><div class="feat-text"><strong>Last ned forsikringsrapport</strong>Klar til å sende forsikringsselskapet</div></div>
+      </div>
+      <button class="btn-start" onclick="nav('new')">Opprett første dokumentasjon →</button>
+      <a href="index.html" style="display:block;text-align:center;font-size:13px;color:var(--g500)">← Tilbake til Placely</a>
+    </div>`;
+    return;
+  }
+  el.innerHTML=`<div style="font-size:11px;font-weight:700;color:var(--g500);letter-spacing:.07em;text-transform:uppercase;margin-bottom:12px;margin-top:4px">${docs.length} DOKUMENTASJON${docs.length>1?'ER':''}</div>
+    <div class="job-list">${docs.map(d=>`<div class="job-card" onclick="openDoc('${d.id}')">
+      <div class="jc-icon">🛡️</div>
+      <div class="jc-info">
+        <div class="jc-name">${esc(d.navn)}</div>
+        <div class="jc-meta">${esc(d.eier||'Ingen eier')}${d.selskap?' · '+esc(d.selskap):''}</div>
+        <div class="sc-stats">${CATS.map(c=>{const n=(d.entries||{})[c.id]?.length||0;return n?`<span class="sc-stat">${c.icon} ${n}</span>`:''}).join('')}</div>
+      </div>
+      <div class="jc-arrow">›</div>
+    </div>`).join('')}</div>`;
+}
+
+function openDoc(id){activeDocId=id;docs=load();nav('doc');}
+
+function renderDoc(){
+  const d=docs.find(x=>x.id===activeDocId);if(!d)return;
+  document.getElementById('doc-name').textContent=d.navn;
+  document.getElementById('doc-sub').textContent=(d.eier||'')+(d.selskap?' · '+d.selskap:'');
+  const total=Object.values(d.entries||{}).reduce((s,arr)=>s+arr.length,0);
+  document.getElementById('doc-sub').textContent+=` · ${total} registreringer`;
+  document.getElementById('cat-list').innerHTML=CATS.map(cat=>{
+    const entries=(d.entries||{})[cat.id]||[];
+    return `<div class="cat-card" id="cat-${cat.id}">
+      <div class="cat-head" onclick="toggleCat('${cat.id}')">
+        <div class="cat-icon">${cat.icon}</div>
+        <div class="cat-name">${cat.name}</div>
+        <div class="cat-count">${entries.length} registrering${entries.length!==1?'er':''}</div>
+        <div style="color:var(--g400);font-size:14px;margin-left:4px" id="chev-${cat.id}">▾</div>
+      </div>
+      <div class="cat-entries" id="entries-${cat.id}">
+        ${entries.map((e,i)=>`<div class="entry"><span>${esc(e)}</span><button class="entry-del" onclick="delEntry('${cat.id}',${i})">×</button></div>`).join('')}
+        <div class="add-entry">
+          <input id="inp-${cat.id}" placeholder="${cat.fields.slice(0,2).join(' · ')}" onkeydown="if(event.key==='Enter')addEntry('${cat.id}')">
+          <button onclick="addEntry('${cat.id}')">+</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleCat(id){
+  const el=document.getElementById('entries-'+id);
+  const ch=document.getElementById('chev-'+id);
+  const open=el.classList.toggle('open');
+  if(ch)ch.style.transform=open?'rotate(180deg)':'';
+}
+
+function addEntry(catId){
+  const inp=document.getElementById('inp-'+catId);
+  const v=inp.value.trim();if(!v)return;
+  docs=load();const d=docs.find(x=>x.id===activeDocId);if(!d)return;
+  if(!d.entries)d.entries={};
+  if(!d.entries[catId])d.entries[catId]=[];
+  d.entries[catId].push(v+' ('+new Date().toLocaleDateString('nb-NO')+')');
+  save(docs);inp.value='';
+  renderDoc();
+  toast(CATS.find(c=>c.id===catId)?.name+' oppdatert');
+}
+
+function delEntry(catId,idx){
+  docs=load();const d=docs.find(x=>x.id===activeDocId);if(!d)return;
+  d.entries[catId].splice(idx,1);save(docs);renderDoc();
+}
+
+function createDoc(){
+  const navn=document.getElementById('n-navn').value.trim();
+  if(!navn){document.getElementById('n-navn').focus();return;}
+  docs=load();
+  const d={id:uid(),navn,eier:document.getElementById('n-eier').value.trim(),selskap:document.getElementById('n-selskap').value.trim(),entries:{},opprettet:Date.now()};
+  docs.push(d);save(docs);
+  activeDocId=d.id;stack.pop();nav('doc');toast('Dokumentasjon opprettet');
+}
+
+function deleteDoc(){
+  const d=docs.find(x=>x.id===activeDocId);
+  if(!confirm(`Slett "${d?.navn}"?`))return;
+  save(load().filter(x=>x.id!==activeDocId));
+  goHome();toast('Slettet');
+}
+
+function printDoc(){
+  const d=docs.find(x=>x.id===activeDocId);if(!d)return;
+  const date=new Date().toLocaleDateString('nb-NO',{day:'numeric',month:'long',year:'numeric'});
+  const rows=CATS.map(cat=>{
+    const entries=(d.entries||{})[cat.id]||[];
+    if(!entries.length)return '';
+    return `<div style="break-inside:avoid;margin-bottom:20px"><div style="font-size:13px;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:6px">${cat.icon} ${cat.name}</div><table style="width:100%;border-collapse:collapse">${entries.map(e=>`<tr><td style="padding:6px 8px;border-bottom:1px solid #f0ede9;font-size:12px">${esc(e)}</td></tr>`).join('')}</table></div>`;
+  }).join('');
+  const pw=document.createElement('div');
+  pw.style.cssText='font-family:Inter,sans-serif;max-width:680px;margin:0 auto;padding:40px 32px;color:#0d0d0d;font-size:13px';
+  pw.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:28px;padding-bottom:20px;border-bottom:2.5px solid #0d0d0d">
+    <div><div style="font-size:22px;font-weight:800;letter-spacing:-.04em">Placely</div><div style="font-size:11px;color:#888;letter-spacing:.04em;text-transform:uppercase">Insurancely – Forsikringsrapport</div></div>
+    <div style="text-align:right;font-size:12px;color:#555">${date}</div>
+  </div>
+  <div style="margin-bottom:24px"><div style="font-size:20px;font-weight:800;letter-spacing:-.03em">${esc(d.navn)}</div><div style="color:#888;font-size:13px">${esc(d.eier||'')}${d.selskap?' · '+esc(d.selskap):''}</div></div>
+  ${rows||'<p style="color:#999">Ingen registreringer.</p>'}
+  <div style="margin-top:28px;padding-top:16px;border-top:1px solid #eee;font-size:11px;color:#bbb;display:flex;justify-content:space-between"><span>Insurancely av Placely · placely.no · NOPS AS</span><span>${date}</span></div>
+  <div style="margin-top:6px;font-size:10px;color:#ccc">Denne rapporten er generert som dokumentasjon. Kontakt fagperson for teknisk vurdering.</div>`;
+  const old=document.querySelector('.ins-print');if(old)old.remove();
+  pw.className='ins-print';
+  const style=document.createElement('style');
+  style.textContent='@media print{body>*:not(.ins-print){display:none!important}.ins-print{display:block!important}@page{size:A4;margin:0}}';
+  document.head.appendChild(style);document.body.appendChild(pw);
+  window.print();setTimeout(()=>{pw.remove();style.remove();},1000);
+}
+
+function toast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('show'),2200);}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+docs=load();renderHome();show('home');
+</script>
+</body>
+</html>
