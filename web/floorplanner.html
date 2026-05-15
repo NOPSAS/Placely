@@ -17,7 +17,6 @@
     html,body{height:100%;overflow:hidden}
     body{font-family:'Inter',sans-serif;font-size:13px;color:var(--black);background:#1a1a18;display:flex;flex-direction:column;-webkit-font-smoothing:antialiased}
 
-    /* HEADER */
     header{height:46px;background:var(--white);border-bottom:1px solid var(--g100);display:flex;align-items:center;padding:0 14px;gap:8px;flex-shrink:0;z-index:50}
     .logo{font-weight:800;font-size:15px;letter-spacing:-.04em}
     .logo em{font-style:normal;color:var(--g500);font-weight:500}
@@ -31,61 +30,47 @@
     .hbtn-b{background:var(--black);color:var(--white)}
     .hbtn-b:hover{background:#222}
 
-    /* WORKSPACE */
-    .workspace{flex:1;display:flex;overflow:hidden;min-height:0;height:calc(100vh - 46px)}
+    .workspace{flex:1;display:flex;overflow:hidden;min-height:0}
 
-    /* 2D */
-    #view2d{position:relative;width:44%;min-width:280px;background:#f5f0e8;overflow:hidden;flex-shrink:0;height:100%}
-    /* Canvas fills view2d absolutely — no reliance on % height inheritance */
-    #canvas2d{position:absolute;top:0;left:0;right:0;bottom:28px;touch-action:none;cursor:crosshair;display:block}
+    #view2d{position:relative;width:44%;min-width:280px;background:#f5f0e8;overflow:hidden;flex-shrink:0}
+    #canvas2d{position:absolute;inset:0 0 28px 0;touch-action:none;cursor:crosshair;display:block}
 
-    /* TOOLBOX */
     #toolbox{position:absolute;top:12px;left:12px;background:rgba(255,255,255,.95);backdrop-filter:blur(10px);border:1px solid var(--g100);border-radius:11px;padding:8px;display:flex;flex-direction:column;gap:3px;box-shadow:0 4px 24px rgba(0,0,0,.1);z-index:10;user-select:none}
     .tb-sep{height:1px;background:var(--g100);margin:3px 0}
     .tb-label{font-size:9px;font-weight:700;color:var(--g500);letter-spacing:.07em;text-transform:uppercase;padding:1px 2px 3px}
-
-    /* Tool buttons */
     .tbtn{width:34px;height:34px;display:flex;align-items:center;justify-content:center;border:none;background:none;border-radius:7px;cursor:pointer;font-size:15px;transition:background .12s;position:relative}
     .tbtn:hover{background:var(--g100)}
     .tbtn.active{background:var(--black);color:#fff}
-    .tbtn-tip{position:absolute;left:42px;top:50%;transform:translateY(-50%);background:#111;color:#fff;font-size:11px;font-weight:600;padding:4px 9px;border-radius:5px;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .12s;letter-spacing:.01em;z-index:100}
+    .tbtn-tip{position:absolute;left:42px;top:50%;transform:translateY(-50%);background:#111;color:#fff;font-size:11px;font-weight:600;padding:4px 9px;border-radius:5px;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .12s;z-index:100}
     .tbtn-tip::before{content:'';position:absolute;left:-5px;top:50%;transform:translateY(-50%);border:5px solid transparent;border-right-color:#111;border-left:none}
     .tbtn:hover .tbtn-tip{opacity:1}
 
-    /* Thickness grid */
     .thick-grid{display:grid;grid-template-columns:1fr 1fr;gap:3px;margin-top:1px}
     .tkbtn{padding:4px 0;font-size:11px;font-weight:600;border:1px solid var(--g200);border-radius:5px;background:#fff;cursor:pointer;transition:all .12s;text-align:center;color:var(--g700)}
     .tkbtn:hover{border-color:var(--black);color:var(--black)}
     .tkbtn.active{background:var(--black);color:#fff;border-color:var(--black)}
 
-    /* Wall type pills */
     .wtype-row{display:flex;flex-direction:column;gap:3px;margin-top:1px}
     .wtbtn{padding:5px 8px;font-size:11px;font-weight:600;border:1px solid var(--g200);border-radius:6px;background:#fff;cursor:pointer;transition:all .12s;text-align:left;color:var(--g700);display:flex;align-items:center;gap:5px;white-space:nowrap}
     .wtbtn:hover{border-color:var(--black);background:var(--g50)}
     .wtbtn.active{background:var(--black);color:#fff;border-color:var(--black)}
     .wt-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0}
 
-    /* Snap pill */
     #snap-pill{position:absolute;bottom:36px;left:50%;transform:translateX(-50%);background:rgba(255,255,255,.94);backdrop-filter:blur(8px);border:1px solid var(--g100);border-radius:99px;padding:5px 14px;display:flex;align-items:center;gap:8px;font-size:11px;color:var(--g700);white-space:nowrap;box-shadow:0 2px 12px rgba(0,0,0,.07);z-index:10}
     #snap-pill select{background:none;border:none;font-size:11px;font-family:inherit;color:var(--black);font-weight:600;cursor:pointer;padding:0}
 
-    /* Axis lock badge */
     #lock-badge{position:absolute;top:10px;left:50%;transform:translateX(-50%);background:#2563eb;color:#fff;padding:4px 14px;border-radius:99px;font-size:11px;font-weight:700;letter-spacing:.06em;opacity:0;pointer-events:none;transition:opacity .15s;z-index:10}
     #lock-badge.show{opacity:1}
 
-    /* Status bar */
     .sb2d{position:absolute;bottom:0;left:0;right:0;height:28px;background:rgba(245,240,232,.96);border-top:1px solid var(--g200);display:flex;align-items:center;padding:0 12px;gap:10px;font-size:11px;color:var(--g500)}
     .sb-tool{font-weight:600;color:var(--black)}
     .sb-sp{flex:1}
     .sb-key{background:var(--g100);border:1px solid var(--g300);border-radius:3px;padding:1px 5px;font-size:10px;color:var(--g700)}
     .sb-coords{font-weight:500;color:var(--g700);font-variant-numeric:tabular-nums}
 
-    /* DIVIDER */
-    #divider{width:4px;background:var(--g200);cursor:col-resize;flex-shrink:0;transition:background .15s;position:relative}
+    #divider{width:4px;background:var(--g200);cursor:col-resize;flex-shrink:0;transition:background .15s}
     #divider:hover{background:var(--blue)}
-    #divider::after{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:4px;height:40px;background:inherit;border-radius:2px}
 
-    /* 3D */
     #view3d{flex:1;position:relative;overflow:hidden;background:#1a1a18;min-width:200px}
     #canvas3d{display:block;width:100%;height:100%}
     #view3d-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none}
@@ -95,7 +80,6 @@
     .v3btn{background:rgba(30,30,28,.8);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.75);border-radius:6px;padding:6px 12px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s}
     .v3btn:hover{background:rgba(255,255,255,.15);color:#fff}
 
-    /* PROPERTIES BAR */
     #propbar{height:0;background:var(--white);border-top:1px solid var(--g100);overflow:hidden;transition:height .22s var(--ease);display:flex;align-items:center;padding:0;z-index:20;flex-shrink:0}
     #propbar.open{height:62px;padding:0 18px}
     .prop-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap;width:100%}
@@ -115,7 +99,6 @@
     .prop-close{background:var(--g50);border:1px solid var(--g200);border-radius:5px;padding:6px 10px;font-size:12px;cursor:pointer;font-family:inherit;transition:all .12s}
     .prop-close:hover{border-color:var(--black)}
 
-    /* MODAL */
     .overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);backdrop-filter:blur(6px);z-index:200;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s}
     .overlay.open{opacity:1;pointer-events:all}
     .modal{background:#fff;border-radius:14px;padding:28px;width:480px;max-width:95vw;transform:translateY(14px);transition:transform .2s;box-shadow:0 24px 64px rgba(0,0,0,.15)}
@@ -153,7 +136,6 @@
 
 <div class="workspace">
 
-  <!-- 2D -->
   <div id="view2d">
     <canvas id="canvas2d"></canvas>
 
@@ -181,7 +163,7 @@
 
       <div class="tb-sep"></div>
       <div class="tb-label">Veggtype</div>
-      <div class="wtype-row" id="wtype-row">
+      <div class="wtype-row">
         <button class="wtbtn active" onclick="FP.setWallType('exterior')">
           <span class="wt-dot" style="background:#1a1714"></span>Yttervegg
         </button>
@@ -194,7 +176,7 @@
       </div>
 
       <div class="tb-sep"></div>
-      <button class="tbtn" onclick="FP.undo()">
+      <button class="tbtn" onclick="FP.doUndo()">
         ↩<div class="tbtn-tip">Angre (Ctrl+Z)</div>
       </button>
       <button class="tbtn" onclick="FP.fitView()">
@@ -216,7 +198,7 @@
     <div id="lock-badge"></div>
 
     <div class="sb2d">
-      <span class="sb-tool" id="sb-tool">Tegn vegg</span>
+      <span class="sb-tool" id="sb-tool">Klikk for å starte vegg</span>
       <span class="sb-key">Shift</span>Lås vinkel
       <span class="sb-key">Del</span>Slett
       <span class="sb-key">Esc</span>Avbryt
@@ -228,7 +210,6 @@
 
   <div id="divider"></div>
 
-  <!-- 3D -->
   <div id="view3d">
     <canvas id="canvas3d"></canvas>
     <div id="view3d-overlay"><div id="view3d-loading">Laster 3D…</div></div>
@@ -241,12 +222,10 @@
 
 </div>
 
-<!-- PROPERTIES BAR -->
 <div id="propbar">
   <div class="prop-row" id="prop-fields"></div>
 </div>
 
-<!-- IMPORT MODAL -->
 <div class="overlay" id="import-modal">
   <div class="modal">
     <h3>Importer tegning</h3>
@@ -271,247 +250,248 @@
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════════════════
-     SCRIPT 1 — All 2D logic (no external deps, always works)
-     ═══════════════════════════════════════════════════════════════ -->
 <script>
 'use strict';
 const XDI = 'https://xdi-production.up.railway.app';
 
-// ── STATE ─────────────────────────────────────────────────────────
-const state = {
+// ── STATE ─────────────────────────────────────────────────────────────────────
+const S = {
   walls:     [],
-  rooms:     [],
   tool:      'wall',
   wallType:  'exterior',
   thickness: 0.20,
-  snapSize:  0.1,
+  snapSize:  0.10,
   cam:       { x: 4, y: 5, scale: 72 },
-  chainStart: null,
+  drawing:   null,   // { x, y } — start of in-progress wall
+  mouse:     { x: 0, y: 0 }, // current snapped world pos
   selected:  null,
   hovered:   null,
-  lockAxis:  null,
-  mouse:     { wx: 0, wy: 0 },
+  axisLock:  null,   // 'h' | 'v' | null
   undoStack: [],
-  _idCtr:    0,
+  _id:       0,
 };
+window._fpState = S;
 
-function newId() { return 'w' + (++state._idCtr); }
+// ── CANVAS ───────────────────────────────────────────────────────────────────
+const cv  = document.getElementById('canvas2d');
+const ctx = cv.getContext('2d');
+const v2d = document.getElementById('view2d');
 
-// ── CANVAS / CTX ──────────────────────────────────────────────────
-const cv   = document.getElementById('canvas2d');
-const ctx  = cv.getContext('2d');
-const v2d  = document.getElementById('view2d');
-
-function resize2D() {
-  // Canvas is position:absolute — clientWidth/Height read actual rendered size
-  const w = cv.clientWidth;
-  const h = cv.clientHeight;
-  if (w > 0 && h > 0) {
-    cv.width  = w;
-    cv.height = h;
-  } else {
-    // Fallback: read from parent if canvas not yet rendered
-    cv.width  = v2d.clientWidth  || 640;
-    cv.height = (v2d.clientHeight || 528) - 28;
-  }
+function resize() {
+  // canvas has position:absolute inset:0 0 28px 0 — read parent size
+  const w = v2d.clientWidth;
+  const h = v2d.clientHeight - 28;
+  if (w > 10 && h > 10) { cv.width = w; cv.height = h; }
   redraw();
 }
 
-// ── COORD HELPERS ─────────────────────────────────────────────────
+// ── COORDS ───────────────────────────────────────────────────────────────────
 const w2s = (wx, wy) => ({
-  x: cv.width  / 2 + (wx - state.cam.x) * state.cam.scale,
-  y: cv.height / 2 - (wy - state.cam.y) * state.cam.scale,
+  x: cv.width  / 2 + (wx - S.cam.x) * S.cam.scale,
+  y: cv.height / 2 - (wy - S.cam.y) * S.cam.scale,
 });
 const s2w = (sx, sy) => ({
-  x: (sx - cv.width  / 2) / state.cam.scale + state.cam.x,
-  y: -((sy - cv.height / 2) / state.cam.scale) + state.cam.y,
+  x:  (sx - cv.width  / 2) / S.cam.scale + S.cam.x,
+  y: -((sy - cv.height / 2) / S.cam.scale) + S.cam.y,
 });
-const snapV  = (v, s) => Math.round(v / s) * s;
-const snapPt = (wx, wy) => ({ x: snapV(wx, state.snapSize), y: snapV(wy, state.snapSize) });
-const dist   = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
+const snap  = v => Math.round(v / S.snapSize) * S.snapSize;
+const snapP = (x, y) => ({ x: snap(x), y: snap(y) });
+const dist  = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
 
-function nearEndpoint(wx, wy, thresh = 0.25) {
-  for (const w of state.walls) {
-    if (dist({x:wx,y:wy}, w.start) < thresh) return { ...w.start, _snap:true };
-    if (dist({x:wx,y:wy}, w.end)   < thresh) return { ...w.end,   _snap:true };
+function nearEndpt(p, thresh) {
+  thresh = thresh || 0.3;
+  for (const w of S.walls) {
+    if (dist(p, w.start) < thresh) return { x: w.start.x, y: w.start.y };
+    if (dist(p, w.end)   < thresh) return { x: w.end.x,   y: w.end.y   };
   }
   return null;
 }
 
-function getSnapped() {
-  let pt = snapPt(state.mouse.wx, state.mouse.wy);
-  const near = nearEndpoint(pt.x, pt.y);
-  pt = near || pt;
-  if (state.lockAxis && state.chainStart) {
-    pt = state.lockAxis === 'h'
-      ? { x: pt.x, y: state.chainStart.y, _snap: pt._snap }
-      : { x: state.chainStart.x, y: pt.y, _snap: pt._snap };
+function applySnap(raw) {
+  let p = snapP(raw.x, raw.y);
+  const near = nearEndpt(p);
+  if (near) p = near;
+  if (S.axisLock && S.drawing) {
+    p = S.axisLock === 'h'
+      ? { x: p.x, y: S.drawing.y }
+      : { x: S.drawing.x, y: p.y };
   }
-  return pt;
+  return p;
 }
 
-// ── WALL COLORS ───────────────────────────────────────────────────
-const WCOLOR = { exterior:'#1a1714', interior:'#7a7570', load_bearing:'#6b1c1c', partition:'#9a938e', foundation:'#4a3d2a' };
-const RCOLOR = { living_room:'rgba(255,247,215,.72)', kitchen:'rgba(215,245,218,.72)', bedroom:'rgba(215,228,255,.72)', bathroom:'rgba(215,243,255,.72)', hallway:'rgba(238,234,228,.72)' };
+function segDist(p, a, b) {
+  const dx = b.x-a.x, dy = b.y-a.y, l2 = dx*dx+dy*dy;
+  if (!l2) return dist(p, a);
+  const t = Math.max(0, Math.min(1, ((p.x-a.x)*dx+(p.y-a.y)*dy)/l2));
+  return dist(p, { x: a.x+t*dx, y: a.y+t*dy });
+}
 
-// ── DRAW ──────────────────────────────────────────────────────────
+function eventPt(e) {
+  const r = cv.getBoundingClientRect();
+  return s2w(e.clientX - r.left, e.clientY - r.top);
+}
+
+// ── COLORS ───────────────────────────────────────────────────────────────────
+const WCLR = { exterior:'#1a1714', interior:'#7a7570', load_bearing:'#6b1c1c' };
+const WFILL = { exterior:'#ccc8c0', interior:'#dedbd4', load_bearing:'#c4b8b0' };
+
+// ── DRAW ─────────────────────────────────────────────────────────────────────
 function redraw() {
   const W = cv.width, H = cv.height;
   ctx.clearRect(0, 0, W, H);
+
+  // Background
   ctx.fillStyle = '#f5f0e8';
   ctx.fillRect(0, 0, W, H);
-  drawGrid();
-  drawRooms();
+
+  drawGrid(W, H);
   drawWalls();
   drawPreview();
-  drawEndpoints();
+  drawCursor();
 }
 
-function drawGrid() {
-  const sc = state.cam.scale;
-  const { x:minX, y:minY } = s2w(0, cv.height);
-  const { x:maxX, y:maxY } = s2w(cv.width, 0);
-  const sn = state.snapSize;
+function drawGrid(W, H) {
+  const sn = S.snapSize;
+  const tl = s2w(0, H), br = s2w(W, 0);
 
-  ctx.strokeStyle = 'rgba(0,0,0,.04)';
-  ctx.lineWidth = .5;
-  for (let x = Math.floor(minX/sn)*sn; x <= maxX; x += sn) {
-    const sx = w2s(x, 0).x;
-    ctx.beginPath(); ctx.moveTo(sx, 0); ctx.lineTo(sx, H); ctx.stroke();
+  // Minor grid (snap size)
+  ctx.strokeStyle = 'rgba(0,0,0,.05)';
+  ctx.lineWidth = 0.5;
+  for (let x = Math.floor(tl.x/sn)*sn; x <= br.x; x += sn) {
+    const sx = w2s(x,0).x;
+    ctx.beginPath(); ctx.moveTo(sx,0); ctx.lineTo(sx,H); ctx.stroke();
   }
-  for (let y = Math.floor(minY/sn)*sn; y <= maxY; y += sn) {
-    const sy = w2s(0, y).y;
-    ctx.beginPath(); ctx.moveTo(0, sy); ctx.lineTo(W, sy); ctx.stroke();
+  for (let y = Math.floor(tl.y/sn)*sn; y <= br.y; y += sn) {
+    const sy = w2s(0,y).y;
+    ctx.beginPath(); ctx.moveTo(0,sy); ctx.lineTo(W,sy); ctx.stroke();
   }
 
-  ctx.strokeStyle = 'rgba(0,0,0,.09)';
+  // Major grid (1 m)
+  ctx.strokeStyle = 'rgba(0,0,0,.12)';
   ctx.lineWidth = 1;
-  for (let x = Math.floor(minX); x <= maxX; x++) {
-    const sx = w2s(x, 0).x;
-    ctx.beginPath(); ctx.moveTo(sx, 0); ctx.lineTo(sx, H); ctx.stroke();
-    if (sc > 38 && x !== 0) {
-      ctx.fillStyle = '#aaa8a0'; ctx.font = '9px Inter'; ctx.textAlign = 'center';
-      ctx.fillText(x + 'm', sx, H - 34);
+  for (let x = Math.floor(tl.x); x <= br.x+1; x++) {
+    const sx = w2s(x,0).x;
+    ctx.beginPath(); ctx.moveTo(sx,0); ctx.lineTo(sx,H); ctx.stroke();
+    if (S.cam.scale > 38) {
+      ctx.fillStyle='#aaa8a0'; ctx.font='9px Inter'; ctx.textAlign='center';
+      ctx.fillText(x+'m', sx, H-34);
     }
   }
-  for (let y = Math.floor(minY); y <= maxY; y++) {
-    const sy = w2s(0, y).y;
-    ctx.beginPath(); ctx.moveTo(0, sy); ctx.lineTo(W, sy); ctx.stroke();
-    if (sc > 38 && y !== 0) {
-      ctx.fillStyle = '#aaa8a0'; ctx.font = '9px Inter'; ctx.textAlign = 'right';
-      ctx.fillText(y + 'm', W - 34, sy - 2);
+  for (let y = Math.floor(tl.y); y <= br.y+1; y++) {
+    const sy = w2s(0,y).y;
+    ctx.beginPath(); ctx.moveTo(0,sy); ctx.lineTo(W,sy); ctx.stroke();
+    if (S.cam.scale > 38) {
+      ctx.fillStyle='#aaa8a0'; ctx.font='9px Inter'; ctx.textAlign='right';
+      ctx.fillText(y+'m', W-34, sy-2);
     }
   }
 
-  const o = w2s(0, 0);
-  ctx.strokeStyle = 'rgba(0,0,0,.16)'; ctx.lineWidth = 1.5;
-  ctx.beginPath(); ctx.moveTo(o.x - 12, o.y); ctx.lineTo(o.x + 12, o.y); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(o.x, o.y - 12); ctx.lineTo(o.x, o.y + 12); ctx.stroke();
+  // Origin cross
+  const o = w2s(0,0);
+  ctx.strokeStyle='rgba(0,0,0,.25)'; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.moveTo(o.x-14,o.y); ctx.lineTo(o.x+14,o.y); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(o.x,o.y-14); ctx.lineTo(o.x,o.y+14); ctx.stroke();
 }
 
-function drawRooms() {
-  for (const r of state.rooms) {
-    if (!r.polygon || r.polygon.length < 3) continue;
-    const p0 = w2s(r.polygon[0].x, r.polygon[0].y);
-    ctx.beginPath(); ctx.moveTo(p0.x, p0.y);
-    for (let i = 1; i < r.polygon.length; i++) {
-      const pi = w2s(r.polygon[i].x, r.polygon[i].y);
-      ctx.lineTo(pi.x, pi.y);
-    }
-    ctx.closePath();
-    ctx.fillStyle = RCOLOR[r.type] || 'rgba(238,234,228,.55)';
-    ctx.fill();
-
-    const cx = r.polygon.reduce((s,p)=>s+p.x,0)/r.polygon.length;
-    const cy = r.polygon.reduce((s,p)=>s+p.y,0)/r.polygon.length;
-    const sc = w2s(cx, cy);
-    ctx.fillStyle = 'rgba(0,0,0,.32)';
-    ctx.font = `${Math.max(9,Math.min(12,state.cam.scale/8))}px Inter`;
-    ctx.textAlign = 'center';
-    ctx.fillText(r.area.toFixed(1) + ' m²', sc.x, sc.y);
-  }
+function wallPoly(w) {
+  const s = w2s(w.start.x, w.start.y);
+  const e = w2s(w.end.x,   w.end.y);
+  const dx = e.x-s.x, dy = e.y-s.y;
+  const len = Math.hypot(dx,dy) || 1;
+  const tk = w.thickness * S.cam.scale;
+  const nx = -dy/len * tk/2, ny = dx/len * tk/2;
+  return { s, e, nx, ny, dx, dy, len, tk };
 }
 
 function drawWalls() {
-  for (const w of state.walls) {
-    const s = w2s(w.start.x, w.start.y);
-    const e = w2s(w.end.x,   w.end.y);
-    const dx = e.x-s.x, dy = e.y-s.y;
-    const len = Math.hypot(dx, dy) || 1;
-    const tk = w.thickness * state.cam.scale;
-    const nx = -dy/len * tk/2, ny = dx/len * tk/2;
-
-    const sel = state.selected === w.id;
-    const hov = state.hovered === w.id;
-    const col = WCOLOR[w.type] || WCOLOR.exterior;
+  for (const w of S.walls) {
+    const { s, e, nx, ny, dx, dy, tk } = wallPoly(w);
+    const sel = w.id === S.selected;
+    const hov = w.id === S.hovered;
 
     ctx.beginPath();
-    ctx.moveTo(s.x+nx, s.y+ny); ctx.lineTo(e.x+nx, e.y+ny);
-    ctx.lineTo(e.x-nx, e.y-ny); ctx.lineTo(s.x-nx, s.y-ny);
+    ctx.moveTo(s.x+nx, s.y+ny);
+    ctx.lineTo(e.x+nx, e.y+ny);
+    ctx.lineTo(e.x-nx, e.y-ny);
+    ctx.lineTo(s.x-nx, s.y-ny);
     ctx.closePath();
 
     if (sel) {
-      ctx.shadowColor = 'rgba(37,99,235,.35)'; ctx.shadowBlur = 10;
-      ctx.fillStyle = '#dce8ff'; ctx.fill();
-      ctx.shadowBlur = 0;
-      ctx.strokeStyle = '#2563eb'; ctx.lineWidth = 2; ctx.stroke();
+      ctx.shadowColor = 'rgba(37,99,235,.4)'; ctx.shadowBlur = 10;
+      ctx.fillStyle = '#d8e8ff';
+    } else if (hov) {
+      ctx.fillStyle = '#e4e0d8';
     } else {
-      ctx.fillStyle = hov ? '#e8e4dc' : (w.type === 'exterior' ? '#d4cfc8' : '#dedbd4');
-      ctx.fill();
-      ctx.strokeStyle = col;
-      ctx.lineWidth = w.type === 'exterior' ? 2 : 1.5;
-      ctx.stroke();
-      if (hov) { ctx.strokeStyle = col; ctx.lineWidth = 2; ctx.stroke(); }
+      ctx.fillStyle = WFILL[w.type] || WFILL.exterior;
     }
+    ctx.fill();
+    ctx.shadowBlur = 0;
+
+    ctx.strokeStyle = sel ? '#2563eb' : (WCLR[w.type] || WCLR.exterior);
+    ctx.lineWidth = sel ? 2 : (w.type === 'exterior' ? 2 : 1.5);
+    ctx.stroke();
 
     // Length label
-    if (state.cam.scale > 40) {
-      const length = dist(w.start, w.end);
-      if (length > 0.2) {
-        const mid = { x:(s.x+e.x)/2, y:(s.y+e.y)/2 };
+    if (S.cam.scale > 38) {
+      const d = dist(w.start, w.end);
+      if (d > 0.2) {
+        const mx = (s.x+e.x)/2, my = (s.y+e.y)/2;
         const angle = Math.atan2(dy, dx);
         ctx.save();
-        ctx.translate(mid.x, mid.y); ctx.rotate(angle);
-        ctx.fillStyle = sel ? '#2563eb' : 'rgba(0,0,0,.45)';
-        ctx.font = `${Math.max(9,Math.min(11,state.cam.scale/9))}px Inter`;
-        ctx.textAlign = 'center';
-        ctx.fillText(length.toFixed(2)+'m', 0, -tk/2-3);
+        ctx.translate(mx, my); ctx.rotate(angle);
+        ctx.fillStyle = sel ? '#2563eb' : 'rgba(0,0,0,.4)';
+        ctx.font = '9px Inter'; ctx.textAlign = 'center';
+        ctx.fillText(d.toFixed(2)+'m', 0, -tk/2-3);
         ctx.restore();
       }
     }
   }
+
+  // Endpoints
+  const ep = new Map();
+  for (const w of S.walls) {
+    for (const p of [w.start, w.end]) {
+      const k = Math.round(p.x*200)+'_'+Math.round(p.y*200);
+      ep.set(k, { p, n: (ep.get(k)?.n||0)+1 });
+    }
+  }
+  for (const { p, n } of ep.values()) {
+    const s = w2s(p.x, p.y);
+    ctx.beginPath(); ctx.arc(s.x, s.y, n>1?5:3, 0, Math.PI*2);
+    ctx.fillStyle = n>1 ? '#0d0d0d' : '#a09890'; ctx.fill();
+    if (n>1) { ctx.strokeStyle='#f5f0e8'; ctx.lineWidth=1.5; ctx.stroke(); }
+  }
 }
 
 function drawPreview() {
-  if (!state.chainStart || state.tool !== 'wall') return;
-  const cur = getSnapped();
-  const s = w2s(state.chainStart.x, state.chainStart.y);
-  const e = w2s(cur.x, cur.y);
+  if (!S.drawing || S.tool !== 'wall') return;
+  const s = w2s(S.drawing.x, S.drawing.y);
+  const e = w2s(S.mouse.x, S.mouse.y);
   const dx = e.x-s.x, dy = e.y-s.y;
-  const len = Math.hypot(dx, dy) || 1;
-  const tk = state.thickness * state.cam.scale;
-  const nx = -dy/len * tk/2, ny = dx/len * tk/2;
+  const len = Math.hypot(dx,dy)||1;
+  const tk = S.thickness * S.cam.scale;
+  const nx = -dy/len*tk/2, ny = dx/len*tk/2;
 
   ctx.beginPath();
-  ctx.moveTo(s.x+nx, s.y+ny); ctx.lineTo(e.x+nx, e.y+ny);
-  ctx.lineTo(e.x-nx, e.y-ny); ctx.lineTo(s.x-nx, s.y-ny);
+  ctx.moveTo(s.x+nx,s.y+ny); ctx.lineTo(e.x+nx,e.y+ny);
+  ctx.lineTo(e.x-nx,e.y-ny); ctx.lineTo(s.x-nx,s.y-ny);
   ctx.closePath();
-  ctx.fillStyle = 'rgba(37,99,235,.09)'; ctx.fill();
+  ctx.fillStyle = 'rgba(37,99,235,.10)'; ctx.fill();
   ctx.strokeStyle = '#2563eb'; ctx.lineWidth = 1.5;
   ctx.setLineDash([5,3]); ctx.stroke(); ctx.setLineDash([]);
 
-  // Dimension pill
-  const d = dist(state.chainStart, cur);
-  if (d > 0.04) {
-    const mid = { x:(s.x+e.x)/2, y:(s.y+e.y)/2 };
-    const angle = Math.atan2(dy, dx);
+  // Dimension label
+  const d = dist(S.drawing, S.mouse);
+  if (d > 0.05) {
+    const mx = (s.x+e.x)/2, my = (s.y+e.y)/2;
+    const angle = Math.atan2(dy,dx);
     ctx.save();
-    ctx.translate(mid.x, mid.y); ctx.rotate(angle);
-    const txt = d.toFixed(2) + ' m';
+    ctx.translate(mx,my); ctx.rotate(angle);
+    const txt = d.toFixed(2)+' m';
     ctx.font = 'bold 11px Inter';
-    const tw = ctx.measureText(txt).width + 14;
-    ctx.fillStyle = '#2563eb'; ctx.beginPath();
+    const tw = ctx.measureText(txt).width + 16;
+    ctx.fillStyle = '#2563eb';
+    ctx.beginPath();
     if (ctx.roundRect) ctx.roundRect(-tw/2, -tk/2-17, tw, 16, 3);
     else ctx.rect(-tw/2, -tk/2-17, tw, 16);
     ctx.fill();
@@ -519,458 +499,362 @@ function drawPreview() {
     ctx.fillText(txt, 0, -tk/2-5);
     ctx.restore();
   }
+
+  // Chain start dot
+  ctx.beginPath(); ctx.arc(s.x, s.y, 5, 0, Math.PI*2);
+  ctx.fillStyle = '#2563eb'; ctx.fill();
 }
 
-function drawEndpoints() {
-  const epMap = new Map();
-  for (const w of state.walls) {
-    for (const p of [w.start, w.end]) {
-      const k = `${Math.round(p.x*100)}_${Math.round(p.y*100)}`;
-      epMap.set(k, { pt:p, cnt:(epMap.get(k)?.cnt||0)+1 });
-    }
-  }
-  for (const { pt, cnt } of epMap.values()) {
-    const s = w2s(pt.x, pt.y);
-    ctx.beginPath(); ctx.arc(s.x, s.y, cnt>1?4.5:3, 0, Math.PI*2);
-    ctx.fillStyle = cnt>1 ? '#1a1714' : '#b0a99c'; ctx.fill();
-    if (cnt > 1) { ctx.strokeStyle = '#f5f0e8'; ctx.lineWidth = 1.5; ctx.stroke(); }
+function drawCursor() {
+  if (S.tool !== 'wall') return;
+  const m = w2s(S.mouse.x, S.mouse.y);
+
+  // Snap ring around nearby endpoint
+  const near = nearEndpt(S.mouse);
+  if (near) {
+    const ns = w2s(near.x, near.y);
+    ctx.beginPath(); ctx.arc(ns.x, ns.y, 12, 0, Math.PI*2);
+    ctx.strokeStyle = '#2563eb'; ctx.lineWidth = 2; ctx.stroke();
   }
 
-  const cur = getSnapped();
-  if (state.tool === 'wall') {
-    const near = nearEndpoint(cur.x, cur.y);
-    if (near) {
-      const s = w2s(near.x, near.y);
-      ctx.beginPath(); ctx.arc(s.x, s.y, 11, 0, Math.PI*2);
-      ctx.strokeStyle = '#2563eb'; ctx.lineWidth = 2; ctx.stroke();
-    }
-    const sc = w2s(cur.x, cur.y);
-    ctx.strokeStyle = '#2563eb'; ctx.lineWidth = 1.5;
-    ctx.beginPath(); ctx.moveTo(sc.x-7,sc.y); ctx.lineTo(sc.x+7,sc.y); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(sc.x,sc.y-7); ctx.lineTo(sc.x,sc.y+7); ctx.stroke();
-    if (state.chainStart) {
-      const cs = w2s(state.chainStart.x, state.chainStart.y);
-      ctx.beginPath(); ctx.arc(cs.x, cs.y, 5, 0, Math.PI*2);
-      ctx.fillStyle = '#2563eb'; ctx.fill();
-    }
-  }
+  // Crosshair cursor
+  ctx.strokeStyle = '#2563eb'; ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(m.x-8,m.y); ctx.lineTo(m.x+8,m.y); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(m.x,m.y-8); ctx.lineTo(m.x,m.y+8); ctx.stroke();
 }
 
-// ── ROOM DETECTION ────────────────────────────────────────────────
-function detectRooms() {
-  const SNAP = 0.12;
-  const walls = state.walls;
-  state.rooms = [];
-  if (walls.length < 3) return;
+// ── PAN ──────────────────────────────────────────────────────────────────────
+let _panAnchor = null;
+let _didPan    = false;
 
-  const adj = {};
-  const ptMap = {};
-  const ptKey = p => `${Math.round(p.x*40)}_${Math.round(p.y*40)}`;
+cv.addEventListener('mousedown', e => {
+  _didPan = false; // always reset so stale drag state never blocks next click
+  if (e.button === 1 || e.altKey || S.tool === 'pan') {
+    e.preventDefault();
+    _panAnchor = { ex: e.clientX, ey: e.clientY, cx: S.cam.x, cy: S.cam.y };
+    cv.style.cursor = 'grabbing';
+  }
+});
 
-  function addPt(p) {
-    const k = ptKey(p); ptMap[k] = p;
-    if (!adj[k]) adj[k] = new Set();
-    return k;
+window.addEventListener('mouseup', e => {
+  if (_panAnchor) {
+    _panAnchor = null;
+    cv.style.cursor = S.tool === 'pan' ? 'grab' : S.tool === 'wall' ? 'crosshair' : 'default';
+  }
+});
+
+// ── MOUSEMOVE — update preview + pan ─────────────────────────────────────────
+cv.addEventListener('mousemove', e => {
+  const raw = eventPt(e);
+  S.mouse = applySnap(raw);
+  document.getElementById('sb-coords').textContent =
+    raw.x.toFixed(2) + ', ' + raw.y.toFixed(2) + ' m';
+
+  if (_panAnchor) {
+    _didPan = true;
+    S.cam.x = _panAnchor.cx - (e.clientX - _panAnchor.ex) / S.cam.scale;
+    S.cam.y = _panAnchor.cy + (e.clientY - _panAnchor.ey) / S.cam.scale;
   }
 
-  for (let i = 0; i < walls.length; i++) {
-    for (let j = i+1; j < walls.length; j++) {
-      const pairs = [
-        [walls[i].end, walls[j].start], [walls[i].end, walls[j].end],
-        [walls[i].start, walls[j].start], [walls[i].start, walls[j].end],
-      ];
-      for (const [a, b] of pairs) {
-        if (dist(a, b) < SNAP) {
-          const ka = addPt(a), kb = addPt(b);
-          adj[ka].add(kb); adj[kb].add(ka);
-        }
+  if (S.tool === 'select') {
+    let found = null;
+    for (const w of S.walls) {
+      if (segDist(raw, w.start, w.end) < 0.3) { found = w.id; break; }
+    }
+    S.hovered = found;
+    cv.style.cursor = found ? 'pointer' : 'default';
+  }
+
+  redraw();
+});
+
+// ── CLICK — the only place walls are created ──────────────────────────────────
+cv.addEventListener('click', e => {
+  // Ignore if we were panning
+  if (_didPan) { _didPan = false; return; }
+  if (e.button !== 0) return;
+
+  const raw = eventPt(e);
+  const pt  = applySnap(raw);
+
+  if (S.tool === 'wall') {
+    if (!S.drawing) {
+      // First click — set start point
+      S.drawing = { x: pt.x, y: pt.y };
+      document.getElementById('sb-tool').textContent =
+        'Klikk for å avslutte veggen – Esc / høyreklikk avbryter';
+    } else {
+      // Second click — finish wall
+      if (dist(S.drawing, pt) >= 0.05) {
+        addWall(S.drawing, pt);
+        S.drawing = { x: pt.x, y: pt.y }; // chain to next wall
       }
     }
-    addPt(walls[i].start); addPt(walls[i].end);
+    redraw();
+    return;
   }
 
-  const cycles = [], seen = new Set();
-  function dfs(start, cur, path, depth) {
-    if (depth > 12) return;
-    for (const nxt of (adj[cur]||[])) {
-      if (nxt === start && path.length >= 3) {
-        const sig = [...path].sort().join(',');
-        if (!seen.has(sig)) { seen.add(sig); cycles.push([...path]); }
-        continue;
-      }
-      if (!path.includes(nxt)) { path.push(nxt); dfs(start,nxt,path,depth+1); path.pop(); }
+  if (S.tool === 'select') {
+    let found = null;
+    for (const w of S.walls) {
+      if (segDist(raw, w.start, w.end) < 0.3) { found = w.id; break; }
     }
+    S.selected = found;
+    renderPropBar();
+    if (window._update3D) window._update3D(S.walls);
+    redraw();
   }
-  for (const k of Object.keys(adj)) {
-    if ((adj[k]?.size||0) >= 2) dfs(k, k, [k], 0);
+});
+
+// Right-click cancels drawing
+cv.addEventListener('contextmenu', e => {
+  e.preventDefault();
+  if (S.drawing) {
+    S.drawing = null;
+    document.getElementById('sb-tool').textContent = 'Klikk for å starte vegg';
+    redraw();
+  }
+});
+
+// Double-click also cancels chain
+cv.addEventListener('dblclick', () => {
+  if (S.drawing) {
+    S.drawing = null;
+    document.getElementById('sb-tool').textContent = 'Klikk for å starte vegg';
+    redraw();
+  }
+});
+
+// ── ZOOM ─────────────────────────────────────────────────────────────────────
+cv.addEventListener('wheel', e => {
+  e.preventDefault();
+  const r = cv.getBoundingClientRect();
+  const sx = e.clientX - r.left, sy = e.clientY - r.top;
+  const before = s2w(sx, sy);
+  const f = e.deltaY < 0 ? 1.12 : 1/1.12;
+  S.cam.scale = Math.max(12, Math.min(800, S.cam.scale * f));
+  const after = s2w(sx, sy);
+  S.cam.x += before.x - after.x;
+  S.cam.y += before.y - after.y;
+  redraw();
+}, { passive: false });
+
+// ── KEYBOARD ─────────────────────────────────────────────────────────────────
+window.addEventListener('keydown', e => {
+  const tag = e.target.tagName;
+  if (tag==='INPUT'||tag==='TEXTAREA'||tag==='SELECT') return;
+
+  if ((e.ctrlKey||e.metaKey) && (e.key==='z'||e.key==='Z')) {
+    e.preventDefault(); doUndo(); return;
   }
 
-  const rooms = cycles
-    .map(c => ({ polygon:c.map(k=>({...ptMap[k]})), area:Math.abs(polyArea(c.map(k=>ptMap[k]))) }))
-    .filter(r => r.area > 0.4)
-    .sort((a,b) => a.area - b.area)
-    .slice(0, 16);
-
-  const unique = [];
-  for (const r of rooms) {
-    if (!unique.some(u => Math.abs(u.area - r.area) < 0.08)) unique.push(r);
+  switch (e.key) {
+    case 'w': case 'W': setTool('wall');   break;
+    case 's': case 'S': if(!e.ctrlKey) setTool('select'); break;
+    case 'p': case 'P': setTool('pan');    break;
+    case 'f': case 'F': fitView();         break;
+    case 'Delete': case 'Backspace': deleteSelected(); break;
+    case 'Escape':
+      S.drawing  = null;
+      S.selected = null;
+      document.getElementById('sb-tool').textContent = 'Klikk for å starte vegg';
+      document.getElementById('propbar').classList.remove('open');
+      redraw();
+      break;
+    case 'Shift':
+      if (!S.axisLock && S.drawing) {
+        const adx = Math.abs(S.mouse.x - S.drawing.x);
+        const ady = Math.abs(S.mouse.y - S.drawing.y);
+        S.axisLock = adx >= ady ? 'h' : 'v';
+      } else if (!S.axisLock) {
+        S.axisLock = 'h';
+      }
+      showLock(); redraw();
+      break;
+    case 'ArrowLeft': case 'ArrowRight': S.axisLock='h'; showLock(); redraw(); break;
+    case 'ArrowUp':   case 'ArrowDown':  S.axisLock='v'; showLock(); redraw(); break;
   }
-  state.rooms = unique;
+});
+
+window.addEventListener('keyup', e => {
+  if (e.key === 'Shift') {
+    S.axisLock = null;
+    document.getElementById('lock-badge').classList.remove('show');
+    redraw();
+  }
+});
+
+function showLock() {
+  const el = document.getElementById('lock-badge');
+  el.textContent = S.axisLock === 'h' ? '⟷  HORISONTAL' : '↕  VERTIKAL';
+  el.classList.add('show');
 }
 
-function polyArea(pts) {
-  let a = 0;
-  for (let i = 0, j = pts.length-1; i < pts.length; j=i++) {
-    a += (pts[j].x+pts[i].x) * (pts[j].y-pts[i].y);
-  }
-  return a / 2;
-}
-
-function segDist(p, a, b) {
-  const dx=b.x-a.x, dy=b.y-a.y, l2=dx*dx+dy*dy;
-  if (!l2) return dist(p,a);
-  const t = Math.max(0, Math.min(1, ((p.x-a.x)*dx+(p.y-a.y)*dy)/l2));
-  return dist(p, {x:a.x+t*dx, y:a.y+t*dy});
-}
-
-// ── WALL CRUD ─────────────────────────────────────────────────────
+// ── WALL CRUD ────────────────────────────────────────────────────────────────
 function pushUndo() {
-  state.undoStack.push(JSON.stringify(state.walls));
-  if (state.undoStack.length > 50) state.undoStack.shift();
+  S.undoStack.push(JSON.stringify(S.walls));
+  if (S.undoStack.length > 50) S.undoStack.shift();
 }
 
-function createWall(s, e) {
-  if (dist(s, e) < 0.05) return null;
+function addWall(a, b) {
   pushUndo();
-  const w = {
-    id: newId(),
-    start: {...s}, end: {...e},
-    heightL: 2.4, heightR: 2.4,
-    thickness: state.thickness,
-    type: state.wallType,
+  S.walls.push({
+    id: 'w' + (++S._id),
+    start:     { x: a.x, y: a.y },
+    end:       { x: b.x, y: b.y },
+    heightL:   2.4,
+    heightR:   2.4,
+    thickness: S.thickness,
+    type:      S.wallType,
     roofDriver: false,
-    topPoints: [],
-  };
-  state.walls.push(w);
-  afterWallChange();
-  return w;
+    topPoints:  [],
+  });
+  if (window._update3D) window._update3D(S.walls);
 }
 
 function deleteSelected() {
-  if (!state.selected) return;
+  if (!S.selected) return;
   pushUndo();
-  state.walls = state.walls.filter(w => w.id !== state.selected);
-  state.selected = null;
+  S.walls = S.walls.filter(w => w.id !== S.selected);
+  S.selected = null;
   closePropBar();
-  afterWallChange();
-}
-
-function afterWallChange() {
-  detectRooms();
+  if (window._update3D) window._update3D(S.walls);
   redraw();
-  if (window._update3D) window._update3D(state.walls, state.rooms);
 }
 
-// ── UNDO ──────────────────────────────────────────────────────────
-function undo() {
-  if (!state.undoStack.length) return;
-  state.walls = JSON.parse(state.undoStack.pop());
-  state.selected = null;
+function doUndo() {
+  if (!S.undoStack.length) return;
+  S.walls    = JSON.parse(S.undoStack.pop());
+  S.selected = null;
+  S.drawing  = null;
   closePropBar();
-  afterWallChange();
-}
-
-// ── PROPERTIES BAR ────────────────────────────────────────────────
-function renderPropBar() {
-  const bar  = document.getElementById('propbar');
-  const flds = document.getElementById('prop-fields');
-  const wall = state.walls.find(w => w.id === state.selected);
-  if (!wall) { bar.classList.remove('open'); return; }
-  bar.classList.add('open');
-  const thickOpts = [10,15,20,25].map(cm => {
-    const v = cm/100;
-    const act = Math.abs(wall.thickness - v) < 0.001;
-    return `<button class="pt-opt${act?' active':''}" onclick="FP.setProp('thickness',${v})">${cm}</button>`;
-  }).join('');
-  flds.innerHTML = `
-    <div class="pf">
-      <div class="pf-l">Veggtype</div>
-      <select class="pf-sel" onchange="FP.setProp('type',this.value)">
-        ${[['exterior','Yttervegg'],['interior','Innervegg'],['load_bearing','Bærende'],['partition','Skillevegg']]
-          .map(([v,l]) => `<option value="${v}"${wall.type===v?' selected':''}>${l}</option>`).join('')}
-      </select>
-    </div>
-    <div class="pf">
-      <div class="pf-l">Høyde V (m)</div>
-      <input class="pf-in" type="number" step=".05" min=".5" max="20" value="${wall.heightL.toFixed(2)}" onchange="FP.setProp('heightL',+this.value)">
-    </div>
-    <div class="pf">
-      <div class="pf-l">Høyde H (m)</div>
-      <input class="pf-in" type="number" step=".05" min=".5" max="20" value="${wall.heightR.toFixed(2)}" onchange="FP.setProp('heightR',+this.value)">
-    </div>
-    <div class="pf">
-      <div class="pf-l">Tykkelse (cm)</div>
-      <div class="pf-thick-row">${thickOpts}<input class="pt-opt" type="number" step="1" min="5" max="80" value="${Math.round(wall.thickness*100)}" style="width:44px;text-align:center" onchange="FP.setProp('thickness',+this.value/100)"></div>
-    </div>
-    <div class="prop-len">📏 ${dist(wall.start,wall.end).toFixed(2)} m</div>
-    <button class="prop-del" onclick="FP.deleteSelected()">Slett</button>
-    <button class="prop-close" onclick="FP.closePropBar()">✕</button>`;
-}
-
-function closePropBar() {
-  state.selected = null;
-  document.getElementById('propbar').classList.remove('open');
-  document.getElementById('prop-fields').innerHTML = '';
+  if (window._update3D) window._update3D(S.walls);
   redraw();
-  if (window._update3D) window._update3D(state.walls, state.rooms);
 }
 
-// ── TOOLS / UI ────────────────────────────────────────────────────
+// ── TOOLS ────────────────────────────────────────────────────────────────────
 function setTool(t) {
-  state.tool = t;
-  if (t !== 'wall') { state.chainStart = null; }
+  S.tool = t;
+  if (t !== 'wall') { S.drawing = null; }
   document.querySelectorAll('.tbtn').forEach(b => b.classList.remove('active'));
   document.getElementById('tb-'+t)?.classList.add('active');
-  document.getElementById('sb-tool').textContent = {wall:'Klikk for å starte vegg',select:'Klikk vegg for å velge',pan:'Dra for å flytte'}[t]||t;
-  cv.style.cursor = t==='wall'?'crosshair':t==='select'?'default':'grab';
+  document.getElementById('sb-tool').textContent =
+    t==='wall' ? 'Klikk for å starte vegg' :
+    t==='select' ? 'Klikk vegg for å velge' : 'Dra for å flytte';
+  cv.style.cursor = t==='wall'?'crosshair': t==='pan'?'grab':'default';
   redraw();
 }
 
 function setThickness(v) {
-  state.thickness = v;
+  S.thickness = v;
   document.querySelectorAll('.tkbtn').forEach(b => {
     b.classList.toggle('active', Math.abs(+b.textContent/100 - v) < 0.001);
   });
 }
 
 function setWallType(t) {
-  state.wallType = t;
+  S.wallType = t;
   document.querySelectorAll('.wtbtn').forEach(b => {
-    const bv = b.getAttribute('onclick').match(/'([^']+)'/)?.[1];
-    b.classList.toggle('active', bv === t);
+    const m = b.getAttribute('onclick').match(/'([^']+)'/);
+    b.classList.toggle('active', m && m[1] === t);
   });
 }
 
-function setSnap(v) { state.snapSize = v; redraw(); }
+function setSnap(v) { S.snapSize = v; redraw(); }
 
-function showLock() {
-  const el = document.getElementById('lock-badge');
-  el.textContent = state.lockAxis === 'h' ? '⟷  HORISONTAL' : '↕  VERTIKAL';
-  el.classList.add('show');
-}
-
-// ── PAN / ZOOM ────────────────────────────────────────────────────
-let panStart = null;
-
-cv.addEventListener('mousemove', e => {
-  const r = cv.getBoundingClientRect();
-  const w = s2w(e.clientX - r.left, e.clientY - r.top);
-  state.mouse = { wx:w.x, wy:w.y };
-  document.getElementById('sb-coords').textContent = `${w.x.toFixed(2)}, ${w.y.toFixed(2)} m`;
-
-  if (panStart) {
-    state.cam.x -= (e.clientX - panStart.x) / state.cam.scale;
-    state.cam.y += (e.clientY - panStart.y) / state.cam.scale;
-    panStart = { x:e.clientX, y:e.clientY };
-  }
-
-  if (state.tool === 'select') {
-    let found = null;
-    for (const wall of state.walls) {
-      if (segDist(w, wall.start, wall.end) < 0.28) { found = wall.id; break; }
-    }
-    state.hovered = found;
-    cv.style.cursor = found ? 'pointer' : 'default';
-  }
-  redraw();
-});
-
-// Unified pointer handler — works for both mouse and touch
-let _ptrDragged = false;
-
-cv.addEventListener('pointerdown', e => {
-  _ptrDragged = false;
-  if (e.button === 1 || (e.button === 0 && state.tool === 'pan')) {
-    panStart = { x:e.clientX, y:e.clientY };
-    cv.style.cursor = 'grabbing';
-    e.preventDefault();
-  }
-});
-
-cv.addEventListener('pointermove', e => {
-  if (panStart) { _ptrDragged = true; }
-  // standard mousemove handling below handles redraw
-});
-
-cv.addEventListener('pointerup', e => {
-  const wasPan = !!panStart;
-  panStart = null;
-  if (state.tool === 'pan') cv.style.cursor = 'grab';
-
-  // Treat as click only if not dragging and primary button
-  if (wasPan || _ptrDragged || e.button !== 0) return;
-
-  const r   = cv.getBoundingClientRect();
-  const raw = s2w(e.clientX - r.left, e.clientY - r.top);
-  let pt    = snapPt(raw.x, raw.y);
-  const near = nearEndpoint(pt.x, pt.y);
-  pt = near || pt;
-  if (state.lockAxis && state.chainStart) {
-    pt = state.lockAxis === 'h' ? {x:pt.x, y:state.chainStart.y} : {x:state.chainStart.x, y:pt.y};
-  }
-
-  if (state.tool === 'wall') {
-    if (!state.chainStart) {
-      state.chainStart = {...pt};
-      document.getElementById('sb-tool').textContent = 'Klikk for å avslutte veggen – Esc avbryter';
-    } else {
-      const w = createWall(state.chainStart, pt);
-      if (w) state.chainStart = {...pt};
-    }
-    redraw(); return;
-  }
-
-  if (state.tool === 'select') {
-    let found = null;
-    for (const wall of state.walls) {
-      if (segDist(raw, wall.start, wall.end) < 0.3) { found = wall.id; break; }
-    }
-    state.selected = found;
-    renderPropBar();
-    if (window._update3D) window._update3D(state.walls, state.rooms);
-    redraw();
-  }
-});
-
-// Keep legacy click for browsers that don't fully support pointer events
-cv.addEventListener('click', e => {
-  // Only handle if pointerup didn't already handle it (non-pointer browsers)
-  if (window.PointerEvent) return; // already handled above
-  if (e.button !== 0 || panStart) return;
-  const r   = cv.getBoundingClientRect();
-  const raw = s2w(e.clientX - r.left, e.clientY - r.top);
-  let pt    = snapPt(raw.x, raw.y);
-  const near = nearEndpoint(pt.x, pt.y);
-  pt = near || pt;
-  if (state.tool === 'wall') {
-    if (!state.chainStart) { state.chainStart = {...pt}; document.getElementById('sb-tool').textContent = 'Klikk for å avslutte veggen'; }
-    else { const w = createWall(state.chainStart, pt); if (w) state.chainStart = {...pt}; }
-    redraw();
-  } else if (state.tool === 'select') {
-    let found = null;
-    for (const wall of state.walls) { if (segDist(raw, wall.start, wall.end) < 0.3) { found = wall.id; break; } }
-    state.selected = found; renderPropBar();
-    if (window._update3D) window._update3D(state.walls, state.rooms);
-    redraw();
-  }
-});
-
-cv.addEventListener('dblclick', () => {
-  if (state.tool === 'wall') { state.chainStart = null; redraw(); }
-});
-
-cv.addEventListener('wheel', e => {
-  e.preventDefault();
-  const r = cv.getBoundingClientRect();
-  const sx = e.clientX - r.left, sy = e.clientY - r.top;
-  const before = s2w(sx, sy);
-  const factor = e.deltaY < 0 ? 1.12 : 1/1.12;
-  state.cam.scale = Math.max(12, Math.min(600, state.cam.scale * factor));
-  const after = s2w(sx, sy);
-  state.cam.x += before.x - after.x;
-  state.cam.y += before.y - after.y;
-  redraw();
-}, { passive: false });
-
-// ── KEYBOARD ──────────────────────────────────────────────────────
-window.addEventListener('keydown', e => {
-  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
-  switch (e.key) {
-    case 'w': case 'W': setTool('wall'); break;
-    case 's': case 'S': if(!e.ctrlKey && !e.metaKey) setTool('select'); break;
-    case 'p': case 'P': setTool('pan'); break;
-    case 'f': case 'F': fitView(); break;
-    case 'Delete': case 'Backspace': deleteSelected(); break;
-    case 'Escape':
-      state.chainStart = null; state.selected = null;
-      document.getElementById('sb-tool').textContent = 'Tegn vegg';
-      document.getElementById('propbar').classList.remove('open');
-      redraw();
-      if (window._update3D) window._update3D(state.walls, state.rooms);
-      break;
-    case 'z': case 'Z':
-      if (e.ctrlKey || e.metaKey) { e.preventDefault(); undo(); } break;
-    case 'Shift':
-      if (!state.lockAxis && state.chainStart) {
-        const cur = getSnapped();
-        const adx = Math.abs(cur.x - state.chainStart.x);
-        const ady = Math.abs(cur.y - state.chainStart.y);
-        state.lockAxis = adx >= ady ? 'h' : 'v';
-      } else if (!state.lockAxis) {
-        state.lockAxis = 'h';
-      }
-      showLock(); redraw(); break;
-    case 'ArrowLeft': case 'ArrowRight': state.lockAxis = 'h'; showLock(); redraw(); break;
-    case 'ArrowUp':   case 'ArrowDown':  state.lockAxis = 'v'; showLock(); redraw(); break;
-  }
-});
-
-window.addEventListener('keyup', e => {
-  if (e.key === 'Shift') {
-    state.lockAxis = null;
-    document.getElementById('lock-badge').classList.remove('show');
-    redraw();
-  }
-});
-
-// ── FIT VIEW ──────────────────────────────────────────────────────
+// ── FIT VIEW ─────────────────────────────────────────────────────────────────
 function fitView() {
-  const W = cv.width, H = cv.height;
-  if (!state.walls.length) { state.cam = {x:4,y:5,scale:72}; redraw(); return; }
-  let minX=Infinity,maxX=-Infinity,minY=Infinity,maxY=-Infinity;
-  for (const w of state.walls) for (const p of [w.start,w.end]) {
-    minX=Math.min(minX,p.x); maxX=Math.max(maxX,p.x);
-    minY=Math.min(minY,p.y); maxY=Math.max(maxY,p.y);
+  if (!S.walls.length) { S.cam = { x:4, y:5, scale:72 }; redraw(); return; }
+  let x0=Infinity, x1=-Infinity, y0=Infinity, y1=-Infinity;
+  for (const w of S.walls) {
+    for (const p of [w.start, w.end]) {
+      x0=Math.min(x0,p.x); x1=Math.max(x1,p.x);
+      y0=Math.min(y0,p.y); y1=Math.max(y1,p.y);
+    }
   }
-  const rX=maxX-minX||8, rY=maxY-minY||8;
-  const pad = 120;
-  state.cam.scale = Math.min((W-pad)/rX, (H-pad-60)/rY);
-  state.cam.x = (minX+maxX)/2; state.cam.y = (minY+maxY)/2;
+  const rx = x1-x0||8, ry = y1-y0||8, pad = 120;
+  S.cam.scale = Math.min((cv.width-pad)/rx, (cv.height-pad)/ry);
+  S.cam.x = (x0+x1)/2;
+  S.cam.y = (y0+y1)/2;
   redraw();
 }
 
-// ── EXPORT / IMPORT ───────────────────────────────────────────────
+// ── PROPERTIES BAR ───────────────────────────────────────────────────────────
+function renderPropBar() {
+  const bar  = document.getElementById('propbar');
+  const flds = document.getElementById('prop-fields');
+  const wall = S.walls.find(w => w.id === S.selected);
+  if (!wall) { bar.classList.remove('open'); return; }
+  bar.classList.add('open');
+
+  const thickOpts = [10,15,20,25].map(cm => {
+    const v = cm/100;
+    const a = Math.abs(wall.thickness - v) < 0.001;
+    return `<button class="pt-opt${a?' active':''}" onclick="FP.setProp('thickness',${v})">${cm}</button>`;
+  }).join('');
+
+  flds.innerHTML = `
+    <div class="pf">
+      <div class="pf-l">Veggtype</div>
+      <select class="pf-sel" onchange="FP.setProp('type',this.value)">
+        ${[['exterior','Yttervegg'],['interior','Innervegg'],['load_bearing','Bærende']]
+          .map(([v,l])=>`<option value="${v}"${wall.type===v?' selected':''}>${l}</option>`).join('')}
+      </select>
+    </div>
+    <div class="pf">
+      <div class="pf-l">Høyde V (m)</div>
+      <input class="pf-in" type="number" step=".05" min=".5" max="20"
+             value="${wall.heightL.toFixed(2)}" onchange="FP.setProp('heightL',+this.value)">
+    </div>
+    <div class="pf">
+      <div class="pf-l">Høyde H (m)</div>
+      <input class="pf-in" type="number" step=".05" min=".5" max="20"
+             value="${wall.heightR.toFixed(2)}" onchange="FP.setProp('heightR',+this.value)">
+    </div>
+    <div class="pf">
+      <div class="pf-l">Tykkelse (cm)</div>
+      <div class="pf-thick-row">${thickOpts}</div>
+    </div>
+    <span class="prop-len">📏 ${dist(wall.start,wall.end).toFixed(2)} m</span>
+    <button class="prop-del" onclick="FP.deleteSelected()">Slett</button>
+    <button class="prop-close" onclick="FP.closePropBar()">✕</button>`;
+}
+
+function closePropBar() {
+  S.selected = null;
+  document.getElementById('propbar').classList.remove('open');
+  document.getElementById('prop-fields').innerHTML = '';
+  redraw();
+}
+
+// ── EXPORT / IMPORT ──────────────────────────────────────────────────────────
 function doExport() {
   const doc = {
-    slimbim_version:'1.0.0',
+    slimbim_version: '1.0.0',
     created_at: new Date().toISOString(),
-    created_by: 'placely-floorplanner-v2',
+    created_by: 'placely-floorplanner-v3',
     property: {
-      id:'prop_'+Date.now(), type:'property',
+      id: 'prop_'+Date.now(), type: 'property',
       address: document.getElementById('plan-name').textContent,
       buildings: [{
-        id:'bygg_001', type:'building', version_status:'proposed',
+        id: 'bygg_001', type: 'building', version_status: 'proposed',
         floors: [{
-          id:'etg_01', type:'floor', level_index:0, floor_type:'ground',
-          bra_m2: state.rooms.reduce((s,r)=>s+r.area,0)||null,
-          walls: state.walls.map(w => ({
-            id:w.id, type:'wall',
-            start:[+w.start.x.toFixed(4),+w.start.y.toFixed(4),0],
-            end:  [+w.end.x.toFixed(4),  +w.end.y.toFixed(4),  0],
-            height_left_m:w.heightL, height_right_m:w.heightR,
-            thickness_m:w.thickness, wall_type:w.type,
-            is_roof_driver:w.roofDriver,
-            top_points: w.topPoints.length
-              ? w.topPoints.map(p=>({x_m:p.x,z_m:p.z}))
-              : [{x_m:0,z_m:w.heightL},{x_m:+dist(w.start,w.end).toFixed(4),z_m:w.heightR}],
+          id: 'etg_01', type: 'floor', level_index: 0, floor_type: 'ground',
+          walls: S.walls.map(w => ({
+            id: w.id, type: 'wall',
+            start: [+w.start.x.toFixed(4), +w.start.y.toFixed(4), 0],
+            end:   [+w.end.x.toFixed(4),   +w.end.y.toFixed(4),   0],
+            height_left_m: w.heightL, height_right_m: w.heightR,
+            thickness_m: w.thickness, wall_type: w.type,
+            is_roof_driver: w.roofDriver,
           })),
-          rooms: state.rooms.map((r,i) => ({ id:'room_'+i, type:'room', area_m2:+r.area.toFixed(2) })),
         }],
       }],
     },
   };
   const blob = new Blob([JSON.stringify(doc,null,2)], {type:'application/json'});
-  Object.assign(document.createElement('a'), { href:URL.createObjectURL(blob), download:'plantegning_slimbim.json' }).click();
+  Object.assign(document.createElement('a'),
+    { href: URL.createObjectURL(blob), download: 'plantegning_slimbim.json' }).click();
 }
 
 function importSlimBIM(doc) {
@@ -979,22 +863,23 @@ function importSlimBIM(doc) {
     for (const b of doc?.property?.buildings||[])
       for (const f of b.floors||[])
         for (const w of f.walls||[]) {
-          const s=w.start||[0,0,0], e=w.end||[1,0,0];
+          const s = w.start||[0,0,0], e = w.end||[1,0,0];
           walls.push({
-            id:w.id||newId(),
-            start:{x:+s[0],y:+s[1]}, end:{x:+e[0],y:+e[1]},
-            heightL:w.height_left_m||2.4, heightR:w.height_right_m||2.4,
-            thickness:w.thickness_m||0.25,
-            type:w.wall_type||'exterior',
-            roofDriver:w.is_roof_driver||false,
-            topPoints:(w.top_points||[]).map(p=>({x:p.x_m||0,z:p.z_m||2.4})),
+            id: w.id || 'w'+(++S._id),
+            start: { x:+s[0], y:+s[1] }, end: { x:+e[0], y:+e[1] },
+            heightL: w.height_left_m||2.4, heightR: w.height_right_m||2.4,
+            thickness: w.thickness_m||0.20,
+            type: w.wall_type||'exterior',
+            roofDriver: w.is_roof_driver||false, topPoints: [],
           });
         }
-  } catch(e) { alert('Feil i SlimBIM JSON: '+e.message); return; }
-  if (!walls.length) { alert('Ingen vegger funnet i dokumentet.'); return; }
-  pushUndo(); state.walls = walls; state.selected = null;
-  fitView(); afterWallChange(); closeImport();
-  alert(walls.length + ' vegger importert.');
+  } catch(ex) { alert('Feil i SlimBIM JSON: '+ex.message); return; }
+  if (!walls.length) { alert('Ingen vegger funnet.'); return; }
+  pushUndo(); S.walls = walls; S.selected = null; S.drawing = null;
+  fitView();
+  if (window._update3D) window._update3D(S.walls);
+  closeImport();
+  alert(walls.length+' vegger importert.');
 }
 
 let _modalFile = null;
@@ -1007,13 +892,12 @@ function switchMtab(t) {
   });
 }
 function onModalFile(inp) {
-  if (inp.files[0]) { _modalFile = inp.files[0]; document.getElementById('m-file-txt').textContent = '✓ '+inp.files[0].name; }
+  if (inp.files[0]) { _modalFile=inp.files[0]; document.getElementById('m-file-txt').textContent='✓ '+inp.files[0].name; }
 }
 async function doImport() {
-  const isJson = document.getElementById('mtab-json').classList.contains('active');
-  if (isJson) {
+  if (document.getElementById('mtab-json').classList.contains('active')) {
     try { importSlimBIM(JSON.parse(document.getElementById('m-json').value)); }
-    catch(e) { alert('Ugyldig JSON: '+e.message); }
+    catch(ex) { alert('Ugyldig JSON: '+ex.message); }
     return;
   }
   if (!_modalFile) { alert('Velg en fil'); return; }
@@ -1023,338 +907,238 @@ async function doImport() {
   try {
     const fd = new FormData(); fd.append('file', _modalFile);
     const ext = _modalFile.name.split('.').pop().toLowerCase();
-    const r = await fetch(XDI+(ext==='pdf'?'/parse/pdf':'/parse/image'), {method:'POST', headers:{'X-API-Key':key}, body:fd});
+    const r = await fetch(XDI+(ext==='pdf'?'/parse/pdf':'/parse/image'),
+      { method:'POST', headers:{'X-API-Key':key}, body:fd });
     if (!r.ok) throw new Error((await r.json()).detail||'Feil');
     importSlimBIM(await r.json());
-  } catch(e) { alert('XDi: '+e.message); }
+  } catch(ex) { alert('XDi: '+ex.message); }
   finally { btn.innerHTML = 'Importer'; btn.disabled = false; }
 }
 
-// ── MISC ──────────────────────────────────────────────────────────
+// ── MISC ─────────────────────────────────────────────────────────────────────
 function confirmClear() {
-  if (!state.walls.length || confirm('Tøm hele tegningen?')) {
-    pushUndo(); state.walls=[]; state.rooms=[]; state.selected=null; state.chainStart=null;
-    afterWallChange();
-    document.getElementById('propbar').classList.remove('open');
+  if (!S.walls.length || confirm('Tøm hele tegningen?')) {
+    pushUndo(); S.walls=[]; S.selected=null; S.drawing=null;
+    closePropBar();
+    if (window._update3D) window._update3D(S.walls);
+    redraw();
   }
 }
 function renamePlan() {
-  const v = prompt('Navn på tegning:', document.getElementById('plan-name').textContent);
+  const v = prompt('Navn:', document.getElementById('plan-name').textContent);
   if (v) document.getElementById('plan-name').textContent = v;
 }
 
-// ── DIVIDER DRAG ──────────────────────────────────────────────────
-const divEl = document.getElementById('divider');
-let divDrag = false;
-divEl.addEventListener('mousedown', () => { divDrag=true; document.body.style.userSelect='none'; document.body.style.cursor='col-resize'; });
+// ── DIVIDER DRAG ─────────────────────────────────────────────────────────────
+let _divDrag = false;
+document.getElementById('divider').addEventListener('mousedown', () => {
+  _divDrag = true; document.body.style.cursor = 'col-resize'; document.body.style.userSelect = 'none';
+});
 window.addEventListener('mouseup', () => {
-  if (divDrag) { divDrag=false; document.body.style.userSelect=''; document.body.style.cursor=''; resize2D(); if(window._resize3D) window._resize3D(); }
+  if (_divDrag) {
+    _divDrag = false; document.body.style.cursor=''; document.body.style.userSelect='';
+    resize(); if (window._resize3D) window._resize3D();
+  }
 });
 window.addEventListener('mousemove', e => {
-  if (!divDrag) return;
+  if (!_divDrag) return;
   const ws = document.querySelector('.workspace');
   const pct = Math.max(25, Math.min(72, (e.clientX - ws.getBoundingClientRect().left) / ws.clientWidth * 100));
   document.getElementById('view2d').style.width = pct + '%';
 });
 
-// Expose state so 3D script can read selected + walls after async load
-window._fpState = state;
+// ── DEMO HOUSE ───────────────────────────────────────────────────────────────
+function loadDemo() {
+  const ext = 'exterior', inn = 'interior';
+  const pairs = [
+    // Outer L-shape (exterior)
+    [[0,0],[9,0], ext],
+    [[9,0],[9,6], ext],
+    [[9,6],[5,6], ext],
+    [[5,6],[5,10],ext],
+    [[5,10],[0,10],ext],
+    [[0,10],[0,0], ext],
+    // Interior walls
+    [[5,0],[5,6],  inn],
+    [[0,5],[5,5],  inn],
+  ];
+  const thickMap = { exterior:0.20, interior:0.15 };
+  for (const [[sx,sy],[ex,ey],type] of pairs) {
+    S.walls.push({
+      id: 'w'+(++S._id),
+      start:{x:sx,y:sy}, end:{x:ex,y:ey},
+      heightL:2.6, heightR:2.6,
+      thickness: thickMap[type],
+      type, roofDriver:false, topPoints:[],
+    });
+  }
+}
 
-// ── EXPOSE AS window.FP ──────────────────────────────────────────
+// ── EXPOSE API ───────────────────────────────────────────────────────────────
 window.FP = {
-  setTool, setThickness, setWallType, setSnap, undo, fitView,
-  deleteSelected, closePropBar, renderPropBar,
-  setProp(k, v) {
-    const wall = state.walls.find(w => w.id === state.selected);
-    if (!wall) return;
-    wall[k] = v;
-    renderPropBar();
-    afterWallChange();
+  setTool, setThickness, setWallType, setSnap, fitView,
+  doUndo, deleteSelected, closePropBar, renderPropBar,
+  setProp(k,v) {
+    const w = S.walls.find(w=>w.id===S.selected);
+    if (!w) return;
+    w[k]=v; renderPropBar(); redraw();
+    if (window._update3D) window._update3D(S.walls);
   },
   doExport, openImport, closeImport, switchMtab, onModalFile, doImport,
   confirmClear, renamePlan,
-  resetCamera() { if (window._resetCamera) window._resetCamera(); },
-  toggleTopView() { if (window._toggleTopView) window._toggleTopView(); },
+  resetCamera()    { if (window._resetCamera)    window._resetCamera(); },
+  toggleTopView()  { if (window._toggleTopView)  window._toggleTopView(); },
 };
 
-// ── INIT ──────────────────────────────────────────────────────────
-function loadDemoHouse() {
-  // Proper L-shaped house: each pair is (start, end) of one wall
-  const walls = [
-    // Outer shell (clockwise)
-    [{x:0,y:0},   {x:8,y:0}],    // bottom
-    [{x:8,y:0},   {x:8,y:6}],    // right
-    [{x:8,y:6},   {x:4.5,y:6}],  // step horizontal
-    [{x:4.5,y:6}, {x:4.5,y:10}], // step vertical
-    [{x:4.5,y:10},{x:0,y:10}],   // top
-    [{x:0,y:10},  {x:0,y:0}],    // left
-    // Interior walls
-    [{x:4.5,y:0}, {x:4.5,y:6}],  // divider
-    [{x:0,y:5},   {x:4.5,y:5}],  // horizontal divider
-  ];
-  for (const [s, e] of walls) {
-    const isInterior = walls.indexOf([s,e]) >= 6;
-    state.walls.push({
-      id: newId(), start:{...s}, end:{...e},
-      heightL:2.6, heightR:2.6,
-      thickness: s === walls[6][0] || s === walls[7][0] ? 0.15 : 0.20,
-      type: 'exterior',
-      roofDriver:false, topPoints:[],
-    });
-  }
-  // Fix interior wall types
-  state.walls[6].type = 'interior';
-  state.walls[7].type = 'interior';
-}
-
-// ResizeObserver is most reliable for flex-layout containers
+// ── INIT ─────────────────────────────────────────────────────────────────────
 if (typeof ResizeObserver !== 'undefined') {
-  new ResizeObserver(() => { resize2D(); if (window._resize3D) window._resize3D(); }).observe(v2d);
+  new ResizeObserver(resize).observe(v2d);
 } else {
-  window.addEventListener('resize', () => { resize2D(); if (window._resize3D) window._resize3D(); });
+  window.addEventListener('resize', resize);
 }
 
-// Double-RAF ensures flex layout is fully computed before we read dimensions
+// Wait for layout, then draw
 requestAnimationFrame(() => requestAnimationFrame(() => {
-  resize2D();
-  loadDemoHouse();
+  resize();
+  loadDemo();
   fitView();
-  afterWallChange();
+  if (window._update3D) window._update3D(S.walls);
 }));
 </script>
 
-<!-- ═══════════════════════════════════════════════════════════════
-     SCRIPT 2 — Three.js 3D (loaded async, graceful fallback)
-     ═══════════════════════════════════════════════════════════════ -->
+<!-- Three.js 3D panel — isolated module, graceful fallback if CDN fails -->
 <script type="module">
-// Wrap in IIFE so we can use return for early exit (return at module top-level is invalid)
 (async () => {
-let THREE, OrbitControls;
-try {
-  // Dynamic import: Three.js uses named exports — capture the whole namespace as THREE
-  [THREE, { OrbitControls }] = await Promise.all([
-    import('https://unpkg.com/three@0.160.0/build/three.module.js'),
-    import('https://unpkg.com/three@0.160.0/examples/jsm/controls/OrbitControls.js'),
-  ]);
-} catch(e) {
-  document.getElementById('view3d-loading').textContent = '3D ikke tilgjengelig';
-  console.warn('Three.js failed to load:', e);
-  return; // valid inside IIFE
-}
+  let THREE, OrbitControls;
+  try {
+    [THREE, { OrbitControls }] = await Promise.all([
+      import('https://unpkg.com/three@0.160.0/build/three.module.js'),
+      import('https://unpkg.com/three@0.160.0/examples/jsm/controls/OrbitControls.js'),
+    ]);
+  } catch(e) {
+    document.getElementById('view3d-loading').textContent = '3D ikke tilgjengelig';
+    return;
+  }
 
-// ── SCENE SETUP ───────────────────────────────────────────────────
-const view3d  = document.getElementById('view3d');
-const cv3     = document.getElementById('canvas3d');
+  const view3d = document.getElementById('view3d');
+  const cv3    = document.getElementById('canvas3d');
 
-const renderer = new THREE.WebGLRenderer({ canvas: cv3, antialias: true });
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-renderer.shadowMap.enabled = true;
-renderer.shadowMap.type    = THREE.PCFSoftShadowMap;
-renderer.toneMapping       = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.15;
-renderer.outputColorSpace  = THREE.SRGBColorSpace;
+  const renderer = new THREE.WebGLRenderer({ canvas: cv3, antialias: true });
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type    = THREE.PCFSoftShadowMap;
+  renderer.toneMapping       = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.2;
+  renderer.outputColorSpace  = THREE.SRGBColorSpace;
 
-const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x18181a);
-scene.fog = new THREE.FogExp2(0x18181a, 0.018);
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x18181a);
+  scene.fog = new THREE.FogExp2(0x18181a, 0.016);
 
-const camera = new THREE.PerspectiveCamera(44, 1, 0.1, 500);
-camera.position.set(12, 9, 12);
+  const cam = new THREE.PerspectiveCamera(44, 1, 0.1, 500);
+  cam.position.set(14, 10, 14);
 
-const controls = new OrbitControls(camera, cv3);
-controls.enableDamping  = true;
-controls.dampingFactor  = 0.06;
-controls.minDistance    = 2;
-controls.maxDistance    = 80;
-controls.maxPolarAngle  = Math.PI / 2.02;
-controls.target.set(4, 1, -5);
-controls.update();
+  const ctrl = new OrbitControls(cam, cv3);
+  ctrl.enableDamping = true; ctrl.dampingFactor = 0.06;
+  ctrl.minDistance = 2; ctrl.maxDistance = 100;
+  ctrl.maxPolarAngle = Math.PI / 2.01;
+  ctrl.target.set(4.5, 1, -5); ctrl.update();
 
-// ── LIGHTS ────────────────────────────────────────────────────────
-scene.add(new THREE.AmbientLight(0xfff5e8, 0.45));
+  scene.add(new THREE.AmbientLight(0xfff5e8, 0.5));
+  const hemi = new THREE.HemisphereLight(0xfff8f0, 0x22201e, 0.8);
+  scene.add(hemi);
+  const sun = new THREE.DirectionalLight(0xfffaf0, 1.4);
+  sun.position.set(20, 30, 15); sun.castShadow = true;
+  sun.shadow.mapSize.set(2048,2048);
+  sun.shadow.camera.left=-25; sun.shadow.camera.right=25;
+  sun.shadow.camera.top=25;   sun.shadow.camera.bottom=-25;
+  sun.shadow.bias = -0.0006; sun.shadow.normalBias = 0.03;
+  scene.add(sun);
+  const fill = new THREE.DirectionalLight(0xb8cce0, 0.3);
+  fill.position.set(-10,6,-10); scene.add(fill);
 
-const hemi = new THREE.HemisphereLight(0xfff8f0, 0x22201e, 0.75);
-scene.add(hemi);
-
-const sun = new THREE.DirectionalLight(0xfffaf0, 1.3);
-sun.position.set(18, 28, 14);
-sun.castShadow = true;
-sun.shadow.mapSize.set(2048, 2048);
-sun.shadow.camera.near  = 0.5;
-sun.shadow.camera.far   = 80;
-sun.shadow.camera.left  = -22; sun.shadow.camera.right  = 22;
-sun.shadow.camera.top   =  22; sun.shadow.camera.bottom = -22;
-sun.shadow.bias = -0.0006;
-sun.shadow.normalBias = 0.03;
-scene.add(sun);
-
-const fill = new THREE.DirectionalLight(0xb8cce0, 0.35);
-fill.position.set(-10, 6, -10);
-scene.add(fill);
-
-// ── GROUND ────────────────────────────────────────────────────────
-const ground = new THREE.Mesh(
-  new THREE.PlaneGeometry(150, 150),
-  new THREE.MeshStandardMaterial({ color:0x1c1c1a, roughness:0.95, metalness:0 })
-);
-ground.rotation.x = -Math.PI/2; ground.position.y = -0.004;
-ground.receiveShadow = true;
-scene.add(ground);
-
-scene.add(new THREE.GridHelper(60, 60, 0x282826, 0x242422));
-
-// ── MATERIALS ─────────────────────────────────────────────────────
-const MAT_WALL_EXT  = new THREE.MeshStandardMaterial({ color:0xf0ece6, roughness:0.85, metalness:0 });
-const MAT_WALL_INT  = new THREE.MeshStandardMaterial({ color:0xf5f2ee, roughness:0.9,  metalness:0 });
-const MAT_WALL_LOAD = new THREE.MeshStandardMaterial({ color:0xe8ddd4, roughness:0.9,  metalness:0 });
-const MAT_WALL_SEL  = new THREE.MeshStandardMaterial({ color:0xccd8f8, roughness:0.8,  metalness:0, emissive:0x1030c0, emissiveIntensity:0.07 });
-const MAT_FLOOR     = new THREE.MeshStandardMaterial({ color:0xd8cfc4, roughness:0.95, metalness:0, side:THREE.DoubleSide });
-
-function getWallMat(wall, selected) {
-  if (selected) return MAT_WALL_SEL;
-  return { exterior:MAT_WALL_EXT, interior:MAT_WALL_INT, load_bearing:MAT_WALL_LOAD }[wall.type] || MAT_WALL_EXT;
-}
-
-// ── GROUPS ────────────────────────────────────────────────────────
-const wallGroup  = new THREE.Group(); scene.add(wallGroup);
-const floorGroup = new THREE.Group(); scene.add(floorGroup);
-
-// ── BUILD WALL MESH ───────────────────────────────────────────────
-function buildWallMesh(wall, selected) {
-  const ax=wall.start.x, ay=wall.start.y;
-  const bx=wall.end.x,   by=wall.end.y;
-  const dx=bx-ax, dy=by-ay;
-  const length=Math.hypot(dx,dy);
-  if (length < 0.01) return null;
-
-  const wx=dx/length, wy=dy/length; // wall dir
-  const px=-wy, py=wx;              // perpendicular (left)
-  const tk=wall.thickness;
-
-  const tps = (wall.topPoints && wall.topPoints.length >= 2)
-    ? wall.topPoints.map(p=>({x:p.x, z:p.z}))
-    : [{x:0, z:wall.heightL}, {x:length, z:wall.heightR}];
-
-  // Helper: world position at (along-wall, height, side: 0=front, 1=back)
-  const V = (al, ht, side) => new THREE.Vector3(
-    ax + wx*al + px*(side*tk),
-    ht,
-    -(ay + wy*al + py*(side*tk))
+  const ground = new THREE.Mesh(
+    new THREE.PlaneGeometry(200,200),
+    new THREE.MeshStandardMaterial({ color:0x1c1c1a, roughness:0.95 })
   );
+  ground.rotation.x = -Math.PI/2; ground.position.y = -0.003;
+  ground.receiveShadow = true; scene.add(ground);
+  scene.add(new THREE.GridHelper(80, 80, 0x282826, 0x222220));
 
-  const verts = []; const inds = [];
-  let vi = 0;
+  const MATS = {
+    exterior:     new THREE.MeshStandardMaterial({ color:0xeee9e2, roughness:0.88 }),
+    interior:     new THREE.MeshStandardMaterial({ color:0xf4f1ec, roughness:0.92 }),
+    load_bearing: new THREE.MeshStandardMaterial({ color:0xe6ddd4, roughness:0.90 }),
+    floor:        new THREE.MeshStandardMaterial({ color:0xd5ccc0, roughness:0.95, side:THREE.DoubleSide }),
+  };
 
-  function quad(a, b, c, d) {
-    verts.push(a,b,c,d);
-    inds.push(vi,vi+1,vi+2, vi+1,vi+3,vi+2);
-    vi += 4;
+  const wallGroup = new THREE.Group(); scene.add(wallGroup);
+
+  function buildWall(w) {
+    const ax=w.start.x, ay=w.start.y, bx=w.end.x, by=w.end.y;
+    const dx=bx-ax, dy=by-ay;
+    const len = Math.hypot(dx,dy);
+    if (len < 0.01) return null;
+    const h  = ((w.heightL||2.4) + (w.heightR||2.4)) / 2;
+    const tk = w.thickness || 0.20;
+
+    const geo  = new THREE.BoxGeometry(len, h, tk);
+    const mat  = MATS[w.type] || MATS.exterior;
+    const mesh = new THREE.Mesh(geo, mat);
+    mesh.castShadow = true; mesh.receiveShadow = true;
+
+    // Center of wall in world space
+    const cx = (ax+bx)/2, cy = (ay+by)/2;
+    mesh.position.set(cx, h/2, -cy);
+    mesh.rotation.y = -Math.atan2(dy, dx);
+    return mesh;
   }
 
-  const n = tps.length;
-  for (let i = 0; i < n-1; i++) {
-    const x0=tps[i].x,   z0=tps[i].z;
-    const x1=tps[i+1].x, z1=tps[i+1].z;
-    quad(V(x0,0,0), V(x1,0,0), V(x0,z0,0), V(x1,z1,0)); // front
-    quad(V(x1,0,1), V(x0,0,1), V(x1,z1,1), V(x0,z0,1)); // back
-    quad(V(x0,z0,0), V(x1,z1,0), V(x0,z0,1), V(x1,z1,1)); // top
+  function update3D(walls) {
+    wallGroup.clear();
+    if (!walls) return;
+    for (const w of walls) {
+      const m = buildWall(w);
+      if (m) wallGroup.add(m);
+    }
   }
-  // Caps
-  quad(V(0,0,1),V(0,0,0),V(0,tps[0].z,1),V(0,tps[0].z,0));
-  quad(V(length,0,0),V(length,0,1),V(length,tps[n-1].z,0),V(length,tps[n-1].z,1));
 
-  const geo = new THREE.BufferGeometry();
-  const positions = new Float32Array(verts.length * 3);
-  verts.forEach((v,i) => { positions[i*3]=v.x; positions[i*3+1]=v.y; positions[i*3+2]=v.z; });
-  geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-  geo.setIndex(inds);
-  geo.computeVertexNormals();
+  window._update3D = update3D;
 
-  const mesh = new THREE.Mesh(geo, getWallMat(wall, selected).clone());
-  mesh.castShadow = true; mesh.receiveShadow = true;
-  mesh.userData.wallId = wall.id;
-  return mesh;
-}
+  let topView = false;
+  window._resetCamera = () => {
+    cam.position.set(14,10,14); ctrl.target.set(4.5,1,-5); ctrl.update(); topView=false;
+  };
+  window._toggleTopView = () => {
+    topView = !topView;
+    if (topView) { cam.position.set(4.5,30,-0.01); ctrl.target.set(4.5,0,-5); }
+    else         { cam.position.set(14,10,14);      ctrl.target.set(4.5,1,-5); }
+    ctrl.update();
+  };
 
-// ── BUILD FLOOR ───────────────────────────────────────────────────
-function buildFloorMesh(room) {
-  if (!room.polygon || room.polygon.length < 3) return null;
-  const shape = new THREE.Shape();
-  shape.moveTo(room.polygon[0].x, -room.polygon[0].y);
-  for (let i=1; i<room.polygon.length; i++) shape.lineTo(room.polygon[i].x, -room.polygon[i].y);
-  shape.closePath();
-  const geo  = new THREE.ShapeGeometry(shape);
-  const mesh = new THREE.Mesh(geo, MAT_FLOOR.clone());
-  mesh.rotation.x = -Math.PI/2;
-  mesh.position.y = 0.003;
-  mesh.receiveShadow = true;
-  return mesh;
-}
-
-// ── UPDATE ────────────────────────────────────────────────────────
-function update3D(walls, rooms) {
-  wallGroup.clear();
-  floorGroup.clear();
-  const selId = window._fpState?.selected;
-  for (const w of walls) {
-    const mesh = buildWallMesh(w, w.id === selId);
-    if (mesh) wallGroup.add(mesh);
+  function resize3D() {
+    const w=view3d.clientWidth, h=view3d.clientHeight;
+    if (w<1||h<1) return;
+    renderer.setSize(w,h);
+    cam.aspect = w/h; cam.updateProjectionMatrix();
   }
-  for (const r of rooms) {
-    const mesh = buildFloorMesh(r);
-    if (mesh) floorGroup.add(mesh);
+  window._resize3D = resize3D;
+
+  function animate() {
+    requestAnimationFrame(animate);
+    ctrl.update();
+    renderer.render(scene, cam);
   }
-}
 
-// Register callback so 2D changes update 3D
-window._update3D = (walls, rooms) => update3D(walls, rooms);
+  resize3D();
+  document.getElementById('view3d-loading').textContent = '';
+  animate();
 
-// ── CAMERA CONTROLS ───────────────────────────────────────────────
-let topView = false;
-window._resetCamera = () => {
-  camera.position.set(12, 9, 12);
-  controls.target.set(4, 1, -5);
-  controls.update();
-  topView = false;
-};
-window._toggleTopView = () => {
-  topView = !topView;
-  if (topView) {
-    camera.position.set(4, 28, -0.01);
-    controls.target.set(4, 0, -5);
-  } else {
-    camera.position.set(12, 9, 12);
-    controls.target.set(4, 1, -5);
+  // Sync walls that 2D already loaded
+  if (window._fpState?.walls?.length) {
+    update3D(window._fpState.walls);
   }
-  controls.update();
-};
-
-// ── RESIZE ────────────────────────────────────────────────────────
-function resize3D() {
-  const w=view3d.clientWidth, h=view3d.clientHeight;
-  renderer.setSize(w, h);
-  camera.aspect = w/h;
-  camera.updateProjectionMatrix();
-}
-window._resize3D = resize3D;
-
-// ── RENDER LOOP ───────────────────────────────────────────────────
-function animate() {
-  requestAnimationFrame(animate);
-  controls.update();
-  renderer.render(scene, camera);
-}
-
-// ── START ─────────────────────────────────────────────────────────
-resize3D();
-document.getElementById('view3d-loading').textContent = '';
-animate();
-
-// Sync initial walls that 2D script already loaded before 3D was ready
-if (window._fpState) {
-  update3D(window._fpState.walls, window._fpState.rooms);
-}
-})(); // end IIFE
+})();
 </script>
 </body>
 </html>
