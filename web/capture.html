@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Capture">
+  <meta name="theme-color" content="#0a0a0a">
+  <link rel="manifest" href="capture-manifest.json">
+  <title>Placely Capture</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:#0a0a0a; --s1:#141414; --s2:#1c1c1c; --s3:#242424;
+      --bd:rgba(255,255,255,.1); --bd2:rgba(255,255,255,.06);
+      --t1:#f0f0ef; --t2:rgba(255,255,255,.6); --t3:rgba(255,255,255,.35);
+      --accent:#f0f0ef;
+      --c-rom:#6366f1; --c-vegg:#0ea5e9; --c-fasade:#f97316;
+      --c-loft:#a855f7; --c-detalj:#22c55e; --c-endring:#ef4444;
+      --safe-t:env(safe-area-inset-top,0px);
+      --safe-b:env(safe-area-inset-bottom,0px);
+      --ease:cubic-bezier(.22,.1,.22,1);
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+    html,body{height:100%;overflow:hidden;background:var(--bg)}
+    body{font-family:'Inter',-apple-system,sans-serif;font-size:15px;color:var(--t1);-webkit-font-smoothing:antialiased;overscroll-behavior:none}
+    button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+    input,textarea{font-family:inherit;color:var(--t1);background:var(--s2);border:1px solid var(--bd);border-radius:10px;font-size:15px;outline:none;width:100%;padding:12px 14px}
+    input::placeholder,textarea::placeholder{color:var(--t3)}
+    input:focus,textarea:focus{border-color:rgba(255,255,255,.35)}
+    a{color:inherit;text-decoration:none}
+
+    /* SCREENS */
+    .screen{position:fixed;inset:0;display:flex;flex-direction:column;transition:transform .28s var(--ease),opacity .28s var(--ease);will-change:transform}
+    .screen.hidden{transform:translateX(100%);opacity:0;pointer-events:none}
+    .screen.back{transform:translateX(-30%);opacity:0;pointer-events:none}
+    #s-home{background:var(--bg)}
+    #s-new{background:var(--bg)}
+    #s-capture{background:#000}
+    #s-station{background:var(--bg)}
+    #s-overview{background:var(--bg)}
+    #s-photo{background:#000}
+
+    /* SAFE AREA HEADER */
+    .nav-bar{padding:calc(var(--safe-t) + 12px) 16px 12px;display:flex;align-items:center;gap:12px;flex-shrink:0;border-bottom:1px solid var(--bd2)}
+    .nav-back{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;background:var(--s2);transition:background .12s;flex-shrink:0}
+    .nav-back:hover{background:var(--s3)}
+    .nav-title{flex:1;font-size:16px;font-weight:700;letter-spacing:-.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .nav-action{padding:7px 14px;background:var(--s2);border-radius:8px;font-size:13px;font-weight:600;transition:background .12s;white-space:nowrap}
+    .nav-action:hover{background:var(--s3)}
+    .nav-action.primary{background:var(--t1);color:var(--bg)}
+
+    /* SCROLLABLE CONTENT */
+    .scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0 0 calc(var(--safe-b) + 80px)}
+
+    /* ── HOME ── */
+    .home-hero{padding:28px 20px 8px}
+    .home-logo{font-size:13px;font-weight:700;color:var(--t3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:16px}
+    .home-logo em{font-style:normal;color:var(--t2)}
+    .home-h1{font-size:28px;font-weight:800;letter-spacing:-.04em;margin-bottom:6px}
+    .home-sub{font-size:14px;color:var(--t2);line-height:1.55}
+
+    .session-list{padding:16px 16px 0}
+    .sl-label{font-size:11px;font-weight:700;color:var(--t3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px}
+    .session-card{background:var(--s1);border:1px solid var(--bd);border-radius:14px;padding:14px 16px;margin-bottom:10px;cursor:pointer;display:flex;align-items:center;gap:14px;transition:background .12s,transform .12s}
+    .session-card:active{background:var(--s2);transform:scale(.98)}
+    .sc-mode-dot{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+    .sc-info{flex:1;min-width:0}
+    .sc-name{font-size:15px;font-weight:600;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .sc-meta{font-size:12px;color:var(--t3);margin-top:3px}
+    .sc-stats{display:flex;gap:10px;margin-top:6px}
+    .sc-stat{font-size:11px;font-weight:600;color:var(--t2);background:var(--s3);padding:2px 8px;border-radius:99px}
+    .sc-arrow{color:var(--t3);font-size:18px;flex-shrink:0}
+
+    .empty-home{padding:48px 24px;text-align:center}
+    .empty-icon{font-size:48px;margin-bottom:12px}
+    .empty-title{font-size:17px;font-weight:700;margin-bottom:6px}
+    .empty-sub{font-size:14px;color:var(--t2);line-height:1.55}
+
+    /* FAB */
+    .fab{position:fixed;bottom:calc(var(--safe-b) + 20px);right:20px;width:58px;height:58px;background:var(--t1);color:var(--bg);border-radius:50%;font-size:28px;font-weight:300;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 24px rgba(0,0,0,.5);transition:transform .12s;z-index:10}
+    .fab:active{transform:scale(.92)}
+
+    /* ── NEW SESSION ── */
+    .new-form{padding:20px 20px 0}
+    .nf-label{font-size:11px;font-weight:700;color:var(--t3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px;display:block}
+    .nf-field{margin-bottom:18px}
+    .mode-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 20px;margin-bottom:10px}
+    .mode-card{background:var(--s1);border:2px solid var(--bd);border-radius:14px;padding:16px;cursor:pointer;transition:all .15s;display:flex;flex-direction:column;gap:8px}
+    .mode-card.selected{border-width:2px}
+    .mode-card:active{transform:scale(.96)}
+    .mc-icon{font-size:28px}
+    .mc-name{font-size:14px;font-weight:700;letter-spacing:-.01em}
+    .mc-desc{font-size:12px;color:var(--t3);line-height:1.4}
+    .mc-min{font-size:11px;font-weight:600;opacity:.5;margin-top:2px}
+
+    /* ── CAPTURE ── */
+    #video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0}
+    #guide-canvas{position:absolute;inset:0;width:100%;height:100%;z-index:1;pointer-events:none}
+    .capture-top{position:absolute;top:0;left:0;right:0;padding:calc(var(--safe-t) + 14px) 16px 14px;display:flex;align-items:center;justify-content:space-between;z-index:10;background:linear-gradient(to bottom,rgba(0,0,0,.55) 0%,transparent 100%)}
+    .capture-top-l,.capture-top-r{display:flex;align-items:center;gap:10px}
+    .cap-back{width:36px;height:36px;background:rgba(0,0,0,.4);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;backdrop-filter:blur(6px)}
+    .cap-mode-badge{padding:4px 12px;border-radius:99px;font-size:12px;font-weight:700;backdrop-filter:blur(6px);background:rgba(0,0,0,.4)}
+    .cap-count{padding:4px 12px;background:rgba(0,0,0,.4);border-radius:99px;font-size:12px;font-weight:700;backdrop-filter:blur(6px)}
+    .cap-station-name{font-size:13px;font-weight:600;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.5)}
+
+    .capture-bottom{position:absolute;bottom:0;left:0;right:0;padding:16px 0 calc(var(--safe-b)+16px);z-index:10;background:linear-gradient(to top,rgba(0,0,0,.7) 0%,transparent 100%)}
+    .tag-scroll{overflow-x:auto;padding:0 16px 14px;display:flex;gap:8px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+    .tag-scroll::-webkit-scrollbar{display:none}
+    .tag-chip{padding:6px 14px;border-radius:99px;font-size:12px;font-weight:700;border:1.5px solid rgba(255,255,255,.35);background:rgba(0,0,0,.35);color:#fff;backdrop-filter:blur(4px);white-space:nowrap;cursor:pointer;transition:all .15s;flex-shrink:0}
+    .tag-chip.active{border-color:#fff;background:rgba(255,255,255,.25)}
+
+    .capture-controls{display:flex;align-items:center;justify-content:space-around;padding:0 24px}
+    .cap-ctrl-btn{width:48px;height:48px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.15);border-radius:14px;font-size:22px;backdrop-filter:blur(6px);cursor:pointer;transition:transform .1s}
+    .cap-ctrl-btn:active{transform:scale(.88)}
+    .cap-shutter{width:76px;height:76px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform .1s;box-shadow:0 0 0 4px rgba(255,255,255,.3)}
+    .cap-shutter:active{transform:scale(.9)}
+    .cap-shutter-inner{width:62px;height:62px;border-radius:50%;background:#fff;border:3px solid #000}
+
+    /* Flash */
+    #flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none;z-index:5;transition:opacity .15s}
+    #flash.go{animation:flash .3s forwards}
+    @keyframes flash{0%{opacity:.8}100%{opacity:0}}
+
+    /* No camera fallback */
+    #no-cam{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:32px;text-align:center;z-index:1;background:var(--s1)}
+    #no-cam p{color:var(--t2);font-size:14px;line-height:1.6}
+
+    /* ── STATION VIEW ── */
+    .sv-header{padding:18px 20px;border-bottom:1px solid var(--bd2)}
+    .sv-mode-row{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+    .sv-mode-badge{padding:3px 10px;border-radius:99px;font-size:11px;font-weight:700}
+    .sv-name{font-size:20px;font-weight:800;letter-spacing:-.03em}
+    .sv-sub{font-size:13px;color:var(--t3);margin-top:3px}
+
+    .photo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;padding:3px}
+    .photo-thumb{aspect-ratio:1;position:relative;cursor:pointer;overflow:hidden;background:var(--s2)}
+    .photo-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+    .thumb-tags{position:absolute;bottom:4px;left:4px;right:4px;display:flex;gap:3px;flex-wrap:wrap}
+    .thumb-tag{font-size:9px;font-weight:700;padding:1px 5px;border-radius:3px;background:rgba(0,0,0,.65);color:#fff;line-height:1.4}
+    .add-photo-btn{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;background:var(--s2);cursor:pointer;transition:background .12s;border:1.5px dashed var(--bd)}
+    .add-photo-btn:active{background:var(--s3)}
+    .add-photo-btn .icon{font-size:24px;color:var(--t3)}
+    .add-photo-btn span{font-size:11px;color:var(--t3);font-weight:600}
+
+    .sv-section{padding:18px 20px;border-top:1px solid var(--bd2)}
+    .sv-sec-title{font-size:12px;font-weight:700;color:var(--t3);letter-spacing:.07em;text-transform:uppercase;margin-bottom:12px}
+    .mal-list{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
+    .mal-item{display:flex;align-items:center;justify-content:space-between;background:var(--s2);border-radius:10px;padding:11px 14px;font-size:14px}
+    .mal-item-fra{color:var(--t2)}
+    .mal-item-val{font-weight:700;font-size:15px}
+    .mal-item-del{color:var(--t3);font-size:18px;padding:0 4px}
+    .mal-form{display:flex;gap:8px;align-items:center}
+    .mal-input{flex:1}
+    .mal-btn{padding:11px 18px;background:var(--t1);color:var(--bg);border-radius:10px;font-size:14px;font-weight:700;white-space:nowrap;flex-shrink:0}
+    .mal-btn:active{opacity:.8}
+
+    .sv-action-row{padding:0 20px 20px;display:flex;gap:10px}
+    .sv-btn{flex:1;padding:14px;border-radius:12px;font-size:14px;font-weight:700;text-align:center;cursor:pointer;transition:all .12s}
+    .sv-btn-primary{background:var(--t1);color:var(--bg)}
+    .sv-btn-primary:active{opacity:.85}
+    .sv-btn-ghost{background:var(--s2);color:var(--t1);border:1px solid var(--bd)}
+    .sv-btn-ghost:active{background:var(--s3)}
+
+    /* ── OVERVIEW ── */
+    .ov-header{padding:20px 20px 16px;border-bottom:1px solid var(--bd2)}
+    .ov-mode-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+    .ov-badge{padding:4px 12px;border-radius:99px;font-size:12px;font-weight:700}
+    .ov-name{font-size:22px;font-weight:800;letter-spacing:-.03em;margin-bottom:3px}
+    .ov-addr{font-size:13px;color:var(--t3)}
+    .ov-stats{display:flex;gap:20px;margin-top:14px}
+    .ov-stat{display:flex;flex-direction:column}
+    .ov-stat-val{font-size:22px;font-weight:700}
+    .ov-stat-lbl{font-size:11px;color:var(--t3);letter-spacing:.04em;text-transform:uppercase}
+
+    .station-list{padding:14px 16px}
+    .station-item{background:var(--s1);border:1px solid var(--bd);border-radius:12px;padding:13px 16px;margin-bottom:10px;cursor:pointer;display:flex;align-items:center;gap:12px;transition:background .12s}
+    .station-item:active{background:var(--s2)}
+    .si-num{width:32px;height:32px;border-radius:8px;background:var(--s3);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
+    .si-info{flex:1;min-width:0}
+    .si-name{font-size:14px;font-weight:600}
+    .si-meta{font-size:12px;color:var(--t3);margin-top:2px}
+    .si-arrow{color:var(--t3);font-size:16px}
+
+    .ov-actions{padding:0 16px 16px;display:flex;flex-direction:column;gap:10px}
+    .ov-btn{width:100%;padding:15px;border-radius:12px;font-size:15px;font-weight:700;text-align:center;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:all .12s}
+    .ov-btn-primary{background:var(--t1);color:var(--bg)}
+    .ov-btn-primary:active{opacity:.85}
+    .ov-btn-secondary{background:var(--s2);color:var(--t1);border:1px solid var(--bd)}
+    .ov-btn-secondary:active{background:var(--s3)}
+    .ov-btn-danger{background:transparent;color:#ef4444;border:1px solid rgba(239,68,68,.3);font-size:14px;padding:12px}
+    .ov-btn-danger:active{background:rgba(239,68,68,.1)}
+
+    /* ── PHOTO DETAIL ── */
+    #s-photo{z-index:50}
+    .photo-full{position:absolute;inset:0;display:flex;flex-direction:column;background:#000}
+    .pf-img-wrap{flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden}
+    .pf-img-wrap img{max-width:100%;max-height:100%;object-fit:contain}
+    .pf-bottom{padding:16px 16px calc(var(--safe-b)+16px);background:rgba(0,0,0,.8);backdrop-filter:blur(10px)}
+    .pf-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+    .pf-tag-chip{padding:6px 12px;border-radius:99px;font-size:13px;font-weight:600;border:1.5px solid rgba(255,255,255,.3);background:transparent;color:#fff;cursor:pointer;transition:all .15s}
+    .pf-tag-chip.active{background:rgba(255,255,255,.2);border-color:#fff}
+    .pf-actions{display:flex;gap:10px}
+    .pf-btn{flex:1;padding:11px;border-radius:10px;font-size:13px;font-weight:700;background:var(--s2);color:#fff;border:1px solid var(--bd);text-align:center;cursor:pointer}
+    .pf-btn.danger{color:#ef4444;border-color:rgba(239,68,68,.3)}
+    .pf-btn:active{opacity:.75}
+
+    /* TOAST */
+    #toast{position:fixed;bottom:calc(var(--safe-b)+90px);left:50%;transform:translateX(-50%) translateY(8px);background:rgba(255,255,255,.15);backdrop-filter:blur(12px);color:#fff;padding:10px 20px;border-radius:99px;font-size:13px;font-weight:600;opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;z-index:200;white-space:nowrap;border:1px solid rgba(255,255,255,.2)}
+    #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+    /* GUIDE STYLES on canvas – handled in JS */
+  </style>
+</head>
+<body>
+
+<div id="toast"></div>
+
+<!-- ═══════ HOME ═══════ -->
+<div class="screen" id="s-home">
+  <div class="nav-bar" style="border-bottom:none">
+    <div class="nav-title">
+      <span style="font-size:13px;font-weight:700;color:var(--t3);letter-spacing:.06em">PLACELY</span>
+      <span style="font-size:13px;font-weight:800;color:var(--t1);letter-spacing:-.02em"> Capture</span>
+    </div>
+    <a href="index.html" class="nav-action" style="font-size:12px">placely.no ↗</a>
+  </div>
+  <div class="scroll">
+    <div class="home-hero">
+      <div class="home-h1">Dokumentasjon</div>
+      <div class="home-sub">Rombasert capture for bygg og eiendom.<br>Scan oppgaven, ikke bygget.</div>
+    </div>
+    <div class="session-list">
+      <div class="sl-label" id="sl-label">Sesjoner</div>
+      <div id="session-list-container"></div>
+    </div>
+  </div>
+  <button class="fab" onclick="showScreen('new')">+</button>
+</div>
+
+<!-- ═══════ NEW SESSION ═══════ -->
+<div class="screen hidden" id="s-new">
+  <div class="nav-bar">
+    <button class="nav-back" onclick="showScreen('home','back')">←</button>
+    <div class="nav-title">Ny sesjon</div>
+    <button class="nav-action primary" onclick="startSession()">Start</button>
+  </div>
+  <div class="scroll">
+    <div class="new-form">
+      <div class="nf-field">
+        <label class="nf-label">Navn / rom</label>
+        <input id="ns-name" type="text" placeholder="f.eks. Bad 2. etasje, Fasade nord">
+      </div>
+      <div class="nf-field">
+        <label class="nf-label">Adresse (valgfritt)</label>
+        <input id="ns-addr" type="text" placeholder="Birkeveien 3A, Oslo">
+      </div>
+    </div>
+    <div style="padding:0 20px 10px">
+      <label class="nf-label">Capture-mode</label>
+    </div>
+    <div class="mode-grid" id="mode-grid"></div>
+    <div style="padding:0 20px 10px">
+      <label class="nf-label" style="margin-bottom:8px;display:block">Guide</label>
+      <div id="mode-guide" style="font-size:14px;color:var(--t2);line-height:1.6;background:var(--s1);border-radius:10px;padding:14px 16px;border:1px solid var(--bd)"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ CAPTURE ═══════ -->
+<div class="screen hidden" id="s-capture">
+  <video id="video" autoplay muted playsinline></video>
+  <canvas id="guide-canvas"></canvas>
+  <div id="no-cam" style="display:none">
+    <div style="font-size:48px">📷</div>
+    <p>Kamera ikke tilgjengelig.<br>Denne appen krever HTTPS og kamera-tillatelse.</p>
+    <button class="sv-btn sv-btn-primary" style="padding:12px 24px;border-radius:10px" onclick="initCamera()">Prøv igjen</button>
+  </div>
+  <div id="flash"></div>
+
+  <div class="capture-top">
+    <div class="capture-top-l">
+      <button class="cap-back" onclick="stopCapture()">←</button>
+      <div>
+        <div class="cap-mode-badge" id="cap-mode-badge"></div>
+        <div class="cap-station-name" id="cap-station-name" style="margin-top:3px"></div>
+      </div>
+    </div>
+    <div class="capture-top-r">
+      <div class="cap-count" id="cap-count">0 bilder</div>
+    </div>
+  </div>
+
+  <div class="capture-bottom">
+    <div class="tag-scroll" id="tag-scroll"></div>
+    <div class="capture-controls">
+      <button class="cap-ctrl-btn" id="btn-mal" onclick="promptMal()" title="Legg til mål">📏</button>
+      <button class="cap-shutter" id="btn-shutter" onclick="capturePhoto()">
+        <div class="cap-shutter-inner"></div>
+      </button>
+      <button class="cap-ctrl-btn" onclick="goToStation()" title="Vis bilder">🖼️</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ STATION VIEW ═══════ -->
+<div class="screen hidden" id="s-station">
+  <div class="nav-bar">
+    <button class="nav-back" onclick="goBackFromStation()">←</button>
+    <div class="nav-title" id="sv-title">Stasjon</div>
+    <button class="nav-action" onclick="openCamera()">📷 Capture</button>
+  </div>
+  <div class="scroll">
+    <div class="sv-header">
+      <div class="sv-mode-row">
+        <span class="sv-mode-badge" id="sv-mode-badge"></span>
+        <span id="sv-guide-text" style="font-size:12px;color:var(--t3)"></span>
+      </div>
+      <div class="sv-name" id="sv-name"></div>
+      <div class="sv-sub" id="sv-sub"></div>
+    </div>
+
+    <!-- PHOTOS -->
+    <div style="padding:14px 0 0">
+      <div style="padding:0 16px 10px;font-size:12px;font-weight:700;color:var(--t3);letter-spacing:.07em;text-transform:uppercase" id="sv-photo-count">Bilder</div>
+      <div class="photo-grid" id="sv-photo-grid"></div>
+    </div>
+
+    <!-- MEASUREMENTS -->
+    <div class="sv-section">
+      <div class="sv-sec-title">Kontrollmål</div>
+      <div class="mal-list" id="mal-list"></div>
+      <div class="mal-form">
+        <input class="mal-input" id="mal-input" type="text" placeholder='f.eks. "Vegg A–B: 3840 mm"'>
+        <button class="mal-btn" onclick="addMal()">+</button>
+      </div>
+    </div>
+
+    <!-- NOTES -->
+    <div class="sv-section" style="padding-bottom:8px">
+      <div class="sv-sec-title">Notis</div>
+      <textarea id="sv-notis" rows="3" style="resize:none" placeholder="Merknader om rommet, avvik, observasjoner…" oninput="saveNotis()"></textarea>
+    </div>
+
+    <div class="sv-action-row">
+      <button class="sv-btn sv-btn-primary" onclick="goToOverview()">Sesjonoversikt</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ SESSION OVERVIEW ═══════ -->
+<div class="screen hidden" id="s-overview">
+  <div class="nav-bar">
+    <button class="nav-back" onclick="showScreen('home','back')">←</button>
+    <div class="nav-title" id="ov-title">Sesjon</div>
+  </div>
+  <div class="scroll">
+    <div class="ov-header">
+      <div class="ov-mode-row">
+        <span class="ov-badge" id="ov-badge"></span>
+      </div>
+      <div class="ov-name" id="ov-name"></div>
+      <div class="ov-addr" id="ov-addr"></div>
+      <div class="ov-stats">
+        <div class="ov-stat"><div class="ov-stat-val" id="ov-stat-st">0</div><div class="ov-stat-lbl">Stasjoner</div></div>
+        <div class="ov-stat"><div class="ov-stat-val" id="ov-stat-ph">0</div><div class="ov-stat-lbl">Bilder</div></div>
+        <div class="ov-stat"><div class="ov-stat-val" id="ov-stat-ml">0</div><div class="ov-stat-lbl">Mål</div></div>
+      </div>
+    </div>
+    <div class="station-list" id="station-list"></div>
+    <div class="ov-actions">
+      <button class="ov-btn ov-btn-primary" onclick="addStation()">+ Ny stasjon</button>
+      <button class="ov-btn ov-btn-secondary" onclick="exportSession()">↓ Eksporter SlimBIM JSON</button>
+      <button class="ov-btn ov-btn-secondary" onclick="uploadToXdi()">⬆ Send til XDi / Romplan-analyse</button>
+      <button class="ov-btn ov-btn-danger" onclick="deleteSession()">Slett sesjon</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ PHOTO DETAIL ═══════ -->
+<div class="screen hidden" id="s-photo">
+  <div class="photo-full">
+    <div style="padding:calc(var(--safe-t)+12px) 16px 12px;display:flex;align-items:center;gap:12px;position:absolute;top:0;left:0;right:0;z-index:1;background:linear-gradient(to bottom,rgba(0,0,0,.6),transparent)">
+      <button class="cap-back" onclick="closePhoto()">←</button>
+      <div style="flex:1;font-size:14px;font-weight:600" id="ph-title">Bilde</div>
+    </div>
+    <div class="pf-img-wrap"><img id="ph-img" src="" alt=""></div>
+    <div class="pf-bottom">
+      <div class="pf-tags" id="ph-tags"></div>
+      <div class="pf-actions">
+        <button class="pf-btn" onclick="closePhoto()">Ferdig</button>
+        <button class="pf-btn danger" onclick="deletePhoto()">Slett</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+// ── MODES ─────────────────────────────────────────────────────────
+const MODES = {
+  rom:    { icon:'🏠', label:'Rommode',     color:'var(--c-rom)',    desc:'Dokumenter et helt rom',             guide:'Ta bilder mot alle 4 vegger + gulv og himling (min 6 bilder)', minB:6,  tags:['vegg-nord','vegg-sør','vegg-øst','vegg-vest','gulv','himling','vindu','dør','hjørne','bad','stue','kjøkken'] },
+  vegg:   { icon:'🧱', label:'Veggmode',    color:'var(--c-vegg)',   desc:'Dokumenter én enkelt vegg',          guide:'Scan fra venstre mot høyre, hold 1–2m avstand', minB:3,  tags:['yttervegg','innervegg','bærende','vindusåpning','dørrom','ventilasjon','kabel','rør','isolasjon'] },
+  fasade: { icon:'🏗️', label:'Fasademode',  color:'var(--c-fasade)', desc:'Dokumenter fasade utvendig',         guide:'Scan systematisk fra hjørne til hjørne, 0–6m avstand', minB:4,  tags:['fasadeplate','vindu','dør','gesims','hjørne','pipe','balkong','fundament','takkant','mur'] },
+  loft:   { icon:'📐', label:'Loft/BRA',    color:'var(--c-loft)',   desc:'Mål og dokumenter loft/knevegg',    guide:'Marker 1.9m-høyde. Scan knevegg, takflate og takvindu', minB:4,  tags:['knevegg','takflate','takvindu','1.9m-linje','etasjeskiller','isolasjon','bjelke','loft','bod'] },
+  detalj: { icon:'🔍', label:'Detaljmode',  color:'var(--c-detalj)', desc:'Dokumenter ett spesifikt objekt',   guide:'Scan objektet fra 3 vinkler, tett inntil', minB:3,  tags:['sluk','pipe','sikringsskap','ventil','bjelke','søyle','fundament','sprekk','skade','detalj'] },
+  endring:{ icon:'📸', label:'Endringsdok.',color:'var(--c-endring)',desc:'Dokumenter endring / før-lukking',  guide:'Dokumenter NÅVÆRENDE tilstand nøye. Tydelige bilder fra 3 vinkler', minB:2, tags:['før-lukking','rørføring','kabel','isolasjon','membran','armering','sluk','boks','gulvvarme'] },
+};
+
+// ── STORAGE (IndexedDB) ───────────────────────────────────────────
+const DB_NAME = 'placely-capture', DB_VER = 1;
+let _db = null;
+
+function dbOpen() {
+  if (_db) return Promise.resolve(_db);
+  return new Promise((res, rej) => {
+    const req = indexedDB.open(DB_NAME, DB_VER);
+    req.onupgradeneeded = e => {
+      const d = e.target.result;
+      if (!d.objectStoreNames.contains('sessions')) d.createObjectStore('sessions', { keyPath:'id' });
+      if (!d.objectStoreNames.contains('photos'))   d.createObjectStore('photos',   { keyPath:'id' });
+    };
+    req.onsuccess = e => { _db = e.target.result; res(_db); };
+    req.onerror   = e => rej(e.target.error);
+  });
+}
+async function dbPut(store, obj)  { const d=await dbOpen(); return new Promise((r,j)=>{ const t=d.transaction(store,'readwrite'); t.objectStore(store).put(obj).onsuccess=()=>r(); t.onerror=j; }); }
+async function dbGet(store, id)   { const d=await dbOpen(); return new Promise((r,j)=>{ const q=d.transaction(store).objectStore(store).get(id); q.onsuccess=e=>r(e.target.result); q.onerror=j; }); }
+async function dbGetAll(store)    { const d=await dbOpen(); return new Promise((r,j)=>{ const q=d.transaction(store).objectStore(store).getAll(); q.onsuccess=e=>r(e.target.result||[]); q.onerror=j; }); }
+async function dbDel(store, id)   { const d=await dbOpen(); return new Promise((r,j)=>{ const t=d.transaction(store,'readwrite'); t.objectStore(store).delete(id).onsuccess=()=>r(); t.onerror=j; }); }
+
+// ── STATE ─────────────────────────────────────────────────────────
+let sessions = [];       // [{id, name, addr, mode, created, stations:[{id,name,mals:[],notis,photoIds:[]}]}]
+let activeSession = null;
+let activeStationIdx = 0;
+let activeTags = [];
+let cameraStream = null;
+let viewingPhotoId = null;
+
+function uid() { return Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
+
+// ── LOAD DATA ─────────────────────────────────────────────────────
+async function loadData() {
+  sessions = await dbGetAll('sessions');
+  sessions.sort((a,b) => b.created - a.created);
+}
+
+// ── SCREENS ───────────────────────────────────────────────────────
+const SCREENS = ['home','new','capture','station','overview','photo'];
+function showScreen(name, dir) {
+  SCREENS.forEach(id => {
+    const el = document.getElementById('s-'+id);
+    if (id === name) {
+      el.classList.remove('hidden','back');
+    } else {
+      el.classList.remove('back');
+      el.classList.add(dir === 'back' ? 'back' : 'hidden');
+    }
+  });
+}
+
+// ── HOME ──────────────────────────────────────────────────────────
+async function renderHome() {
+  await loadData();
+  const el = document.getElementById('session-list-container');
+  const lbl = document.getElementById('sl-label');
+  if (!sessions.length) {
+    lbl.style.display = 'none';
+    el.innerHTML = `<div class="empty-home"><div class="empty-icon">📷</div><div class="empty-title">Ingen sesjoner</div><div class="empty-sub">Trykk + for å starte en ny capture-sesjon</div></div>`;
+    return;
+  }
+  lbl.style.display = '';
+  lbl.textContent = `${sessions.length} sesjon${sessions.length>1?'er':''}`;
+
+  const photoCountMap = {};
+  const allPhotos = await dbGetAll('photos');
+  for (const p of allPhotos) photoCountMap[p.sessionId] = (photoCountMap[p.sessionId]||0)+1;
+
+  el.innerHTML = sessions.map(s => {
+    const m = MODES[s.mode] || MODES.rom;
+    const nSt = (s.stations||[]).length;
+    const nPh = photoCountMap[s.id] || 0;
+    const nMal = (s.stations||[]).reduce((n,st)=>n+(st.mals||[]).length,0);
+    const d = new Date(s.created).toLocaleDateString('nb-NO',{day:'numeric',month:'short'});
+    return `<div class="session-card" onclick="openSession('${s.id}')">
+      <div class="sc-mode-dot" style="background:${m.color.replace('var(','')}15;color:${m.color}">${m.icon}</div>
+      <div class="sc-info">
+        <div class="sc-name">${esc(s.name)}</div>
+        <div class="sc-meta">${esc(s.addr||'Ingen adresse')} · ${d}</div>
+        <div class="sc-stats">
+          <span class="sc-stat">${nSt} st.</span>
+          <span class="sc-stat">${nPh} bilder</span>
+          ${nMal?`<span class="sc-stat">${nMal} mål</span>`:''}
+        </div>
+      </div>
+      <div class="sc-arrow">›</div>
+    </div>`;
+  }).join('');
+}
+
+// ── NEW SESSION ───────────────────────────────────────────────────
+let selectedMode = 'rom';
+
+function renderModeGrid() {
+  document.getElementById('mode-grid').innerHTML = Object.entries(MODES).map(([key, m]) =>
+    `<div class="mode-card${key===selectedMode?' selected':''}" id="mc-${key}" onclick="selectMode('${key}')" style="${key===selectedMode?`border-color:${m.color.replace('var(','').replace(')','')};background:${m.color.replace('var(','')}15`:''}">
+      <div class="mc-icon">${m.icon}</div>
+      <div class="mc-name" style="${key===selectedMode?`color:${m.color}`:''}">${m.label}</div>
+      <div class="mc-desc">${m.desc}</div>
+      <div class="mc-min">min ${m.minB} bilder</div>
+    </div>`
+  ).join('');
+  document.getElementById('mode-guide').textContent = MODES[selectedMode].guide;
+}
+
+function selectMode(key) {
+  selectedMode = key;
+  renderModeGrid();
+}
+
+function startSession() {
+  const name = document.getElementById('ns-name').value.trim() ||
+    `${MODES[selectedMode].label} – ${new Date().toLocaleDateString('nb-NO',{day:'numeric',month:'short'})}`;
+  const addr = document.getElementById('ns-addr').value.trim();
+  const sess = { id:uid(), name, addr, mode:selectedMode, created:Date.now(), stations:[] };
+  sessions.unshift(sess);
+  dbPut('sessions', sess);
+  activeSession = sess;
+  document.getElementById('ns-name').value = '';
+  document.getElementById('ns-addr').value = '';
+  addStation(true);
+}
+
+// ── STATION ───────────────────────────────────────────────────────
+function addStation(autoOpenCamera) {
+  const s = activeSession;
+  const idx = s.stations.length + 1;
+  const st = { id:uid(), name:`Stasjon ${idx}`, mals:[], notis:'', photoIds:[] };
+  s.stations.push(st);
+  activeStationIdx = s.stations.length - 1;
+  dbPut('sessions', s);
+  renderStation();
+  showScreen('station');
+  if (autoOpenCamera) openCamera();
+}
+
+function renderStation() {
+  const s = activeSession;
+  const st = s?.stations[activeStationIdx];
+  if (!s || !st) return;
+  const m = MODES[s.mode] || MODES.rom;
+
+  document.getElementById('sv-title').textContent = st.name;
+  document.getElementById('sv-mode-badge').textContent = m.label;
+  document.getElementById('sv-mode-badge').style.cssText = `background:${m.color}20;color:${m.color}`;
+  document.getElementById('sv-guide-text').textContent = m.guide;
+  document.getElementById('sv-name').textContent = esc(s.name);
+  document.getElementById('sv-sub').textContent = (s.addr||'') + (s.addr?` · `:' ') + `${st.photoIds.length} bilder · ${st.mals.length} mål`;
+  document.getElementById('sv-notis').value = st.notis || '';
+  document.getElementById('sv-photo-count').textContent = `${st.photoIds.length} bilde${st.photoIds.length!==1?'r':''}`;
+
+  renderMalList();
+  renderStationPhotos();
+}
+
+async function renderStationPhotos() {
+  const st = activeSession?.stations[activeStationIdx];
+  if (!st) return;
+  const grid = document.getElementById('sv-photo-grid');
+  const photos = await Promise.all(st.photoIds.map(id => dbGet('photos', id)));
+  grid.innerHTML = photos.filter(Boolean).map(p => {
+    const tagHtml = (p.tags||[]).map(t=>`<span class="thumb-tag">${esc(t)}</span>`).join('');
+    return `<div class="photo-thumb" onclick="viewPhoto('${p.id}')"><img src="${p.data}" loading="lazy"><div class="thumb-tags">${tagHtml}</div></div>`;
+  }).join('') + `<div class="add-photo-btn" onclick="openCamera()"><div class="icon">📷</div><span>Legg til</span></div>`;
+}
+
+function renderMalList() {
+  const st = activeSession?.stations[activeStationIdx];
+  if (!st) return;
+  document.getElementById('mal-list').innerHTML = (st.mals||[]).map((m,i) =>
+    `<div class="mal-item"><span class="mal-item-fra">${esc(m)}</span><button class="mal-item-del" onclick="delMal(${i})">×</button></div>`
+  ).join('');
+}
+
+function addMal() {
+  const inp = document.getElementById('mal-input');
+  const v = inp.value.trim();
+  if (!v) return;
+  const st = activeSession?.stations[activeStationIdx];
+  if (!st) return;
+  if (!st.mals) st.mals = [];
+  st.mals.push(v);
+  dbPut('sessions', activeSession);
+  inp.value = '';
+  renderMalList();
+  updateStationSub();
+}
+
+function delMal(i) {
+  const st = activeSession?.stations[activeStationIdx];
+  if (!st) return;
+  st.mals.splice(i,1);
+  dbPut('sessions', activeSession);
+  renderMalList();
+  updateStationSub();
+}
+
+function promptMal() {
+  const v = prompt('Legg til kontrollmål (f.eks. "Vegg A–B: 3840 mm"):');
+  if (v?.trim()) {
+    const st = activeSession?.stations[activeStationIdx];
+    if (!st) return;
+    if (!st.mals) st.mals = [];
+    st.mals.push(v.trim());
+    dbPut('sessions', activeSession);
+    updateStationSub();
+    toast('Mål lagt til');
+  }
+}
+
+function saveNotis() {
+  const st = activeSession?.stations[activeStationIdx];
+  if (!st) return;
+  st.notis = document.getElementById('sv-notis').value;
+  dbPut('sessions', activeSession);
+}
+
+function updateStationSub() {
+  const s=activeSession, st=s?.stations[activeStationIdx];
+  if(!st) return;
+  document.getElementById('sv-sub').textContent = (s.addr||'')+(s.addr?' · ':' ')+`${st.photoIds.length} bilder · ${st.mals.length} mål`;
+}
+
+function goBackFromStation() {
+  stopCamera();
+  renderOverview();
+  showScreen('overview','back');
+}
+
+function goToStation() {
+  renderStation();
+  showScreen('station','back');
+}
+
+function goToOverview() {
+  renderOverview();
+  showScreen('overview');
+}
+
+// ── OVERVIEW ──────────────────────────────────────────────────────
+async function renderOverview() {
+  const s = activeSession;
+  if (!s) return;
+  const m = MODES[s.mode] || MODES.rom;
+
+  document.getElementById('ov-title').textContent = esc(s.name);
+  document.getElementById('ov-badge').textContent = m.label;
+  document.getElementById('ov-badge').style.cssText = `background:${m.color}20;color:${m.color}`;
+  document.getElementById('ov-name').textContent = esc(s.name);
+  document.getElementById('ov-addr').textContent = s.addr||'';
+
+  const allPhotos = await dbGetAll('photos');
+  const sessionPhotos = allPhotos.filter(p => p.sessionId===s.id);
+  const nMal = s.stations.reduce((n,st)=>n+(st.mals||[]).length,0);
+  document.getElementById('ov-stat-st').textContent = s.stations.length;
+  document.getElementById('ov-stat-ph').textContent = sessionPhotos.length;
+  document.getElementById('ov-stat-ml').textContent = nMal;
+
+  const photosByStation = {};
+  for (const p of sessionPhotos) {
+    if (!photosByStation[p.stationId]) photosByStation[p.stationId] = [];
+    photosByStation[p.stationId].push(p);
+  }
+
+  document.getElementById('station-list').innerHTML = s.stations.map((st,i) => {
+    const nPh = (photosByStation[st.id]||[]).length;
+    const nMl = (st.mals||[]).length;
+    return `<div class="station-item" onclick="openStationAt(${i})">
+      <div class="si-num">${i+1}</div>
+      <div class="si-info">
+        <div class="si-name">${esc(st.name)}</div>
+        <div class="si-meta">${nPh} bilder · ${nMl} mål</div>
+      </div>
+      <div class="si-arrow">›</div>
+    </div>`;
+  }).join('') + `<div class="station-item" style="border-style:dashed;opacity:.6" onclick="addStation()">
+    <div class="si-num" style="font-size:20px">+</div>
+    <div class="si-info"><div class="si-name">Ny stasjon</div></div>
+  </div>`;
+}
+
+function openStationAt(i) {
+  activeStationIdx = i;
+  renderStation();
+  showScreen('station');
+}
+
+function openSession(id) {
+  activeSession = sessions.find(s=>s.id===id);
+  renderOverview();
+  showScreen('overview');
+}
+
+// ── CAMERA ────────────────────────────────────────────────────────
+async function openCamera() {
+  renderCaptureUI();
+  showScreen('capture');
+  await initCamera();
+}
+
+async function initCamera() {
+  document.getElementById('no-cam').style.display = 'none';
+  try {
+    if (cameraStream) cameraStream.getTracks().forEach(t=>t.stop());
+    cameraStream = await navigator.mediaDevices.getUserMedia({
+      video:{ facingMode:'environment', width:{ideal:1920}, height:{ideal:1080} },
+      audio:false,
+    });
+    const v = document.getElementById('video');
+    v.srcObject = cameraStream;
+    await v.play();
+    resizeGuideCanvas();
+    drawGuide();
+  } catch(e) {
+    console.warn('Camera error:', e);
+    document.getElementById('no-cam').style.display = 'flex';
+  }
+}
+
+function stopCamera() {
+  if (cameraStream) { cameraStream.getTracks().forEach(t=>t.stop()); cameraStream=null; }
+}
+
+function stopCapture() {
+  stopCamera();
+  renderStation();
+  showScreen('station','back');
+}
+
+function renderCaptureUI() {
+  const s = activeSession;
+  const st = s?.stations[activeStationIdx];
+  if (!s || !st) return;
+  const m = MODES[s.mode] || MODES.rom;
+  activeTags = [];
+
+  document.getElementById('cap-mode-badge').textContent = m.icon + ' ' + m.label;
+  document.getElementById('cap-mode-badge').style.cssText = `color:${m.color}`;
+  document.getElementById('cap-station-name').textContent = esc(st.name);
+  updateCapCount();
+
+  const tagScroll = document.getElementById('tag-scroll');
+  tagScroll.innerHTML = m.tags.map(t =>
+    `<div class="tag-chip" id="tc-${t.replace(/[^a-z0-9]/g,'')}" onclick="toggleTag('${t}')">${t}</div>`
+  ).join('');
+}
+
+function updateCapCount() {
+  const st = activeSession?.stations[activeStationIdx];
+  const n = st?.photoIds?.length || 0;
+  document.getElementById('cap-count').textContent = n + (n===1?' bilde':' bilder');
+}
+
+function toggleTag(t) {
+  const id = 'tc-' + t.replace(/[^a-z0-9]/g,'');
+  const el = document.getElementById(id);
+  if (activeTags.includes(t)) {
+    activeTags = activeTags.filter(x=>x!==t);
+    el?.classList.remove('active');
+  } else {
+    activeTags.push(t);
+    el?.classList.add('active');
+  }
+}
+
+async function capturePhoto() {
+  const v = document.getElementById('video');
+  if (!v.videoWidth) { toast('Venter på kamera…'); return; }
+
+  // Flash
+  const fl = document.getElementById('flash');
+  fl.classList.add('go');
+  setTimeout(()=>fl.classList.remove('go'), 300);
+
+  // Capture
+  const c = document.createElement('canvas');
+  const MAX = 1200;
+  const scale = Math.min(1, MAX/v.videoWidth, MAX/v.videoHeight);
+  c.width  = Math.round(v.videoWidth  * scale);
+  c.height = Math.round(v.videoHeight * scale);
+  c.getContext('2d').drawImage(v, 0, 0, c.width, c.height);
+  const data = c.toDataURL('image/jpeg', 0.78);
+
+  const s = activeSession, st = s?.stations[activeStationIdx];
+  if (!st) return;
+  const photo = { id:uid(), sessionId:s.id, stationId:st.id, data, tags:[...activeTags], created:Date.now() };
+  await dbPut('photos', photo);
+  if (!st.photoIds) st.photoIds = [];
+  st.photoIds.push(photo.id);
+  await dbPut('sessions', s);
+  updateCapCount();
+  toast(`📸 ${activeTags.length?activeTags.join(', '):'Bilde tatt'}`);
+}
+
+// ── GUIDE CANVAS ──────────────────────────────────────────────────
+function resizeGuideCanvas() {
+  const v = document.getElementById('video');
+  const gc = document.getElementById('guide-canvas');
+  gc.width  = v.clientWidth  || window.innerWidth;
+  gc.height = v.clientHeight || window.innerHeight;
+}
+
+function drawGuide() {
+  const gc = document.getElementById('guide-canvas');
+  const ctx = gc.getContext('2d');
+  const W = gc.width, H = gc.height;
+  ctx.clearRect(0,0,W,H);
+
+  const mode = activeSession?.mode || 'rom';
+  ctx.strokeStyle = 'rgba(255,255,255,.2)';
+  ctx.lineWidth = 1;
+
+  if (mode === 'rom') {
+    // Rule-of-thirds grid
+    for (let i=1;i<3;i++) {
+      ctx.beginPath(); ctx.moveTo(W/3*i,0); ctx.lineTo(W/3*i,H); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(0,H/3*i); ctx.lineTo(W,H/3*i); ctx.stroke();
+    }
+  } else if (mode === 'vegg' || mode === 'fasade') {
+    // Horizontal level line
+    ctx.strokeStyle = 'rgba(255,255,255,.3)';
+    ctx.beginPath(); ctx.moveTo(0,H/2); ctx.lineTo(W,H/2); ctx.stroke();
+    // Vertical center
+    ctx.beginPath(); ctx.moveTo(W/2,0); ctx.lineTo(W/2,H); ctx.stroke();
+  } else if (mode === 'detalj' || mode === 'endring') {
+    // Target box
+    const bw=W*.55, bh=H*.55;
+    const bx=(W-bw)/2, by=(H-bh)/2;
+    ctx.strokeStyle = 'rgba(255,255,255,.4)';
+    ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.roundRect?ctx.roundRect(bx,by,bw,bh,12):ctx.rect(bx,by,bw,bh); ctx.stroke();
+  } else if (mode === 'loft') {
+    // 1.9m reference line (at ~60% height of frame)
+    ctx.strokeStyle = 'rgba(168,85,247,.5)';
+    ctx.lineWidth = 2;
+    ctx.setLineDash([12,6]);
+    ctx.beginPath(); ctx.moveTo(0,H*.6); ctx.lineTo(W,H*.6); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = 'rgba(168,85,247,.7)';
+    ctx.font = 'bold 12px Inter,sans-serif';
+    ctx.fillText('↔ 1.9 m', 14, H*.6-6);
+  }
+
+  // Center crosshair
+  const cx=W/2, cy=H/2;
+  ctx.strokeStyle='rgba(255,255,255,.55)'; ctx.lineWidth=1.5; ctx.setLineDash([]);
+  ctx.beginPath(); ctx.moveTo(cx-10,cy); ctx.lineTo(cx+10,cy); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(cx,cy-10); ctx.lineTo(cx,cy+10); ctx.stroke();
+}
+
+// ── PHOTO VIEWER ──────────────────────────────────────────────────
+async function viewPhoto(id) {
+  viewingPhotoId = id;
+  const p = await dbGet('photos', id);
+  if (!p) return;
+  const m = MODES[activeSession?.mode] || MODES.rom;
+
+  document.getElementById('ph-img').src = p.data;
+  document.getElementById('ph-title').textContent = (p.tags||[]).join(', ') || 'Bilde';
+
+  const tagContainer = document.getElementById('ph-tags');
+  tagContainer.innerHTML = m.tags.map(t =>
+    `<button class="pf-tag-chip${(p.tags||[]).includes(t)?' active':''}" onclick="togglePhotoTag('${id}','${t}',this)">${t}</button>`
+  ).join('');
+
+  showScreen('photo');
+}
+
+async function togglePhotoTag(id, tag, el) {
+  const p = await dbGet('photos', id);
+  if (!p) return;
+  if (!p.tags) p.tags = [];
+  if (p.tags.includes(tag)) p.tags = p.tags.filter(t=>t!==tag);
+  else p.tags.push(tag);
+  await dbPut('photos', p);
+  el.classList.toggle('active', p.tags.includes(tag));
+  document.getElementById('ph-title').textContent = p.tags.join(', ')||'Bilde';
+}
+
+async function deletePhoto() {
+  if (!viewingPhotoId) return;
+  if (!confirm('Slett dette bildet?')) return;
+  const st = activeSession?.stations[activeStationIdx];
+  if (st) {
+    st.photoIds = (st.photoIds||[]).filter(id=>id!==viewingPhotoId);
+    await dbPut('sessions', activeSession);
+  }
+  await dbDel('photos', viewingPhotoId);
+  closePhoto();
+  renderStation();
+}
+
+function closePhoto() {
+  document.getElementById('ph-img').src='';
+  showScreen('station','back');
+}
+
+// ── EXPORT ────────────────────────────────────────────────────────
+async function exportSession() {
+  const s = activeSession;
+  if (!s) return;
+  const allPhotos = await dbGetAll('photos');
+  const sessionPhotos = allPhotos.filter(p=>p.sessionId===s.id);
+  const photoMap = {};
+  for (const p of sessionPhotos) photoMap[p.id] = p;
+
+  const doc = {
+    slimbim_version: '1.0.0',
+    created_at: new Date().toISOString(),
+    created_by: 'placely-capture-v1',
+    capture_mode: s.mode,
+    property: {
+      id: 'prop_'+s.id, type:'property',
+      address: s.addr||null,
+      buildings: [{
+        id: 'bygg_001', type:'building', version_status:'as_built',
+        floors: [{
+          id:'etg_01', type:'floor', level_index:0,
+          capture_stations: s.stations.map((st,i) => ({
+            station_id: st.id,
+            station_index: i+1,
+            name: st.name,
+            capture_mode: s.mode,
+            measurements: st.mals||[],
+            notes: st.notis||null,
+            images: (st.photoIds||[]).map(pid => {
+              const p = photoMap[pid];
+              return p ? { id:p.id, tags:p.tags||[], created_at:new Date(p.created).toISOString() } : null;
+            }).filter(Boolean),
+          })),
+        }],
+      }],
+    },
+    metadata: {
+      session_name: s.name,
+      session_id: s.id,
+      total_stations: s.stations.length,
+      total_images: sessionPhotos.length,
+    },
+  };
+
+  const blob = new Blob([JSON.stringify(doc,null,2)], {type:'application/json'});
+  Object.assign(document.createElement('a'), {href:URL.createObjectURL(blob), download:`capture_${s.name.replace(/\s+/g,'_')}_slimbim.json`}).click();
+  toast('SlimBIM JSON lastet ned');
+}
+
+async function uploadToXdi() {
+  const s = activeSession;
+  if (!s) return;
+  const photos = (await dbGetAll('photos')).filter(p=>p.sessionId===s.id);
+  if (!photos.length) { toast('Ingen bilder å sende'); return; }
+  const key = localStorage.getItem('placely_api_key')||'';
+  if (!key) { toast('Ingen API-nøkkel – se placely.no'); return; }
+
+  toast('Sender til XDi…');
+  // Send first station's first photo for romplan analysis
+  const firstPhoto = photos[0];
+  const fd = new FormData();
+  const res = await fetch('data:'+firstPhoto.data);
+  const blob = await res.blob();
+  fd.append('file', blob, 'capture.jpg');
+  if (s.addr) fd.append('address', s.addr);
+
+  try {
+    const r = await fetch('https://xdi-production.up.railway.app/analyse/romplan', {method:'POST', headers:{'X-API-Key':key}, body:fd});
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.detail||'Feil');
+    const bra = d.bra_total_m2 ? `BRA: ${d.bra_total_m2.toFixed(0)} m²` : '';
+    const rom = d.rom?.length ? ` · ${d.rom.length} rom` : '';
+    toast('✅ ' + (bra||'Analysert') + rom);
+  } catch(e) { toast('⚠ ' + e.message.slice(0,50)); }
+}
+
+async function deleteSession() {
+  if (!activeSession) return;
+  if (!confirm(`Slett sesjonen "${activeSession.name}"?\nAlle bilder og mål slettes permanent.`)) return;
+  const photos = (await dbGetAll('photos')).filter(p=>p.sessionId===activeSession.id);
+  for (const p of photos) await dbDel('photos', p.id);
+  await dbDel('sessions', activeSession.id);
+  activeSession = null;
+  await renderHome();
+  showScreen('home','back');
+  toast('Sesjon slettet');
+}
+
+// ── UTILS ─────────────────────────────────────────────────────────
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('show');
+  clearTimeout(el._t); el._t = setTimeout(()=>el.classList.remove('show'), 2400);
+}
+
+window.addEventListener('resize', () => {
+  if (!document.getElementById('s-capture').classList.contains('hidden')) {
+    resizeGuideCanvas(); drawGuide();
+  }
+});
+
+// ── PWA ───────────────────────────────────────────────────────────
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/capture-sw.js').catch(()=>{});
+}
+
+// ── INIT ──────────────────────────────────────────────────────────
+(async () => {
+  renderModeGrid();
+  await renderHome();
+  showScreen('home');
+})();
+</script>
+</body>
+</html>
