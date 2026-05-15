@@ -199,6 +199,29 @@
     /* DIVIDER */
     .dv { height:1px; background:var(--g100); margin:16px 0; }
     .spacer { height:80px; }
+
+    /* LANDING / ONBOARDING */
+    .landing { padding:8px 0 32px; }
+    .landing-tagline { font-size:22px; font-weight:800; letter-spacing:-.03em; margin-bottom:8px; line-height:1.25; }
+    .landing-sub { font-size:14px; color:var(--g500); line-height:1.6; margin-bottom:28px; }
+    .landing-steps { display:flex; flex-direction:column; gap:12px; margin-bottom:28px; }
+    .ls { background:var(--white); border:1px solid var(--g100); border-radius:var(--r); padding:14px 16px; display:flex; align-items:flex-start; gap:14px; }
+    .ls-icon { font-size:26px; flex-shrink:0; width:38px; text-align:center; margin-top:1px; }
+    .ls-body { flex:1; min-width:0; }
+    .ls-title { font-size:14px; font-weight:700; letter-spacing:-.01em; margin-bottom:3px; }
+    .ls-desc { font-size:13px; color:var(--g500); line-height:1.5; }
+    .btn-landing { width:100%; padding:15px; background:var(--black); color:var(--white); border-radius:10px; font-size:16px; font-weight:700; letter-spacing:-.01em; transition:background .15s; margin-bottom:14px; }
+    .btn-landing:hover { background:#1a1a1a; }
+    .back-placely { display:block; text-align:center; font-size:13px; color:var(--g500); transition:color .15s; }
+    .back-placely:hover { color:var(--black); }
+
+    /* HOME HEADER BADGE */
+    .hdr-badge { display:inline-flex; align-items:center; padding:3px 9px; border-radius:99px; font-size:10px; font-weight:700; letter-spacing:.04em; background:var(--g50); color:var(--g500); border:1px solid var(--g100); white-space:nowrap; flex-shrink:0; }
+
+    /* HOME BACK LINK */
+    #home-back { width:36px; height:36px; border-radius:8px; display:flex; align-items:center; justify-content:center; color:var(--black); transition:background .15s; flex-shrink:0; text-decoration:none; }
+    #home-back:hover { background:var(--g50); }
+    #home-back.hidden { visibility:hidden; }
   </style>
 </head>
 <body>
@@ -211,10 +234,14 @@
 <div id="toast"></div>
 
 <header id="hdr">
+  <a id="home-back" href="index.html" title="Tilbake til Placely">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+  </a>
   <button id="back-btn" class="hidden" onclick="goBack()">
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
   </button>
   <div id="page-title"><span class="logo-hl">Handly <em>by Placely</em></span></div>
+  <span id="hdr-badge" class="hdr-badge hidden">Håndverker-verktøy</span>
   <button id="hdr-action" class="hidden"></button>
 </header>
 
@@ -292,11 +319,18 @@ function showS(s) {
   document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));
   document.getElementById('screen-'+s)?.classList.add('active');
   const bb = document.getElementById('back-btn');
+  const hb = document.getElementById('home-back');
   const pt = document.getElementById('page-title');
   const ha = document.getElementById('hdr-action');
+  const bdg = document.getElementById('hdr-badge');
   const fab = document.getElementById('fab');
-  bb.className = stack.length>1 ? '' : 'hidden';
-  fab.className = s==='home' ? 'fab' : 'fab hidden';
+  const isHome = s === 'home';
+  // On home: show home-back (to index.html), hide in-app back-btn
+  // On other screens: hide home-back, show in-app back-btn
+  hb.className = isHome ? '' : 'hidden';
+  bb.className = !isHome && stack.length>1 ? '' : 'hidden';
+  bdg.className = isHome ? 'hdr-badge' : 'hdr-badge hidden';
+  fab.className = isHome ? 'fab' : 'fab hidden';
   const cfgs = {
     'home':     { t:'<span class="logo-hl">Handly <em>by Placely</em></span>', a:null },
     'new-job':  { t:'Nytt oppdrag', a:null },
@@ -324,7 +358,36 @@ function renderHome() {
   const jobs = load();
   const el = document.getElementById('home-content');
   if (!jobs.length) {
-    el.innerHTML = `<div class="empty"><div class="empty-icon">🔨</div><div class="empty-title">Ingen oppdrag ennå</div><div class="empty-sub">Trykk + for å opprette ditt første oppdrag</div></div>`;
+    el.innerHTML = `
+      <div class="landing">
+        <div class="landing-tagline">Handly er den digitale arbeidsboken din</div>
+        <div class="landing-sub">Hold oversikt over jobber, rom og oppgaver. Dokumenter med bilder. Generer profesjonelle PDF-rapporter.</div>
+        <div class="landing-steps">
+          <div class="ls">
+            <div class="ls-icon">🏗️</div>
+            <div class="ls-body">
+              <div class="ls-title">Opprett oppdrag</div>
+              <div class="ls-desc">Legg inn adresse og kundeinfo</div>
+            </div>
+          </div>
+          <div class="ls">
+            <div class="ls-icon">🏠</div>
+            <div class="ls-body">
+              <div class="ls-title">Legg til rom og oppgaver</div>
+              <div class="ls-desc">Spor fremdrift per rom</div>
+            </div>
+          </div>
+          <div class="ls">
+            <div class="ls-icon">📄</div>
+            <div class="ls-body">
+              <div class="ls-title">Generer rapport</div>
+              <div class="ls-desc">Last ned PDF med bilder og oppgavestatus</div>
+            </div>
+          </div>
+        </div>
+        <button class="btn-landing" onclick="nav('new-job')">Opprett ditt første oppdrag →</button>
+        <a class="back-placely" href="index.html">← Tilbake til Placely</a>
+      </div>`;
     return;
   }
   el.innerHTML = `
