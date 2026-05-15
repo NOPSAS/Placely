@@ -256,7 +256,7 @@
     <div id="mpanel-img">
       <div class="mupload" onclick="document.getElementById('m-file').click()">
         <p id="m-file-txt">Klikk eller dra PNG, JPG eller PDF hit</p>
-        <input type="file" id="m-file" accept=".pdf,.png,.jpg,.jpeg" style="display:none" onchange="FP.onModalFile(this)">
+        <input type="file" id="m-file" accept="application/pdf,image/*" style="display:none" onchange="FP.onModalFile(this)">
       </div>
     </div>
     <div id="mpanel-json" style="display:none">
@@ -1069,16 +1069,19 @@ afterWallChange();
      SCRIPT 2 — Three.js 3D (loaded async, graceful fallback)
      ═══════════════════════════════════════════════════════════════ -->
 <script type="module">
+// Wrap in IIFE so we can use return for early exit (return at module top-level is invalid)
+(async () => {
 let THREE, OrbitControls;
 try {
-  [{ default: THREE }, { OrbitControls }] = await Promise.all([
+  // Dynamic import: Three.js uses named exports — capture the whole namespace as THREE
+  [THREE, { OrbitControls }] = await Promise.all([
     import('https://unpkg.com/three@0.160.0/build/three.module.js'),
     import('https://unpkg.com/three@0.160.0/examples/jsm/controls/OrbitControls.js'),
   ]);
 } catch(e) {
-  document.getElementById('view3d-loading').textContent = '3D ikke tilgjengelig (nettverk)';
-  console.warn('Three.js failed:', e);
-  return; // abort 3D setup, 2D still works fine
+  document.getElementById('view3d-loading').textContent = '3D ikke tilgjengelig';
+  console.warn('Three.js failed to load:', e);
+  return; // valid inside IIFE
 }
 
 // ── SCENE SETUP ───────────────────────────────────────────────────
@@ -1293,6 +1296,7 @@ animate();
 if (window._fpState) {
   update3D(window._fpState.walls, window._fpState.rooms);
 }
+})(); // end IIFE
 </script>
 </body>
 </html>
