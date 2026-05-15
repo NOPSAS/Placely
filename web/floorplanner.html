@@ -7,118 +7,132 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root {
-      --black:#0d0d0d; --white:#fff; --g50:#f7f7f5; --g100:#efedea;
-      --g200:#e0ddd8; --g300:#ccc9c2; --g500:#76736c; --g700:#3d3a35;
-      --blue:#2563eb; --ease:cubic-bezier(.22,.1,.22,1);
-      --wall-ext:#1a1714; --wall-int:#7a7570; --wall-load:#6b1c1c;
-      --room-living:rgba(255,247,215,.75); --room-kitchen:rgba(215,245,218,.75);
-      --room-bed:rgba(215,228,255,.75); --room-bath:rgba(215,243,255,.75);
-      --room-hall:rgba(238,234,228,.75); --room-default:rgba(238,234,228,.6);
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --black:#0d0d0d;--white:#fff;--g50:#f7f7f5;--g100:#efedea;
+      --g200:#e0ddd8;--g300:#ccc9c2;--g500:#76736c;--g700:#3d3a35;
+      --blue:#2563eb;--ease:cubic-bezier(.22,.1,.22,1);
     }
-    html,body { height:100%; overflow:hidden; }
-    body { font-family:'Inter',sans-serif; font-size:13px; color:var(--black); background:#1a1a18; display:flex; flex-direction:column; -webkit-font-smoothing:antialiased; }
+    html,body{height:100%;overflow:hidden}
+    body{font-family:'Inter',sans-serif;font-size:13px;color:var(--black);background:#1a1a18;display:flex;flex-direction:column;-webkit-font-smoothing:antialiased}
 
-    /* ── HEADER ── */
-    header { height:46px; background:var(--white); border-bottom:1px solid var(--g100); display:flex; align-items:center; padding:0 16px; gap:10px; flex-shrink:0; z-index:50; }
-    .logo { font-weight:800; font-size:15px; letter-spacing:-.04em; }
-    .logo em { font-style:normal; color:var(--g500); font-weight:500; }
-    .h-sep { width:1px; height:18px; background:var(--g200); }
-    .plan-name { font-size:13px; font-weight:500; color:var(--g500); cursor:pointer; padding:3px 6px; border-radius:4px; }
-    .plan-name:hover { background:var(--g50); color:var(--black); }
-    .hsp { flex:1; }
-    .hbtn { padding:6px 13px; font-size:12px; font-weight:600; border-radius:5px; cursor:pointer; border:none; font-family:inherit; transition:all .15s; }
-    .hbtn-o { background:var(--white); color:var(--black); border:1px solid var(--g200); }
-    .hbtn-o:hover { border-color:var(--black); }
-    .hbtn-b { background:var(--black); color:var(--white); }
-    .hbtn-b:hover { background:#222; }
-    .hbtn-link { display:inline-flex; align-items:center; text-decoration:none; }
+    /* HEADER */
+    header{height:46px;background:var(--white);border-bottom:1px solid var(--g100);display:flex;align-items:center;padding:0 14px;gap:8px;flex-shrink:0;z-index:50}
+    .logo{font-weight:800;font-size:15px;letter-spacing:-.04em}
+    .logo em{font-style:normal;color:var(--g500);font-weight:500}
+    .h-sep{width:1px;height:18px;background:var(--g200)}
+    .plan-name{font-size:13px;font-weight:500;color:var(--g500);cursor:pointer;padding:3px 7px;border-radius:4px;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .plan-name:hover{background:var(--g50);color:var(--black)}
+    .hsp{flex:1}
+    .hbtn{padding:6px 13px;font-size:12px;font-weight:600;border-radius:5px;cursor:pointer;border:none;font-family:inherit;transition:all .15s;letter-spacing:-.01em}
+    .hbtn-o{background:var(--white);color:var(--black);border:1px solid var(--g200)}
+    .hbtn-o:hover{border-color:var(--black)}
+    .hbtn-b{background:var(--black);color:var(--white)}
+    .hbtn-b:hover{background:#222}
 
-    /* ── WORKSPACE ── */
-    .workspace { flex:1; display:flex; overflow:hidden; }
+    /* WORKSPACE */
+    .workspace{flex:1;display:flex;overflow:hidden;min-height:0}
 
-    /* ── 2D VIEW ── */
-    #view2d { position:relative; width:42%; min-width:300px; background:#f5f0e8; overflow:hidden; flex-shrink:0; }
-    canvas#fp { display:block; width:100%; height:100%; }
+    /* 2D */
+    #view2d{position:relative;width:44%;min-width:280px;background:#f5f0e8;overflow:hidden;flex-shrink:0}
+    #canvas2d{display:block;width:100%;height:100%;cursor:crosshair}
 
-    /* Floating toolbox */
-    #toolbox { position:absolute; top:14px; left:14px; background:rgba(255,255,255,.92); backdrop-filter:blur(10px); border:1px solid var(--g100); border-radius:10px; padding:8px; display:flex; flex-direction:column; gap:2px; box-shadow:0 4px 24px rgba(0,0,0,.08); z-index:10; }
-    .tbtn { width:36px; height:36px; display:flex; align-items:center; justify-content:center; border:none; background:none; border-radius:7px; cursor:pointer; font-size:16px; transition:background .15s; position:relative; }
-    .tbtn:hover { background:var(--g100); }
-    .tbtn.active { background:var(--black); }
-    .tbtn.active svg path { stroke:#fff; }
-    .tbtn.active .tbtn-icon { filter:invert(1); }
-    .tbtn-icon { font-size:15px; line-height:1; }
-    .tb-sep { height:1px; background:var(--g100); margin:4px 0; }
-    .tbtn-tip { position:absolute; left:46px; background:var(--black); color:#fff; font-size:11px; font-weight:600; padding:4px 9px; border-radius:5px; white-space:nowrap; opacity:0; pointer-events:none; transition:opacity .15s; letter-spacing:.02em; }
-    .tbtn:hover .tbtn-tip { opacity:1; }
-    .tbtn-tip::before { content:''; position:absolute; left:-5px; top:50%; transform:translateY(-50%); border:5px solid transparent; border-right-color:var(--black); border-left:none; }
+    /* TOOLBOX */
+    #toolbox{position:absolute;top:12px;left:12px;background:rgba(255,255,255,.95);backdrop-filter:blur(10px);border:1px solid var(--g100);border-radius:11px;padding:8px;display:flex;flex-direction:column;gap:3px;box-shadow:0 4px 24px rgba(0,0,0,.1);z-index:10;user-select:none}
+    .tb-sep{height:1px;background:var(--g100);margin:3px 0}
+    .tb-label{font-size:9px;font-weight:700;color:var(--g500);letter-spacing:.07em;text-transform:uppercase;padding:1px 2px 3px}
+
+    /* Tool buttons */
+    .tbtn{width:34px;height:34px;display:flex;align-items:center;justify-content:center;border:none;background:none;border-radius:7px;cursor:pointer;font-size:15px;transition:background .12s;position:relative}
+    .tbtn:hover{background:var(--g100)}
+    .tbtn.active{background:var(--black);color:#fff}
+    .tbtn-tip{position:absolute;left:42px;top:50%;transform:translateY(-50%);background:#111;color:#fff;font-size:11px;font-weight:600;padding:4px 9px;border-radius:5px;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .12s;letter-spacing:.01em;z-index:100}
+    .tbtn-tip::before{content:'';position:absolute;left:-5px;top:50%;transform:translateY(-50%);border:5px solid transparent;border-right-color:#111;border-left:none}
+    .tbtn:hover .tbtn-tip{opacity:1}
+
+    /* Thickness grid */
+    .thick-grid{display:grid;grid-template-columns:1fr 1fr;gap:3px;margin-top:1px}
+    .tkbtn{padding:4px 0;font-size:11px;font-weight:600;border:1px solid var(--g200);border-radius:5px;background:#fff;cursor:pointer;transition:all .12s;text-align:center;color:var(--g700)}
+    .tkbtn:hover{border-color:var(--black);color:var(--black)}
+    .tkbtn.active{background:var(--black);color:#fff;border-color:var(--black)}
+
+    /* Wall type pills */
+    .wtype-row{display:flex;flex-direction:column;gap:3px;margin-top:1px}
+    .wtbtn{padding:5px 8px;font-size:11px;font-weight:600;border:1px solid var(--g200);border-radius:6px;background:#fff;cursor:pointer;transition:all .12s;text-align:left;color:var(--g700);display:flex;align-items:center;gap:5px;white-space:nowrap}
+    .wtbtn:hover{border-color:var(--black);background:var(--g50)}
+    .wtbtn.active{background:var(--black);color:#fff;border-color:var(--black)}
+    .wt-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0}
 
     /* Snap pill */
-    #snap-pill { position:absolute; bottom:38px; left:50%; transform:translateX(-50%); background:rgba(255,255,255,.92); backdrop-filter:blur(8px); border:1px solid var(--g100); border-radius:99px; padding:5px 14px; display:flex; align-items:center; gap:8px; font-size:11px; color:var(--g700); white-space:nowrap; box-shadow:0 2px 12px rgba(0,0,0,.06); z-index:10; }
-    #snap-pill select { background:none; border:none; font-size:11px; font-family:inherit; color:var(--black); font-weight:600; cursor:pointer; padding:0; }
-    #snap-pill select:focus { outline:none; }
+    #snap-pill{position:absolute;bottom:36px;left:50%;transform:translateX(-50%);background:rgba(255,255,255,.94);backdrop-filter:blur(8px);border:1px solid var(--g100);border-radius:99px;padding:5px 14px;display:flex;align-items:center;gap:8px;font-size:11px;color:var(--g700);white-space:nowrap;box-shadow:0 2px 12px rgba(0,0,0,.07);z-index:10}
+    #snap-pill select{background:none;border:none;font-size:11px;font-family:inherit;color:var(--black);font-weight:600;cursor:pointer;padding:0}
 
     /* Axis lock badge */
-    #lock-badge { position:absolute; top:12px; left:50%; transform:translateX(-50%); background:var(--blue); color:#fff; padding:4px 14px; border-radius:99px; font-size:11px; font-weight:700; letter-spacing:.06em; opacity:0; pointer-events:none; transition:opacity .15s; z-index:10; }
-    #lock-badge.show { opacity:1; }
+    #lock-badge{position:absolute;top:10px;left:50%;transform:translateX(-50%);background:#2563eb;color:#fff;padding:4px 14px;border-radius:99px;font-size:11px;font-weight:700;letter-spacing:.06em;opacity:0;pointer-events:none;transition:opacity .15s;z-index:10}
+    #lock-badge.show{opacity:1}
 
     /* Status bar */
-    .sb2d { position:absolute; bottom:0; left:0; right:0; height:28px; background:rgba(245,240,232,.95); border-top:1px solid var(--g200); display:flex; align-items:center; padding:0 12px; gap:12px; font-size:11px; color:var(--g500); }
-    .sb2d-tool { font-weight:600; color:var(--black); }
-    .sb2d-sp { flex:1; }
-    .sb2d-coords { font-weight:500; color:var(--g700); font-variant-numeric:tabular-nums; }
+    .sb2d{position:absolute;bottom:0;left:0;right:0;height:28px;background:rgba(245,240,232,.96);border-top:1px solid var(--g200);display:flex;align-items:center;padding:0 12px;gap:10px;font-size:11px;color:var(--g500)}
+    .sb-tool{font-weight:600;color:var(--black)}
+    .sb-sp{flex:1}
+    .sb-key{background:var(--g100);border:1px solid var(--g300);border-radius:3px;padding:1px 5px;font-size:10px;color:var(--g700)}
+    .sb-coords{font-weight:500;color:var(--g700);font-variant-numeric:tabular-nums}
 
-    /* ── DIVIDER ── */
-    #divider { width:3px; background:var(--g200); cursor:col-resize; flex-shrink:0; transition:background .15s; }
-    #divider:hover { background:var(--blue); }
+    /* DIVIDER */
+    #divider{width:4px;background:var(--g200);cursor:col-resize;flex-shrink:0;transition:background .15s;position:relative}
+    #divider:hover{background:var(--blue)}
+    #divider::after{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:4px;height:40px;background:inherit;border-radius:2px}
 
-    /* ── 3D VIEW ── */
-    #view3d { flex:1; position:relative; overflow:hidden; background:#1a1a18; min-width:200px; }
-    canvas#fp3d { display:block; width:100%; height:100%; }
-    #view3d-label { position:absolute; top:12px; right:16px; font-size:11px; font-weight:600; color:rgba(255,255,255,.35); letter-spacing:.06em; text-transform:uppercase; pointer-events:none; }
-    .view3d-btns { position:absolute; bottom:14px; right:14px; display:flex; gap:6px; }
-    .v3btn { background:rgba(255,255,255,.1); backdrop-filter:blur(6px); border:1px solid rgba(255,255,255,.15); color:#fff; border-radius:6px; padding:6px 12px; font-size:11px; font-weight:600; cursor:pointer; font-family:inherit; transition:background .15s; }
-    .v3btn:hover { background:rgba(255,255,255,.2); }
+    /* 3D */
+    #view3d{flex:1;position:relative;overflow:hidden;background:#1a1a18;min-width:200px}
+    #canvas3d{display:block;width:100%;height:100%}
+    #view3d-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none}
+    #view3d-loading{color:rgba(255,255,255,.25);font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase}
+    #view3d-label{position:absolute;top:10px;right:14px;font-size:10px;font-weight:700;color:rgba(255,255,255,.3);letter-spacing:.08em;text-transform:uppercase;pointer-events:none}
+    .v3-btns{position:absolute;bottom:12px;right:12px;display:flex;gap:5px}
+    .v3btn{background:rgba(30,30,28,.8);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.75);border-radius:6px;padding:6px 12px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s}
+    .v3btn:hover{background:rgba(255,255,255,.15);color:#fff}
 
-    /* ── PROPERTIES PANEL ── */
-    #propbar { height:0; background:var(--white); border-top:1px solid var(--g100); overflow:hidden; transition:height .25s var(--ease); display:flex; align-items:center; padding:0; z-index:20; flex-shrink:0; }
-    #propbar.open { height:64px; padding:0 20px; }
-    .prop-fields { display:flex; align-items:center; gap:16px; flex-wrap:wrap; }
-    .pf { display:flex; flex-direction:column; }
-    .pf-l { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--g500); margin-bottom:4px; }
-    .pf-in { padding:5px 9px; border:1px solid var(--g200); border-radius:5px; font-family:inherit; font-size:13px; width:80px; }
-    .pf-in:focus { outline:none; border-color:var(--black); }
-    .pf-sel { padding:5px 9px; border:1px solid var(--g200); border-radius:5px; font-family:inherit; font-size:12px; background:#fff; cursor:pointer; }
-    .pf-sel:focus { outline:none; border-color:var(--black); }
-    .pf-chk { display:flex; align-items:center; gap:6px; font-size:12px; cursor:pointer; color:var(--g700); }
-    .prop-del { margin-left:auto; background:#fff; color:#b91c1c; border:1px solid #fecaca; border-radius:5px; padding:6px 14px; font-family:inherit; font-size:12px; font-weight:600; cursor:pointer; transition:background .15s; }
-    .prop-del:hover { background:#fef2f2; }
-    .prop-close { margin-left:8px; background:var(--g50); border:1px solid var(--g200); border-radius:5px; padding:6px 10px; font-size:12px; cursor:pointer; font-family:inherit; }
+    /* PROPERTIES BAR */
+    #propbar{height:0;background:var(--white);border-top:1px solid var(--g100);overflow:hidden;transition:height .22s var(--ease);display:flex;align-items:center;padding:0;z-index:20;flex-shrink:0}
+    #propbar.open{height:62px;padding:0 18px}
+    .prop-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap;width:100%}
+    .pf{display:flex;flex-direction:column}
+    .pf-l{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--g500);margin-bottom:4px}
+    .pf-in{padding:5px 9px;border:1px solid var(--g200);border-radius:5px;font-family:inherit;font-size:13px;width:78px;outline:none;transition:border-color .12s}
+    .pf-in:focus{border-color:var(--black)}
+    .pf-sel{padding:5px 9px;border:1px solid var(--g200);border-radius:5px;font-family:inherit;font-size:12px;background:#fff;cursor:pointer;outline:none}
+    .pf-sel:focus{border-color:var(--black)}
+    .pf-thick-row{display:flex;gap:4px}
+    .pt-opt{padding:5px 9px;font-size:11px;font-weight:600;border:1px solid var(--g200);border-radius:5px;cursor:pointer;background:#fff;font-family:inherit;transition:all .12s;color:var(--g700)}
+    .pt-opt:hover{border-color:var(--black);color:var(--black)}
+    .pt-opt.active{background:var(--black);color:#fff;border-color:var(--black)}
+    .prop-len{font-size:12px;color:var(--g500);white-space:nowrap;margin-top:14px}
+    .prop-del{margin-left:auto;background:#fff;color:#b91c1c;border:1px solid #fecaca;border-radius:5px;padding:6px 14px;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;transition:background .12s}
+    .prop-del:hover{background:#fef2f2}
+    .prop-close{background:var(--g50);border:1px solid var(--g200);border-radius:5px;padding:6px 10px;font-size:12px;cursor:pointer;font-family:inherit;transition:all .12s}
+    .prop-close:hover{border-color:var(--black)}
 
-    /* ── IMPORT MODAL ── */
-    .overlay { position:fixed; inset:0; background:rgba(0,0,0,.45); backdrop-filter:blur(6px); z-index:200; display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition:opacity .2s; }
-    .overlay.open { opacity:1; pointer-events:all; }
-    .modal { background:#fff; border-radius:14px; padding:32px; width:500px; max-width:95vw; transform:translateY(16px); transition:transform .2s; }
-    .overlay.open .modal { transform:none; }
-    .modal h3 { font-size:18px; font-weight:700; letter-spacing:-.02em; margin-bottom:8px; }
-    .modal-sub { font-size:13px; color:var(--g500); margin-bottom:24px; line-height:1.6; }
-    .mtabs { display:flex; border-bottom:1px solid var(--g100); margin-bottom:18px; }
-    .mtab { padding:8px 18px; font-size:13px; font-weight:500; cursor:pointer; color:var(--g500); border-bottom:2px solid transparent; margin-bottom:-1px; }
-    .mtab.active { color:var(--black); border-bottom-color:var(--black); font-weight:600; }
-    .mupload { border:1.5px dashed var(--g300); border-radius:10px; padding:32px; text-align:center; cursor:pointer; transition:border-color .15s; }
-    .mupload:hover { border-color:var(--black); }
-    .mupload input { display:none; }
-    .mupload p { font-size:13px; color:var(--g500); margin:0; }
-    .mjson { width:100%; height:100px; padding:10px; border:1px solid var(--g100); border-radius:8px; font-family:monospace; font-size:12px; resize:vertical; }
-    .mjson:focus { outline:none; border-color:var(--black); }
-    .mfooter { display:flex; justify-content:flex-end; gap:8px; margin-top:18px; }
-    .mbtn { padding:9px 20px; border-radius:6px; font-family:inherit; font-size:13px; font-weight:600; cursor:pointer; border:none; }
-    .mbtn-c { background:var(--g50); color:var(--g700); }
-    .mbtn-ok { background:var(--black); color:#fff; }
-    .spin { display:inline-block; width:14px; height:14px; border:2px solid rgba(255,255,255,.3); border-top-color:#fff; border-radius:50%; animation:sp .5s linear infinite; }
-    @keyframes sp { to { transform:rotate(360deg); } }
+    /* MODAL */
+    .overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);backdrop-filter:blur(6px);z-index:200;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s}
+    .overlay.open{opacity:1;pointer-events:all}
+    .modal{background:#fff;border-radius:14px;padding:28px;width:480px;max-width:95vw;transform:translateY(14px);transition:transform .2s;box-shadow:0 24px 64px rgba(0,0,0,.15)}
+    .overlay.open .modal{transform:none}
+    .modal h3{font-size:17px;font-weight:700;letter-spacing:-.02em;margin-bottom:6px}
+    .modal-sub{font-size:13px;color:var(--g500);margin-bottom:20px;line-height:1.55}
+    .mtabs{display:flex;border-bottom:1px solid var(--g100);margin-bottom:16px}
+    .mtab{padding:7px 16px;font-size:13px;font-weight:500;cursor:pointer;color:var(--g500);border-bottom:2px solid transparent;margin-bottom:-1px;transition:color .12s}
+    .mtab.active{color:var(--black);border-bottom-color:var(--black);font-weight:600}
+    .mupload{border:1.5px dashed var(--g300);border-radius:10px;padding:28px;text-align:center;cursor:pointer;transition:border-color .15s}
+    .mupload:hover{border-color:var(--black)}
+    .mjson{width:100%;height:96px;padding:10px;border:1px solid var(--g100);border-radius:8px;font-family:monospace;font-size:12px;resize:vertical;outline:none}
+    .mjson:focus{border-color:var(--black)}
+    .mfooter{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}
+    .mbtn{padding:8px 18px;border-radius:6px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;border:none}
+    .mbtn-c{background:var(--g50);color:var(--g700)}
+    .mbtn-ok{background:var(--black);color:#fff}
+    .spin{display:inline-block;width:13px;height:13px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .5s linear infinite;vertical-align:middle}
+    @keyframes spin{to{transform:rotate(360deg)}}
   </style>
 </head>
 <body>
@@ -126,49 +140,69 @@
 <header>
   <div class="logo">Placely <em>/ Plantegning</em></div>
   <div class="h-sep"></div>
-  <div class="plan-name" id="plan-name" onclick="renamePlan()">Ny tegning</div>
+  <div class="plan-name" id="plan-name" onclick="FP.renamePlan()">Ny tegning</div>
   <div class="hsp"></div>
-  <button class="hbtn hbtn-o" onclick="openImport()">Importer</button>
-  <button class="hbtn hbtn-o" onclick="doExport()">Eksporter JSON</button>
-  <button class="hbtn hbtn-o" onclick="confirmClear()">Tøm</button>
+  <button class="hbtn hbtn-o" onclick="FP.openImport()">Importer</button>
+  <button class="hbtn hbtn-o" onclick="FP.doExport()">Eksporter JSON</button>
+  <button class="hbtn hbtn-o" onclick="FP.confirmClear()">Tøm</button>
   <div class="h-sep"></div>
-  <a class="hbtn hbtn-o hbtn-link" href="index.html">← Tilbake</a>
+  <a class="hbtn hbtn-o" href="index.html">← Tilbake</a>
 </header>
 
 <div class="workspace">
 
-  <!-- 2D VIEW -->
+  <!-- 2D -->
   <div id="view2d">
-    <canvas id="fp"></canvas>
+    <canvas id="canvas2d"></canvas>
 
-    <!-- Toolbox -->
     <div id="toolbox">
-      <button class="tbtn active" id="tb-wall" onclick="setTool('wall')" title="">
-        <span class="tbtn-icon">✏️</span>
-        <div class="tbtn-tip">Tegn vegg (W)</div>
+      <div class="tb-label">Verktøy</div>
+      <button class="tbtn active" id="tb-wall"   onclick="FP.setTool('wall')">
+        ✏️<div class="tbtn-tip">Tegn vegg (W)</div>
       </button>
-      <button class="tbtn" id="tb-select" onclick="setTool('select')">
-        <span class="tbtn-icon">↖</span>
-        <div class="tbtn-tip">Velg (S)</div>
+      <button class="tbtn"        id="tb-select" onclick="FP.setTool('select')">
+        ↖<div class="tbtn-tip">Velg (S)</div>
       </button>
-      <button class="tbtn" id="tb-pan" onclick="setTool('pan')">
-        <span class="tbtn-icon">✋</span>
-        <div class="tbtn-tip">Flytt (P)</div>
+      <button class="tbtn"        id="tb-pan"    onclick="FP.setTool('pan')">
+        ✋<div class="tbtn-tip">Pan (P)</div>
       </button>
+
       <div class="tb-sep"></div>
-      <button class="tbtn" onclick="undo()">
-        <span class="tbtn-icon">↩</span>
-        <div class="tbtn-tip">Angre (Ctrl+Z)</div>
+      <div class="tb-label">Tykkelse</div>
+      <div class="thick-grid" id="thick-grid">
+        <button class="tkbtn"        onclick="FP.setThickness(0.10)">10</button>
+        <button class="tkbtn"        onclick="FP.setThickness(0.15)">15</button>
+        <button class="tkbtn active" onclick="FP.setThickness(0.20)">20</button>
+        <button class="tkbtn"        onclick="FP.setThickness(0.25)">25</button>
+      </div>
+      <div style="font-size:9px;color:var(--g500);text-align:center;margin-top:1px">cm</div>
+
+      <div class="tb-sep"></div>
+      <div class="tb-label">Veggtype</div>
+      <div class="wtype-row" id="wtype-row">
+        <button class="wtbtn active" onclick="FP.setWallType('exterior')">
+          <span class="wt-dot" style="background:#1a1714"></span>Yttervegg
+        </button>
+        <button class="wtbtn" onclick="FP.setWallType('interior')">
+          <span class="wt-dot" style="background:#7a7570"></span>Innervegg
+        </button>
+        <button class="wtbtn" onclick="FP.setWallType('load_bearing')">
+          <span class="wt-dot" style="background:#6b1c1c"></span>Bærende
+        </button>
+      </div>
+
+      <div class="tb-sep"></div>
+      <button class="tbtn" onclick="FP.undo()">
+        ↩<div class="tbtn-tip">Angre (Ctrl+Z)</div>
       </button>
-      <button class="tbtn" onclick="fitView()">
-        <span class="tbtn-icon">⊡</span>
-        <div class="tbtn-tip">Tilpass visning</div>
+      <button class="tbtn" onclick="FP.fitView()">
+        ⊡<div class="tbtn-tip">Tilpass (F)</div>
       </button>
     </div>
 
     <div id="snap-pill">
       Snap
-      <select id="snap-sel" onchange="state.snapSize=parseFloat(this.value);redraw()">
+      <select id="snap-sel" onchange="FP.setSnap(+this.value)">
         <option value="0.05">5 cm</option>
         <option value="0.1" selected>10 cm</option>
         <option value="0.25">25 cm</option>
@@ -177,28 +211,29 @@
       </select>
     </div>
 
-    <div id="lock-badge">HORISONTAL</div>
+    <div id="lock-badge"></div>
 
     <div class="sb2d">
-      <span class="sb2d-tool" id="sb-tool">Tegn vegg</span>
-      <kbd style="background:var(--g100);border:1px solid var(--g300);border-radius:3px;padding:1px 5px;font-size:10px;color:var(--g700)">Shift</kbd> Lås
-      <kbd style="background:var(--g100);border:1px solid var(--g300);border-radius:3px;padding:1px 5px;font-size:10px;color:var(--g700)">Del</kbd> Slett
-      <kbd style="background:var(--g100);border:1px solid var(--g300);border-radius:3px;padding:1px 5px;font-size:10px;color:var(--g700)">ESC</kbd> Avbryt
-      <div class="sb2d-sp"></div>
-      <span class="sb2d-coords" id="sb-coords">0.00, 0.00 m</span>
+      <span class="sb-tool" id="sb-tool">Tegn vegg</span>
+      <span class="sb-key">Shift</span>Lås vinkel
+      <span class="sb-key">Del</span>Slett
+      <span class="sb-key">Esc</span>Avbryt
+      <span class="sb-key">F</span>Tilpass
+      <div class="sb-sp"></div>
+      <span class="sb-coords" id="sb-coords">0.00, 0.00 m</span>
     </div>
   </div>
 
-  <!-- DIVIDER -->
   <div id="divider"></div>
 
-  <!-- 3D VIEW -->
+  <!-- 3D -->
   <div id="view3d">
-    <canvas id="fp3d"></canvas>
-    <div id="view3d-label">3D Modell</div>
-    <div class="view3d-btns">
-      <button class="v3btn" onclick="resetCamera()">Reset kamera</button>
-      <button class="v3btn" onclick="toggleTopView()">Topp</button>
+    <canvas id="canvas3d"></canvas>
+    <div id="view3d-overlay"><div id="view3d-loading">Laster 3D…</div></div>
+    <div id="view3d-label">3D · Orbit ↻ · Scroll ±</div>
+    <div class="v3-btns">
+      <button class="v3btn" onclick="FP.resetCamera()">⟳ Kamera</button>
+      <button class="v3btn" onclick="FP.toggleTopView()">⊞ Topp</button>
     </div>
   </div>
 
@@ -206,99 +241,96 @@
 
 <!-- PROPERTIES BAR -->
 <div id="propbar">
-  <div class="prop-fields" id="prop-fields"></div>
+  <div class="prop-row" id="prop-fields"></div>
 </div>
 
 <!-- IMPORT MODAL -->
 <div class="overlay" id="import-modal">
   <div class="modal">
     <h3>Importer tegning</h3>
-    <p class="modal-sub">Last opp bilde/PDF – XDi analyserer og tegner veggene automatisk. Eller lim inn SlimBIM JSON direkte.</p>
+    <p class="modal-sub">Last opp bilde/PDF – XDi analyserer automatisk. Eller lim inn SlimBIM JSON.</p>
     <div class="mtabs">
-      <div class="mtab active" id="mtab-img" onclick="switchMtab('img')">Bilde / PDF</div>
-      <div class="mtab" id="mtab-json" onclick="switchMtab('json')">SlimBIM JSON</div>
+      <div class="mtab active" id="mtab-img"  onclick="FP.switchMtab('img')">Bilde / PDF</div>
+      <div class="mtab"       id="mtab-json" onclick="FP.switchMtab('json')">SlimBIM JSON</div>
     </div>
     <div id="mpanel-img">
       <div class="mupload" onclick="document.getElementById('m-file').click()">
         <p id="m-file-txt">Klikk eller dra PNG, JPG eller PDF hit</p>
-        <input type="file" id="m-file" accept=".pdf,.png,.jpg,.jpeg" onchange="onModalFile(this)">
+        <input type="file" id="m-file" accept=".pdf,.png,.jpg,.jpeg" style="display:none" onchange="FP.onModalFile(this)">
       </div>
     </div>
     <div id="mpanel-json" style="display:none">
       <textarea class="mjson" id="m-json" placeholder='{"slimbim_version":"1.0.0","property":{...}}'></textarea>
     </div>
     <div class="mfooter">
-      <button class="mbtn mbtn-c" onclick="closeImport()">Avbryt</button>
-      <button class="mbtn mbtn-ok" id="m-ok" onclick="doImport()">Importer</button>
+      <button class="mbtn mbtn-c" onclick="FP.closeImport()">Avbryt</button>
+      <button class="mbtn mbtn-ok" id="m-ok" onclick="FP.doImport()">Importer</button>
     </div>
   </div>
 </div>
 
-<script type="module">
-import * as THREE from 'https://unpkg.com/three@0.160.0/build/three.module.js';
-import { OrbitControls } from 'https://unpkg.com/three@0.160.0/examples/jsm/controls/OrbitControls.js';
-
+<!-- ═══════════════════════════════════════════════════════════════
+     SCRIPT 1 — All 2D logic (no external deps, always works)
+     ═══════════════════════════════════════════════════════════════ -->
+<script>
+'use strict';
 const XDI = 'https://xdi-production.up.railway.app';
 
-// ═══════════════════════════════════════════════════════════════
-// STATE
-// ═══════════════════════════════════════════════════════════════
+// ── STATE ─────────────────────────────────────────────────────────
 const state = {
-  walls:      [],
-  rooms:      [],
-  tool:       'wall',
-  snapSize:   0.1,
-  cam:        { x: 0, y: 0, scale: 80 },
+  walls:     [],
+  rooms:     [],
+  tool:      'wall',
+  wallType:  'exterior',
+  thickness: 0.20,
+  snapSize:  0.1,
+  cam:       { x: 4, y: 5, scale: 72 },
   chainStart: null,
-  selected:   null,
-  hovered:    null,
-  lockAxis:   null,
-  mouse:      { wx: 0, wy: 0 },
-  undoStack:  [],
-  redoStack:  [],
+  selected:  null,
+  hovered:   null,
+  lockAxis:  null,
+  mouse:     { wx: 0, wy: 0 },
+  undoStack: [],
+  _idCtr:    0,
 };
 
-let wallIdCounter = 0;
-const newId = () => 'w' + (++wallIdCounter);
+function newId() { return 'w' + (++state._idCtr); }
 
-// ═══════════════════════════════════════════════════════════════
-// 2D CANVAS SETUP
-// ═══════════════════════════════════════════════════════════════
-const canvas2d = document.getElementById('fp');
-const ctx = canvas2d.getContext('2d');
-const view2d = document.getElementById('view2d');
+// ── CANVAS / CTX ──────────────────────────────────────────────────
+const cv   = document.getElementById('canvas2d');
+const ctx  = cv.getContext('2d');
+const v2d  = document.getElementById('view2d');
 
 function resize2D() {
-  canvas2d.width  = view2d.clientWidth;
-  canvas2d.height = view2d.clientHeight;
+  cv.width  = v2d.clientWidth  || 600;
+  cv.height = v2d.clientHeight || 500;
   redraw();
 }
 
-// Coord conversion
+// ── COORD HELPERS ─────────────────────────────────────────────────
 const w2s = (wx, wy) => ({
-  x: canvas2d.width  / 2 + (wx - state.cam.x) * state.cam.scale,
-  y: canvas2d.height / 2 - (wy - state.cam.y) * state.cam.scale,
+  x: cv.width  / 2 + (wx - state.cam.x) * state.cam.scale,
+  y: cv.height / 2 - (wy - state.cam.y) * state.cam.scale,
 });
 const s2w = (sx, sy) => ({
-  x: (sx - canvas2d.width  / 2) / state.cam.scale + state.cam.x,
-  y: -((sy - canvas2d.height / 2) / state.cam.scale) + state.cam.y,
+  x: (sx - cv.width  / 2) / state.cam.scale + state.cam.x,
+  y: -((sy - cv.height / 2) / state.cam.scale) + state.cam.y,
 });
-const snap = (v, s) => Math.round(v / s) * s;
-const snapPt = (wx, wy) => ({ x: snap(wx, state.snapSize), y: snap(wy, state.snapSize) });
-const ptDist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
+const snapV  = (v, s) => Math.round(v / s) * s;
+const snapPt = (wx, wy) => ({ x: snapV(wx, state.snapSize), y: snapV(wy, state.snapSize) });
+const dist   = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
 
-function findNearEndpoint(wx, wy, thresh = 0.22) {
+function nearEndpoint(wx, wy, thresh = 0.25) {
   for (const w of state.walls) {
-    if (ptDist({x:wx,y:wy}, w.start) < thresh) return { ...w.start, _snap: true };
-    if (ptDist({x:wx,y:wy}, w.end)   < thresh) return { ...w.end,   _snap: true };
+    if (dist({x:wx,y:wy}, w.start) < thresh) return { ...w.start, _snap:true };
+    if (dist({x:wx,y:wy}, w.end)   < thresh) return { ...w.end,   _snap:true };
   }
   return null;
 }
 
-function getSnappedMouse() {
-  const { wx, wy } = state.mouse;
-  let pt = snapPt(wx, wy);
-  const near = findNearEndpoint(pt.x, pt.y);
+function getSnapped() {
+  let pt = snapPt(state.mouse.wx, state.mouse.wy);
+  const near = nearEndpoint(pt.x, pt.y);
   pt = near || pt;
   if (state.lockAxis && state.chainStart) {
     pt = state.lockAxis === 'h'
@@ -308,100 +340,92 @@ function getSnappedMouse() {
   return pt;
 }
 
-// ═══════════════════════════════════════════════════════════════
-// 2D DRAWING
-// ═══════════════════════════════════════════════════════════════
-const WALL_COLOR = { exterior:'#1a1714', interior:'#7a7570', load_bearing:'#6b1c1c', partition:'#a09890', foundation:'#4a3d2a' };
-const ROOM_COLOR = { living_room:'rgba(255,247,215,.75)', kitchen:'rgba(215,245,218,.75)', bedroom:'rgba(215,228,255,.75)', bathroom:'rgba(215,243,255,.75)', hallway:'rgba(238,234,228,.75)' };
+// ── WALL COLORS ───────────────────────────────────────────────────
+const WCOLOR = { exterior:'#1a1714', interior:'#7a7570', load_bearing:'#6b1c1c', partition:'#9a938e', foundation:'#4a3d2a' };
+const RCOLOR = { living_room:'rgba(255,247,215,.72)', kitchen:'rgba(215,245,218,.72)', bedroom:'rgba(215,228,255,.72)', bathroom:'rgba(215,243,255,.72)', hallway:'rgba(238,234,228,.72)' };
 
+// ── DRAW ──────────────────────────────────────────────────────────
 function redraw() {
-  const W = canvas2d.width, H = canvas2d.height;
+  const W = cv.width, H = cv.height;
   ctx.clearRect(0, 0, W, H);
-
-  // Background
   ctx.fillStyle = '#f5f0e8';
   ctx.fillRect(0, 0, W, H);
-
-  drawGrid2D();
-  drawRooms2D();
-  drawWalls2D();
-  drawPreview2D();
-  drawEndpoints2D();
+  drawGrid();
+  drawRooms();
+  drawWalls();
+  drawPreview();
+  drawEndpoints();
 }
 
-function drawGrid2D() {
+function drawGrid() {
   const sc = state.cam.scale;
-  const { x: minX, y: minY } = s2w(0, canvas2d.height);
-  const { x: maxX, y: maxY } = s2w(canvas2d.width, 0);
-
-  // Minor grid
-  ctx.strokeStyle = 'rgba(0,0,0,.045)';
-  ctx.lineWidth = .5;
+  const { x:minX, y:minY } = s2w(0, cv.height);
+  const { x:maxX, y:maxY } = s2w(cv.width, 0);
   const sn = state.snapSize;
+
+  ctx.strokeStyle = 'rgba(0,0,0,.04)';
+  ctx.lineWidth = .5;
   for (let x = Math.floor(minX/sn)*sn; x <= maxX; x += sn) {
     const sx = w2s(x, 0).x;
-    ctx.beginPath(); ctx.moveTo(sx, 0); ctx.lineTo(sx, canvas2d.height); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(sx, 0); ctx.lineTo(sx, H); ctx.stroke();
   }
   for (let y = Math.floor(minY/sn)*sn; y <= maxY; y += sn) {
     const sy = w2s(0, y).y;
-    ctx.beginPath(); ctx.moveTo(0, sy); ctx.lineTo(canvas2d.width, sy); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(0, sy); ctx.lineTo(W, sy); ctx.stroke();
   }
 
-  // Major 1m grid
-  ctx.strokeStyle = 'rgba(0,0,0,.1)';
+  ctx.strokeStyle = 'rgba(0,0,0,.09)';
   ctx.lineWidth = 1;
   for (let x = Math.floor(minX); x <= maxX; x++) {
     const sx = w2s(x, 0).x;
-    ctx.beginPath(); ctx.moveTo(sx, 0); ctx.lineTo(sx, canvas2d.height); ctx.stroke();
-    if (sc > 35 && x !== 0) {
-      ctx.fillStyle = '#aaa8a0'; ctx.font = '9px Inter,sans-serif'; ctx.textAlign = 'center';
-      ctx.fillText(x + 'm', sx, canvas2d.height - 32);
+    ctx.beginPath(); ctx.moveTo(sx, 0); ctx.lineTo(sx, H); ctx.stroke();
+    if (sc > 38 && x !== 0) {
+      ctx.fillStyle = '#aaa8a0'; ctx.font = '9px Inter'; ctx.textAlign = 'center';
+      ctx.fillText(x + 'm', sx, H - 34);
     }
   }
   for (let y = Math.floor(minY); y <= maxY; y++) {
     const sy = w2s(0, y).y;
-    ctx.beginPath(); ctx.moveTo(0, sy); ctx.lineTo(canvas2d.width, sy); ctx.stroke();
-    if (sc > 35 && y !== 0) {
-      ctx.fillStyle = '#aaa8a0'; ctx.font = '9px Inter,sans-serif'; ctx.textAlign = 'right';
-      ctx.fillText(y + 'm', canvas2d.width - 32, sy - 2);
+    ctx.beginPath(); ctx.moveTo(0, sy); ctx.lineTo(W, sy); ctx.stroke();
+    if (sc > 38 && y !== 0) {
+      ctx.fillStyle = '#aaa8a0'; ctx.font = '9px Inter'; ctx.textAlign = 'right';
+      ctx.fillText(y + 'm', W - 34, sy - 2);
     }
   }
 
-  // Origin
   const o = w2s(0, 0);
-  ctx.strokeStyle = 'rgba(0,0,0,.18)'; ctx.lineWidth = 1.5;
-  ctx.beginPath(); ctx.moveTo(o.x-12, o.y); ctx.lineTo(o.x+12, o.y); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(o.x, o.y-12); ctx.lineTo(o.x, o.y+12); ctx.stroke();
+  ctx.strokeStyle = 'rgba(0,0,0,.16)'; ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(o.x - 12, o.y); ctx.lineTo(o.x + 12, o.y); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(o.x, o.y - 12); ctx.lineTo(o.x, o.y + 12); ctx.stroke();
 }
 
-function drawRooms2D() {
-  for (const room of state.rooms) {
-    if (!room.polygon || room.polygon.length < 3) continue;
-    const p0 = w2s(room.polygon[0].x, room.polygon[0].y);
+function drawRooms() {
+  for (const r of state.rooms) {
+    if (!r.polygon || r.polygon.length < 3) continue;
+    const p0 = w2s(r.polygon[0].x, r.polygon[0].y);
     ctx.beginPath(); ctx.moveTo(p0.x, p0.y);
-    for (let i = 1; i < room.polygon.length; i++) {
-      const pi = w2s(room.polygon[i].x, room.polygon[i].y);
+    for (let i = 1; i < r.polygon.length; i++) {
+      const pi = w2s(r.polygon[i].x, r.polygon[i].y);
       ctx.lineTo(pi.x, pi.y);
     }
     ctx.closePath();
-    ctx.fillStyle = ROOM_COLOR[room.type] || 'rgba(238,234,228,.6)';
+    ctx.fillStyle = RCOLOR[r.type] || 'rgba(238,234,228,.55)';
     ctx.fill();
 
-    // Area label
-    const cx = room.polygon.reduce((s,p)=>s+p.x,0)/room.polygon.length;
-    const cy = room.polygon.reduce((s,p)=>s+p.y,0)/room.polygon.length;
+    const cx = r.polygon.reduce((s,p)=>s+p.x,0)/r.polygon.length;
+    const cy = r.polygon.reduce((s,p)=>s+p.y,0)/r.polygon.length;
     const sc = w2s(cx, cy);
-    ctx.fillStyle = 'rgba(0,0,0,.35)';
-    ctx.font = `${Math.max(9, Math.min(12, state.cam.scale/9))}px Inter,sans-serif`;
+    ctx.fillStyle = 'rgba(0,0,0,.32)';
+    ctx.font = `${Math.max(9,Math.min(12,state.cam.scale/8))}px Inter`;
     ctx.textAlign = 'center';
-    ctx.fillText(room.area.toFixed(1) + ' m²', sc.x, sc.y);
+    ctx.fillText(r.area.toFixed(1) + ' m²', sc.x, sc.y);
   }
 }
 
-function drawWalls2D() {
+function drawWalls() {
   for (const w of state.walls) {
     const s = w2s(w.start.x, w.start.y);
-    const e = w2s(w.end.x, w.end.y);
+    const e = w2s(w.end.x,   w.end.y);
     const dx = e.x-s.x, dy = e.y-s.y;
     const len = Math.hypot(dx, dy) || 1;
     const tk = w.thickness * state.cam.scale;
@@ -409,361 +433,128 @@ function drawWalls2D() {
 
     const sel = state.selected === w.id;
     const hov = state.hovered === w.id;
-    const col = WALL_COLOR[w.type] || WALL_COLOR.exterior;
+    const col = WCOLOR[w.type] || WCOLOR.exterior;
 
-    // Wall fill
     ctx.beginPath();
     ctx.moveTo(s.x+nx, s.y+ny); ctx.lineTo(e.x+nx, e.y+ny);
     ctx.lineTo(e.x-nx, e.y-ny); ctx.lineTo(s.x-nx, s.y-ny);
     ctx.closePath();
 
     if (sel) {
-      // Selection: blue glow
-      ctx.shadowColor = 'rgba(37,99,235,.4)'; ctx.shadowBlur = 8;
+      ctx.shadowColor = 'rgba(37,99,235,.35)'; ctx.shadowBlur = 10;
       ctx.fillStyle = '#dce8ff'; ctx.fill();
       ctx.shadowBlur = 0;
       ctx.strokeStyle = '#2563eb'; ctx.lineWidth = 2; ctx.stroke();
-    } else if (hov) {
-      ctx.fillStyle = '#e8e4dc'; ctx.fill();
-      ctx.strokeStyle = col; ctx.lineWidth = 1.5; ctx.stroke();
     } else {
-      ctx.fillStyle = w.type === 'exterior' ? '#d4cfc8' : '#dedbd4';
+      ctx.fillStyle = hov ? '#e8e4dc' : (w.type === 'exterior' ? '#d4cfc8' : '#dedbd4');
       ctx.fill();
-      ctx.strokeStyle = col; ctx.lineWidth = w.type === 'exterior' ? 2 : 1.5; ctx.stroke();
+      ctx.strokeStyle = col;
+      ctx.lineWidth = w.type === 'exterior' ? 2 : 1.5;
+      ctx.stroke();
+      if (hov) { ctx.strokeStyle = col; ctx.lineWidth = 2; ctx.stroke(); }
     }
 
-    // Roof driver marker
-    if (w.roofDriver) {
-      const mid = w2s((w.start.x+w.end.x)/2, (w.start.y+w.end.y)/2);
-      ctx.fillStyle = '#2563eb'; ctx.font = 'bold 10px Inter';
-      ctx.textAlign = 'center';
-      ctx.fillText('▲', mid.x, mid.y - tk/2 - 5);
-    }
-
-    // Length dimension
-    if (state.cam.scale > 45) {
-      const length = ptDist(w.start, w.end);
-      if (length > 0.25) {
-        const mid = { x: (s.x+e.x)/2, y: (s.y+e.y)/2 };
+    // Length label
+    if (state.cam.scale > 40) {
+      const length = dist(w.start, w.end);
+      if (length > 0.2) {
+        const mid = { x:(s.x+e.x)/2, y:(s.y+e.y)/2 };
         const angle = Math.atan2(dy, dx);
         ctx.save();
         ctx.translate(mid.x, mid.y); ctx.rotate(angle);
-        ctx.fillStyle = sel ? '#2563eb' : 'rgba(0,0,0,.5)';
-        ctx.font = `${Math.max(9, Math.min(11, state.cam.scale/9))}px Inter`;
+        ctx.fillStyle = sel ? '#2563eb' : 'rgba(0,0,0,.45)';
+        ctx.font = `${Math.max(9,Math.min(11,state.cam.scale/9))}px Inter`;
         ctx.textAlign = 'center';
-        ctx.fillText(length.toFixed(2) + 'm', 0, -tk/2 - 3);
+        ctx.fillText(length.toFixed(2)+'m', 0, -tk/2-3);
         ctx.restore();
       }
     }
   }
 }
 
-function drawPreview2D() {
+function drawPreview() {
   if (!state.chainStart || state.tool !== 'wall') return;
-  const cur = getSnappedMouse();
-  if (!cur) return;
+  const cur = getSnapped();
   const s = w2s(state.chainStart.x, state.chainStart.y);
   const e = w2s(cur.x, cur.y);
   const dx = e.x-s.x, dy = e.y-s.y;
   const len = Math.hypot(dx, dy) || 1;
-  const tk = 0.25 * state.cam.scale;
+  const tk = state.thickness * state.cam.scale;
   const nx = -dy/len * tk/2, ny = dx/len * tk/2;
 
-  // Ghost wall
   ctx.beginPath();
   ctx.moveTo(s.x+nx, s.y+ny); ctx.lineTo(e.x+nx, e.y+ny);
   ctx.lineTo(e.x-nx, e.y-ny); ctx.lineTo(s.x-nx, s.y-ny);
   ctx.closePath();
-  ctx.fillStyle = 'rgba(37,99,235,.1)'; ctx.fill();
+  ctx.fillStyle = 'rgba(37,99,235,.09)'; ctx.fill();
   ctx.strokeStyle = '#2563eb'; ctx.lineWidth = 1.5;
-  ctx.setLineDash([5, 3]); ctx.stroke(); ctx.setLineDash([]);
+  ctx.setLineDash([5,3]); ctx.stroke(); ctx.setLineDash([]);
 
-  // Dimension
-  const d = ptDist(state.chainStart, cur);
-  const mid = { x: (s.x+e.x)/2, y: (s.y+e.y)/2 };
-  const angle = Math.atan2(dy, dx);
-  ctx.save();
-  ctx.translate(mid.x, mid.y); ctx.rotate(angle);
-  // Background pill
-  const txt = d.toFixed(2) + ' m';
-  ctx.font = 'bold 12px Inter';
-  const tw = ctx.measureText(txt).width + 12;
-  ctx.fillStyle = '#2563eb'; ctx.beginPath();
-  if (ctx.roundRect) ctx.roundRect(-tw/2, -tk/2-18, tw, 18, 4);
-  else ctx.rect(-tw/2, -tk/2-18, tw, 18);
-  ctx.fill();
-  ctx.fillStyle = '#fff'; ctx.textAlign = 'center';
-  ctx.fillText(txt, 0, -tk/2 - 5);
-  ctx.restore();
+  // Dimension pill
+  const d = dist(state.chainStart, cur);
+  if (d > 0.04) {
+    const mid = { x:(s.x+e.x)/2, y:(s.y+e.y)/2 };
+    const angle = Math.atan2(dy, dx);
+    ctx.save();
+    ctx.translate(mid.x, mid.y); ctx.rotate(angle);
+    const txt = d.toFixed(2) + ' m';
+    ctx.font = 'bold 11px Inter';
+    const tw = ctx.measureText(txt).width + 14;
+    ctx.fillStyle = '#2563eb'; ctx.beginPath();
+    if (ctx.roundRect) ctx.roundRect(-tw/2, -tk/2-17, tw, 16, 3);
+    else ctx.rect(-tw/2, -tk/2-17, tw, 16);
+    ctx.fill();
+    ctx.fillStyle = '#fff'; ctx.textAlign = 'center';
+    ctx.fillText(txt, 0, -tk/2-5);
+    ctx.restore();
+  }
 }
 
-function drawEndpoints2D() {
-  const endpointSet = new Map();
+function drawEndpoints() {
+  const epMap = new Map();
   for (const w of state.walls) {
     for (const p of [w.start, w.end]) {
       const k = `${Math.round(p.x*100)}_${Math.round(p.y*100)}`;
-      endpointSet.set(k, { pt: p, count: (endpointSet.get(k)?.count||0)+1 });
+      epMap.set(k, { pt:p, cnt:(epMap.get(k)?.cnt||0)+1 });
     }
   }
-  for (const { pt, count } of endpointSet.values()) {
+  for (const { pt, cnt } of epMap.values()) {
     const s = w2s(pt.x, pt.y);
-    ctx.beginPath(); ctx.arc(s.x, s.y, count > 1 ? 4.5 : 3, 0, Math.PI*2);
-    ctx.fillStyle = count > 1 ? '#1a1714' : '#b0a99c'; ctx.fill();
-    if (count > 1) { ctx.strokeStyle = '#f5f0e8'; ctx.lineWidth = 1.5; ctx.stroke(); }
+    ctx.beginPath(); ctx.arc(s.x, s.y, cnt>1?4.5:3, 0, Math.PI*2);
+    ctx.fillStyle = cnt>1 ? '#1a1714' : '#b0a99c'; ctx.fill();
+    if (cnt > 1) { ctx.strokeStyle = '#f5f0e8'; ctx.lineWidth = 1.5; ctx.stroke(); }
   }
 
-  // Snap ring
-  const cur = getSnappedMouse();
-  if (cur && state.tool === 'wall') {
-    const near = findNearEndpoint(cur.x, cur.y);
+  const cur = getSnapped();
+  if (state.tool === 'wall') {
+    const near = nearEndpoint(cur.x, cur.y);
     if (near) {
       const s = w2s(near.x, near.y);
-      ctx.beginPath(); ctx.arc(s.x, s.y, 10, 0, Math.PI*2);
+      ctx.beginPath(); ctx.arc(s.x, s.y, 11, 0, Math.PI*2);
       ctx.strokeStyle = '#2563eb'; ctx.lineWidth = 2; ctx.stroke();
     }
-    // Cross-hair at snapped point
     const sc = w2s(cur.x, cur.y);
     ctx.strokeStyle = '#2563eb'; ctx.lineWidth = 1.5;
-    ctx.beginPath(); ctx.moveTo(sc.x-6, sc.y); ctx.lineTo(sc.x+6, sc.y); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(sc.x, sc.y-6); ctx.lineTo(sc.x, sc.y+6); ctx.stroke();
-  }
-}
-
-// ═══════════════════════════════════════════════════════════════
-// THREE.JS 3D SETUP
-// ═══════════════════════════════════════════════════════════════
-const view3d  = document.getElementById('view3d');
-const canvas3d = document.getElementById('fp3d');
-
-const renderer = new THREE.WebGLRenderer({ canvas: canvas3d, antialias: true, alpha: false });
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-renderer.shadowMap.enabled = true;
-renderer.shadowMap.type    = THREE.PCFSoftShadowMap;
-renderer.toneMapping       = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.1;
-renderer.outputColorSpace  = THREE.SRGBColorSpace;
-
-const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x1a1a18);
-scene.fog = new THREE.Fog(0x1a1a18, 40, 100);
-
-const camera3d = new THREE.PerspectiveCamera(42, 1, 0.1, 500);
-camera3d.position.set(14, 10, 14);
-camera3d.lookAt(0, 1, 0);
-
-const controls = new OrbitControls(camera3d, canvas3d);
-controls.enableDamping  = true;
-controls.dampingFactor  = 0.07;
-controls.minDistance    = 2;
-controls.maxDistance    = 60;
-controls.maxPolarAngle  = Math.PI / 2.05;
-controls.target.set(0, 1, 0);
-
-// Lights
-const hemi = new THREE.HemisphereLight(0xfff8ec, 0x2a2820, 0.7);
-scene.add(hemi);
-
-const sun = new THREE.DirectionalLight(0xfff5e0, 1.2);
-sun.position.set(15, 22, 12);
-sun.castShadow = true;
-sun.shadow.mapSize.set(2048, 2048);
-sun.shadow.camera.near = 0.5; sun.shadow.camera.far = 80;
-sun.shadow.camera.left = -20; sun.shadow.camera.right = 20;
-sun.shadow.camera.top  =  20; sun.shadow.camera.bottom = -20;
-sun.shadow.bias = -0.0008;
-scene.add(sun);
-
-const fill = new THREE.DirectionalLight(0xc8d8ff, 0.4);
-fill.position.set(-10, 6, -8);
-scene.add(fill);
-
-scene.add(new THREE.AmbientLight(0xffffff, 0.35));
-
-// Ground
-const groundGeo = new THREE.PlaneGeometry(120, 120, 60, 60);
-const groundMat = new THREE.MeshStandardMaterial({ color: 0x1e1e1c, roughness: 1, metalness: 0 });
-const ground = new THREE.Mesh(groundGeo, groundMat);
-ground.rotation.x = -Math.PI / 2;
-ground.position.y = -0.005;
-ground.receiveShadow = true;
-scene.add(ground);
-
-// Grid helper on ground
-const gridHelper = new THREE.GridHelper(40, 40, 0x2a2a28, 0x252523);
-gridHelper.position.y = 0.001;
-scene.add(gridHelper);
-
-// Materials
-const wallMat   = new THREE.MeshStandardMaterial({ color: 0xf7f3ee, roughness: 0.88, metalness: 0 });
-const selMat    = new THREE.MeshStandardMaterial({ color: 0xd0deff, roughness: 0.85, metalness: 0, emissive: 0x1030a0, emissiveIntensity: 0.08 });
-const floorMat  = new THREE.MeshStandardMaterial({ color: 0xe8dfd4, roughness: 0.95, metalness: 0 });
-const roofMat   = new THREE.MeshStandardMaterial({ color: 0xd4c8b0, roughness: 0.9, metalness: 0, side: THREE.DoubleSide });
-
-// Groups
-const wallGroup  = new THREE.Group(); scene.add(wallGroup);
-const floorGroup = new THREE.Group(); scene.add(floorGroup);
-const roofGroup  = new THREE.Group(); scene.add(roofGroup);
-
-const wallMeshMap = {};
-
-// ── BUILD WALL MESH ──────────────────────────────────────────────
-function buildWallMesh3D(wall) {
-  const ax = wall.start.x, ay = wall.start.y;
-  const bx = wall.end.x,   by = wall.end.y;
-  const dx = bx - ax, dy = by - ay;
-  const length = Math.hypot(dx, dy);
-  if (length < 0.01) return null;
-
-  const wx = dx/length, wy = dy/length; // wall direction
-  const px = -wy, py =  wx;             // perpendicular
-
-  // Top profile points [x_along_wall, z_height]
-  let tps = wall.topPoints && wall.topPoints.length >= 2
-    ? wall.topPoints.map(p => ({ x: p.x, z: p.z }))
-    : [{ x: 0, z: wall.heightL }, { x: length, z: wall.heightR }];
-
-  const thick = wall.thickness;
-
-  // Build custom BufferGeometry
-  const pos = [], nrm = [], idx = [];
-  const n = tps.length;
-
-  // Helper: world position from (along-wall, height, depth)
-  const V = (al, ht, dp) => [
-    ax + wx * al + px * dp,
-    ht,
-    -(ay + wy * al + py * dp),
-  ];
-
-  // 8 vertices per profile segment: front-bottom, front-top, back-bottom, back-top
-  let vIdx = 0;
-  function addFace(a, b, c, d) {
-    // a, b, c, d are vertex arrays [x,y,z]
-    const base = vIdx;
-    pos.push(...a, ...b, ...c, ...d);
-    // Normal computation (simple cross product)
-    const AB = [b[0]-a[0], b[1]-a[1], b[2]-a[2]];
-    const AC = [c[0]-a[0], c[1]-a[1], c[2]-a[2]];
-    const n = [AB[1]*AC[2]-AB[2]*AC[1], AB[2]*AC[0]-AB[0]*AC[2], AB[0]*AC[1]-AB[1]*AC[0]];
-    const nl = Math.hypot(...n) || 1;
-    const nn = n.map(v=>v/nl);
-    for (let i = 0; i < 4; i++) nrm.push(...nn);
-    idx.push(base, base+1, base+2, base+1, base+3, base+2);
-    vIdx += 4;
-  }
-
-  // Front face (outside) + back face segments
-  for (let i = 0; i < n - 1; i++) {
-    const x0 = tps[i].x, z0 = tps[i].z;
-    const x1 = tps[i+1].x, z1 = tps[i+1].z;
-    // Front face
-    addFace(V(x0,0,0), V(x1,0,0), V(x0,z0,0), V(x1,z1,0));
-    // Back face (reversed winding)
-    addFace(V(x1,0,thick), V(x0,0,thick), V(x1,z1,thick), V(x0,z0,thick));
-    // Top face
-    addFace(V(x0,z0,0), V(x1,z1,0), V(x0,z0,thick), V(x1,z1,thick));
-    // Bottom face
-    addFace(V(x1,0,0), V(x0,0,0), V(x1,0,thick), V(x0,0,thick));
-  }
-  // Left cap
-  addFace(V(tps[0].x,0,thick), V(tps[0].x,0,0), V(tps[0].x,tps[0].z,thick), V(tps[0].x,tps[0].z,0));
-  // Right cap
-  const last = n - 1;
-  addFace(V(tps[last].x,0,0), V(tps[last].x,0,thick), V(tps[last].x,tps[last].z,0), V(tps[last].x,tps[last].z,thick));
-
-  const geo = new THREE.BufferGeometry();
-  geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
-  geo.setAttribute('normal',   new THREE.Float32BufferAttribute(nrm, 3));
-  geo.setIndex(idx);
-  geo.computeVertexNormals();
-
-  const mat = state.selected === wall.id ? selMat : wallMat;
-  const mesh = new THREE.Mesh(geo, mat.clone());
-  mesh.castShadow   = true;
-  mesh.receiveShadow = true;
-  mesh.userData.wallId = wall.id;
-  return mesh;
-}
-
-// ── BUILD FLOOR MESH ─────────────────────────────────────────────
-function buildFloorMesh3D(room) {
-  if (!room.polygon || room.polygon.length < 3) return null;
-  const shape = new THREE.Shape();
-  shape.moveTo(room.polygon[0].x, -room.polygon[0].y);
-  for (let i = 1; i < room.polygon.length; i++) {
-    shape.lineTo(room.polygon[i].x, -room.polygon[i].y);
-  }
-  shape.closePath();
-  const geo  = new THREE.ShapeGeometry(shape);
-  const mat  = floorMat.clone();
-  const mesh = new THREE.Mesh(geo, mat);
-  mesh.rotation.x = -Math.PI / 2;
-  mesh.position.y = 0.002;
-  mesh.receiveShadow = true;
-  return mesh;
-}
-
-// ── UPDATE 3D SCENE ──────────────────────────────────────────────
-function update3D() {
-  wallGroup.clear();
-  floorGroup.clear();
-  roofGroup.clear();
-  Object.keys(wallMeshMap).forEach(k => delete wallMeshMap[k]);
-
-  for (const wall of state.walls) {
-    const mesh = buildWallMesh3D(wall);
-    if (mesh) {
-      wallMeshMap[wall.id] = mesh;
-      wallGroup.add(mesh);
-    }
-  }
-
-  for (const room of state.rooms) {
-    const mesh = buildFloorMesh3D(room);
-    if (mesh) floorGroup.add(mesh);
-  }
-
-  buildRoof3D();
-}
-
-function buildRoof3D() {
-  const drivers = state.walls.filter(w => w.roofDriver);
-  if (!drivers.length) return;
-
-  for (const w of drivers) {
-    const tps = w.topPoints && w.topPoints.length >= 2 ? w.topPoints : [{ x: 0, z: w.heightL }, { x: ptDist(w.start, w.end), z: w.heightR }];
-    const dx = w.end.x - w.start.x, dy = w.end.y - w.start.y;
-    const len = Math.hypot(dx, dy) || 1;
-    const wx = dx/len, wy = dy/len;
-
-    const roofPts = [];
-    for (const tp of tps) {
-      roofPts.push(new THREE.Vector3(
-        w.start.x + wx * tp.x,
-        tp.z,
-        -(w.start.y + wy * tp.x)
-      ));
-    }
-    if (roofPts.length >= 2) {
-      const geo  = new THREE.BufferGeometry().setFromPoints(roofPts);
-      const line = new THREE.Line(geo, new THREE.LineBasicMaterial({ color: 0x2563eb, linewidth: 2 }));
-      roofGroup.add(line);
+    ctx.beginPath(); ctx.moveTo(sc.x-7,sc.y); ctx.lineTo(sc.x+7,sc.y); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(sc.x,sc.y-7); ctx.lineTo(sc.x,sc.y+7); ctx.stroke();
+    if (state.chainStart) {
+      const cs = w2s(state.chainStart.x, state.chainStart.y);
+      ctx.beginPath(); ctx.arc(cs.x, cs.y, 5, 0, Math.PI*2);
+      ctx.fillStyle = '#2563eb'; ctx.fill();
     }
   }
 }
 
-// ═══════════════════════════════════════════════════════════════
-// ROOM DETECTION
-// ═══════════════════════════════════════════════════════════════
+// ── ROOM DETECTION ────────────────────────────────────────────────
 function detectRooms() {
-  const SNAP = 0.08;
+  const SNAP = 0.12;
   const walls = state.walls;
   state.rooms = [];
   if (walls.length < 3) return;
 
   const adj = {};
   const ptMap = {};
-  const ptKey = p => `${Math.round(p.x*50)}_${Math.round(p.y*50)}`;
+  const ptKey = p => `${Math.round(p.x*40)}_${Math.round(p.y*40)}`;
 
   function addPt(p) {
     const k = ptKey(p); ptMap[k] = p;
@@ -773,9 +564,12 @@ function detectRooms() {
 
   for (let i = 0; i < walls.length; i++) {
     for (let j = i+1; j < walls.length; j++) {
-      const pairs = [[walls[i].end, walls[j].start],[walls[i].end, walls[j].end],[walls[i].start, walls[j].start],[walls[i].start, walls[j].end]];
+      const pairs = [
+        [walls[i].end, walls[j].start], [walls[i].end, walls[j].end],
+        [walls[i].start, walls[j].start], [walls[i].start, walls[j].end],
+      ];
       for (const [a, b] of pairs) {
-        if (ptDist(a, b) < SNAP) {
+        if (dist(a, b) < SNAP) {
           const ka = addPt(a), kb = addPt(b);
           adj[ka].add(kb); adj[kb].add(ka);
         }
@@ -784,16 +578,16 @@ function detectRooms() {
     addPt(walls[i].start); addPt(walls[i].end);
   }
 
-  const cycles = []; const seen = new Set();
+  const cycles = [], seen = new Set();
   function dfs(start, cur, path, depth) {
-    if (depth > 10) return;
-    for (const next of (adj[cur] || [])) {
-      if (next === start && path.length >= 3) {
+    if (depth > 12) return;
+    for (const nxt of (adj[cur]||[])) {
+      if (nxt === start && path.length >= 3) {
         const sig = [...path].sort().join(',');
         if (!seen.has(sig)) { seen.add(sig); cycles.push([...path]); }
         continue;
       }
-      if (!path.includes(next)) { path.push(next); dfs(start, next, path, depth+1); path.pop(); }
+      if (!path.includes(nxt)) { path.push(nxt); dfs(start,nxt,path,depth+1); path.pop(); }
     }
   }
   for (const k of Object.keys(adj)) {
@@ -801,15 +595,14 @@ function detectRooms() {
   }
 
   const rooms = cycles
-    .map(c => ({ polygon: c.map(k=>({...ptMap[k]})), area: Math.abs(polyArea(c.map(k=>ptMap[k]))) }))
-    .filter(r => r.area > 0.5)
+    .map(c => ({ polygon:c.map(k=>({...ptMap[k]})), area:Math.abs(polyArea(c.map(k=>ptMap[k]))) }))
+    .filter(r => r.area > 0.4)
     .sort((a,b) => a.area - b.area)
-    .slice(0, 15);
+    .slice(0, 16);
 
-  // Deduplicate (same area ≈ same room)
   const unique = [];
   for (const r of rooms) {
-    if (!unique.some(u => Math.abs(u.area - r.area) < 0.1)) unique.push(r);
+    if (!unique.some(u => Math.abs(u.area - r.area) < 0.08)) unique.push(r);
   }
   state.rooms = unique;
 }
@@ -817,24 +610,36 @@ function detectRooms() {
 function polyArea(pts) {
   let a = 0;
   for (let i = 0, j = pts.length-1; i < pts.length; j=i++) {
-    a += (pts[j].x+pts[i].x)*(pts[j].y-pts[i].y);
+    a += (pts[j].x+pts[i].x) * (pts[j].y-pts[i].y);
   }
-  return a/2;
+  return a / 2;
 }
 
-// ═══════════════════════════════════════════════════════════════
-// WALL OPERATIONS
-// ═══════════════════════════════════════════════════════════════
+function segDist(p, a, b) {
+  const dx=b.x-a.x, dy=b.y-a.y, l2=dx*dx+dy*dy;
+  if (!l2) return dist(p,a);
+  const t = Math.max(0, Math.min(1, ((p.x-a.x)*dx+(p.y-a.y)*dy)/l2));
+  return dist(p, {x:a.x+t*dx, y:a.y+t*dy});
+}
+
+// ── WALL CRUD ─────────────────────────────────────────────────────
 function pushUndo() {
-  state.undoStack.push(JSON.stringify({ walls: state.walls, chainStart: state.chainStart }));
-  if (state.undoStack.length > 40) state.undoStack.shift();
-  state.redoStack = [];
+  state.undoStack.push(JSON.stringify(state.walls));
+  if (state.undoStack.length > 50) state.undoStack.shift();
 }
 
-function createWall(start, end) {
-  if (ptDist(start, end) < 0.04) return null;
+function createWall(s, e) {
+  if (dist(s, e) < 0.05) return null;
   pushUndo();
-  const w = { id: newId(), start:{...start}, end:{...end}, heightL:2.4, heightR:2.4, thickness:0.248, type:'exterior', roofDriver:false, topPoints:[] };
+  const w = {
+    id: newId(),
+    start: {...s}, end: {...e},
+    heightL: 2.4, heightR: 2.4,
+    thickness: state.thickness,
+    type: state.wallType,
+    roofDriver: false,
+    topPoints: [],
+  };
   state.walls.push(w);
   afterWallChange();
   return w;
@@ -845,176 +650,157 @@ function deleteSelected() {
   pushUndo();
   state.walls = state.walls.filter(w => w.id !== state.selected);
   state.selected = null;
+  closePropBar();
   afterWallChange();
-  renderPropBar();
 }
 
 function afterWallChange() {
   detectRooms();
   redraw();
-  update3D();
+  if (window._update3D) window._update3D(state.walls, state.rooms);
 }
 
+// ── UNDO ──────────────────────────────────────────────────────────
 function undo() {
   if (!state.undoStack.length) return;
-  state.redoStack.push(JSON.stringify({ walls: state.walls }));
-  const prev = JSON.parse(state.undoStack.pop());
-  state.walls = prev.walls;
+  state.walls = JSON.parse(state.undoStack.pop());
   state.selected = null;
+  closePropBar();
   afterWallChange();
-  renderPropBar();
 }
 
-// ═══════════════════════════════════════════════════════════════
-// PROPERTIES BAR
-// ═══════════════════════════════════════════════════════════════
+// ── PROPERTIES BAR ────────────────────────────────────────────────
 function renderPropBar() {
-  const bar = document.getElementById('propbar');
-  const fields = document.getElementById('prop-fields');
+  const bar  = document.getElementById('propbar');
+  const flds = document.getElementById('prop-fields');
   const wall = state.walls.find(w => w.id === state.selected);
   if (!wall) { bar.classList.remove('open'); return; }
   bar.classList.add('open');
-  fields.innerHTML = `
-    <div class="pf"><div class="pf-l">Veggtype</div>
-    <select class="pf-sel" onchange="sp('type',this.value)">
-      ${['exterior:Yttervegg','interior:Innervegg','load_bearing:Bærende','partition:Skillevegg']
-        .map(s => { const [v,l]=s.split(':'); return `<option value="${v}" ${wall.type===v?'selected':''}>${l}</option>`; }).join('')}
-    </select></div>
-    <div class="pf"><div class="pf-l">Høyde V (m)</div><input class="pf-in" type="number" step=".1" min=".5" max="20" value="${wall.heightL.toFixed(2)}" onchange="sp('heightL',+this.value)"></div>
-    <div class="pf"><div class="pf-l">Høyde H (m)</div><input class="pf-in" type="number" step=".1" min=".5" max="20" value="${wall.heightR.toFixed(2)}" onchange="sp('heightR',+this.value)"></div>
-    <div class="pf"><div class="pf-l">Tykkelse (mm)</div><input class="pf-in" type="number" step="10" min="50" max="800" value="${Math.round(wall.thickness*1000)}" onchange="sp('thickness',+this.value/1000)"></div>
-    <label class="pf-chk pf"><input type="checkbox" ${wall.roofDriver?'checked':''} onchange="sp('roofDriver',this.checked)"> Takdriver</label>
-    <div class="pf" style="color:var(--g500);font-size:11px">Lengde: ${ptDist(wall.start,wall.end).toFixed(2)} m</div>
-    <button class="prop-del" onclick="deleteSelected()">Slett</button>
-    <button class="prop-close" onclick="closePropBar()">✕</button>`;
+  const thickOpts = [10,15,20,25].map(cm => {
+    const v = cm/100;
+    const act = Math.abs(wall.thickness - v) < 0.001;
+    return `<button class="pt-opt${act?' active':''}" onclick="FP.setProp('thickness',${v})">${cm}</button>`;
+  }).join('');
+  flds.innerHTML = `
+    <div class="pf">
+      <div class="pf-l">Veggtype</div>
+      <select class="pf-sel" onchange="FP.setProp('type',this.value)">
+        ${[['exterior','Yttervegg'],['interior','Innervegg'],['load_bearing','Bærende'],['partition','Skillevegg']]
+          .map(([v,l]) => `<option value="${v}"${wall.type===v?' selected':''}>${l}</option>`).join('')}
+      </select>
+    </div>
+    <div class="pf">
+      <div class="pf-l">Høyde V (m)</div>
+      <input class="pf-in" type="number" step=".05" min=".5" max="20" value="${wall.heightL.toFixed(2)}" onchange="FP.setProp('heightL',+this.value)">
+    </div>
+    <div class="pf">
+      <div class="pf-l">Høyde H (m)</div>
+      <input class="pf-in" type="number" step=".05" min=".5" max="20" value="${wall.heightR.toFixed(2)}" onchange="FP.setProp('heightR',+this.value)">
+    </div>
+    <div class="pf">
+      <div class="pf-l">Tykkelse (cm)</div>
+      <div class="pf-thick-row">${thickOpts}<input class="pt-opt" type="number" step="1" min="5" max="80" value="${Math.round(wall.thickness*100)}" style="width:44px;text-align:center" onchange="FP.setProp('thickness',+this.value/100)"></div>
+    </div>
+    <div class="prop-len">📏 ${dist(wall.start,wall.end).toFixed(2)} m</div>
+    <button class="prop-del" onclick="FP.deleteSelected()">Slett</button>
+    <button class="prop-close" onclick="FP.closePropBar()">✕</button>`;
 }
 
-window.sp = (key, val) => {
-  const wall = state.walls.find(w => w.id === state.selected);
-  if (!wall) return;
-  wall[key] = val;
-  // Auto-update topPoints if heights changed and topPoints is simple
-  if ((key === 'heightL' || key === 'heightR') && wall.topPoints.length === 0) {
-    // no-op, let rendering use heightL/heightR directly
-  }
-  afterWallChange();
-};
+function closePropBar() {
+  state.selected = null;
+  document.getElementById('propbar').classList.remove('open');
+  document.getElementById('prop-fields').innerHTML = '';
+  redraw();
+  if (window._update3D) window._update3D(state.walls, state.rooms);
+}
 
-// ═══════════════════════════════════════════════════════════════
-// TOOLS
-// ═══════════════════════════════════════════════════════════════
-window.setTool = (t) => {
+// ── TOOLS / UI ────────────────────────────────────────────────────
+function setTool(t) {
   state.tool = t;
-  if (t !== 'wall') { state.chainStart = null; }
+  if (t !== 'wall') state.chainStart = null;
   document.querySelectorAll('.tbtn').forEach(b => b.classList.remove('active'));
-  document.getElementById('tb-' + t)?.classList.add('active');
-  const names = { wall:'Tegn vegg', select:'Velg objekt', pan:'Flytt/pan' };
-  document.getElementById('sb-tool').textContent = names[t]||t;
-  view2d.style.cursor = t==='wall'?'crosshair':t==='select'?'default':'grab';
+  document.getElementById('tb-'+t)?.classList.add('active');
+  document.getElementById('sb-tool').textContent = {wall:'Tegn vegg',select:'Velg objekt',pan:'Pan/flytt'}[t]||t;
+  cv.style.cursor = t==='wall'?'crosshair':t==='select'?'default':'grab';
   redraw();
-};
+}
 
-window.confirmClear = () => {
-  if (!state.walls.length || confirm('Tøm hele tegningen?')) {
-    pushUndo(); state.walls=[]; state.rooms=[]; state.selected=null; state.chainStart=null;
-    afterWallChange(); renderPropBar();
-  }
-};
+function setThickness(v) {
+  state.thickness = v;
+  document.querySelectorAll('.tkbtn').forEach(b => {
+    b.classList.toggle('active', Math.abs(+b.textContent/100 - v) < 0.001);
+  });
+}
 
-window.renamePlan = () => {
-  const v = prompt('Navn:', document.getElementById('plan-name').textContent);
-  if (v) document.getElementById('plan-name').textContent = v;
-};
+function setWallType(t) {
+  state.wallType = t;
+  document.querySelectorAll('.wtbtn').forEach(b => {
+    const bv = b.getAttribute('onclick').match(/'([^']+)'/)?.[1];
+    b.classList.toggle('active', bv === t);
+  });
+}
 
-window.fitView = () => {
-  const W = canvas2d.width, H = canvas2d.height;
-  if (!state.walls.length) { state.cam = {x:0,y:0,scale:80}; redraw(); return; }
-  let minX=Infinity,maxX=-Infinity,minY=Infinity,maxY=-Infinity;
-  for (const w of state.walls) for (const p of [w.start,w.end]) {
-    minX=Math.min(minX,p.x); maxX=Math.max(maxX,p.x);
-    minY=Math.min(minY,p.y); maxY=Math.max(maxY,p.y);
-  }
-  const rX=maxX-minX||10, rY=maxY-minY||10;
-  state.cam.scale = Math.min((W-80)/rX, (H-80)/rY);
-  state.cam.x = (minX+maxX)/2; state.cam.y = (minY+maxY)/2;
-  redraw();
-};
+function setSnap(v) { state.snapSize = v; redraw(); }
 
-window.resetCamera = () => {
-  camera3d.position.set(14, 10, 14);
-  controls.target.set(0, 1, 0);
-  controls.update();
-};
+function showLock() {
+  const el = document.getElementById('lock-badge');
+  el.textContent = state.lockAxis === 'h' ? '⟷  HORISONTAL' : '↕  VERTIKAL';
+  el.classList.add('show');
+}
 
-let topView = false;
-window.toggleTopView = () => {
-  topView = !topView;
-  if (topView) {
-    camera3d.position.set(0, 25, 0.01);
-    controls.target.set(0, 0, 0);
-  } else {
-    camera3d.position.set(14, 10, 14);
-    controls.target.set(0, 1, 0);
-  }
-  controls.update();
-};
-
-// ═══════════════════════════════════════════════════════════════
-// 2D EVENTS
-// ═══════════════════════════════════════════════════════════════
+// ── PAN / ZOOM ────────────────────────────────────────────────────
 let panStart = null;
 
-canvas2d.addEventListener('mousemove', e => {
-  const r = canvas2d.getBoundingClientRect();
+cv.addEventListener('mousemove', e => {
+  const r = cv.getBoundingClientRect();
   const w = s2w(e.clientX - r.left, e.clientY - r.top);
-  state.mouse = { wx: w.x, wy: w.y };
+  state.mouse = { wx:w.x, wy:w.y };
   document.getElementById('sb-coords').textContent = `${w.x.toFixed(2)}, ${w.y.toFixed(2)} m`;
 
-  if (state.tool === 'pan' && panStart) {
+  if (panStart) {
     state.cam.x -= (e.clientX - panStart.x) / state.cam.scale;
     state.cam.y += (e.clientY - panStart.y) / state.cam.scale;
-    panStart = { x: e.clientX, y: e.clientY };
+    panStart = { x:e.clientX, y:e.clientY };
   }
 
   if (state.tool === 'select') {
-    const raw = s2w(e.clientX - r.left, e.clientY - r.top);
     let found = null;
     for (const wall of state.walls) {
-      if (segDist(raw, wall.start, wall.end) < 0.28) { found = wall.id; break; }
+      if (segDist(w, wall.start, wall.end) < 0.28) { found = wall.id; break; }
     }
     state.hovered = found;
-    view2d.style.cursor = found ? 'pointer' : 'default';
+    cv.style.cursor = found ? 'pointer' : 'default';
   }
-
   redraw();
 });
 
-canvas2d.addEventListener('mousedown', e => {
+cv.addEventListener('mousedown', e => {
   if (e.button === 1 || (e.button === 0 && state.tool === 'pan')) {
-    panStart = { x: e.clientX, y: e.clientY };
-    view2d.style.cursor = 'grabbing';
+    panStart = { x:e.clientX, y:e.clientY };
+    cv.style.cursor = 'grabbing';
     e.preventDefault();
   }
 });
-canvas2d.addEventListener('mouseup', e => {
+
+cv.addEventListener('mouseup', () => {
   panStart = null;
-  if (state.tool === 'pan') view2d.style.cursor = 'grab';
+  if (state.tool === 'pan') cv.style.cursor = 'grab';
 });
 
-canvas2d.addEventListener('click', e => {
+cv.addEventListener('click', e => {
   if (e.button !== 0 || panStart) return;
-  const r  = canvas2d.getBoundingClientRect();
+  const r  = cv.getBoundingClientRect();
   const raw = s2w(e.clientX - r.left, e.clientY - r.top);
   let pt = snapPt(raw.x, raw.y);
-  const near = findNearEndpoint(pt.x, pt.y);
+  const near = nearEndpoint(pt.x, pt.y);
   pt = near || pt;
   if (state.lockAxis && state.chainStart) {
-    pt = state.lockAxis === 'h' ? { x: pt.x, y: state.chainStart.y } : { x: state.chainStart.x, y: pt.y };
+    pt = state.lockAxis === 'h' ? {x:pt.x, y:state.chainStart.y} : {x:state.chainStart.x, y:pt.y};
   }
 
   if (state.tool === 'wall') {
-    if (!state.chainStart) { state.chainStart = { ...pt }; }
-    else { const w = createWall(state.chainStart, pt); if (w) state.chainStart = { ...pt }; }
+    if (!state.chainStart) { state.chainStart = {...pt}; }
+    else { const w = createWall(state.chainStart, pt); if (w) state.chainStart = {...pt}; }
     redraw(); return;
   }
 
@@ -1025,48 +811,53 @@ canvas2d.addEventListener('click', e => {
     }
     state.selected = found;
     renderPropBar();
-    update3D();
+    if (window._update3D) window._update3D(state.walls, state.rooms);
     redraw();
   }
 });
 
-canvas2d.addEventListener('dblclick', () => {
+cv.addEventListener('dblclick', () => {
   if (state.tool === 'wall') { state.chainStart = null; redraw(); }
 });
 
-canvas2d.addEventListener('wheel', e => {
+cv.addEventListener('wheel', e => {
   e.preventDefault();
-  const r = canvas2d.getBoundingClientRect();
+  const r = cv.getBoundingClientRect();
   const sx = e.clientX - r.left, sy = e.clientY - r.top;
   const before = s2w(sx, sy);
-  state.cam.scale = Math.max(15, Math.min(600, state.cam.scale * (e.deltaY < 0 ? 1.15 : 0.87)));
+  const factor = e.deltaY < 0 ? 1.12 : 1/1.12;
+  state.cam.scale = Math.max(12, Math.min(600, state.cam.scale * factor));
   const after = s2w(sx, sy);
-  state.cam.x -= after.x - before.x;
-  state.cam.y -= after.y - before.y;
+  state.cam.x += before.x - after.x;
+  state.cam.y += before.y - after.y;
   redraw();
 }, { passive: false });
 
-// Keyboard
+// ── KEYBOARD ──────────────────────────────────────────────────────
 window.addEventListener('keydown', e => {
-  if (['INPUT','TEXTAREA','SELECT'].includes(e.target.tagName)) return;
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
   switch (e.key) {
     case 'w': case 'W': setTool('wall'); break;
-    case 's': case 'S': setTool('select'); break;
+    case 's': case 'S': if(!e.ctrlKey && !e.metaKey) setTool('select'); break;
     case 'p': case 'P': setTool('pan'); break;
+    case 'f': case 'F': fitView(); break;
     case 'Delete': case 'Backspace': deleteSelected(); break;
     case 'Escape':
       state.chainStart = null; state.selected = null;
-      renderPropBar(); redraw(); update3D(); break;
+      document.getElementById('propbar').classList.remove('open');
+      redraw();
+      if (window._update3D) window._update3D(state.walls, state.rooms);
+      break;
     case 'z': case 'Z':
       if (e.ctrlKey || e.metaKey) { e.preventDefault(); undo(); } break;
     case 'Shift':
-      if (!state.lockAxis) {
-        const cur = getSnappedMouse();
-        if (cur && state.chainStart) {
-          const adx = Math.abs(cur.x - state.chainStart.x);
-          const ady = Math.abs(cur.y - state.chainStart.y);
-          state.lockAxis = adx >= ady ? 'h' : 'v';
-        } else state.lockAxis = 'h';
+      if (!state.lockAxis && state.chainStart) {
+        const cur = getSnapped();
+        const adx = Math.abs(cur.x - state.chainStart.x);
+        const ady = Math.abs(cur.y - state.chainStart.y);
+        state.lockAxis = adx >= ady ? 'h' : 'v';
+      } else if (!state.lockAxis) {
+        state.lockAxis = 'h';
       }
       showLock(); redraw(); break;
     case 'ArrowLeft': case 'ArrowRight': state.lockAxis = 'h'; showLock(); redraw(); break;
@@ -1082,191 +873,426 @@ window.addEventListener('keyup', e => {
   }
 });
 
-function showLock() {
-  const badge = document.getElementById('lock-badge');
-  badge.textContent = state.lockAxis === 'h' ? '⟷  HORISONTAL' : '⟨ VERTIKAL ⟩';
-  badge.classList.add('show');
+// ── FIT VIEW ──────────────────────────────────────────────────────
+function fitView() {
+  const W = cv.width, H = cv.height;
+  if (!state.walls.length) { state.cam = {x:4,y:5,scale:72}; redraw(); return; }
+  let minX=Infinity,maxX=-Infinity,minY=Infinity,maxY=-Infinity;
+  for (const w of state.walls) for (const p of [w.start,w.end]) {
+    minX=Math.min(minX,p.x); maxX=Math.max(maxX,p.x);
+    minY=Math.min(minY,p.y); maxY=Math.max(maxY,p.y);
+  }
+  const rX=maxX-minX||8, rY=maxY-minY||8;
+  const pad = 120;
+  state.cam.scale = Math.min((W-pad)/rX, (H-pad-60)/rY);
+  state.cam.x = (minX+maxX)/2; state.cam.y = (minY+maxY)/2;
+  redraw();
 }
 
-function segDist(p, a, b) {
-  const dx = b.x-a.x, dy = b.y-a.y;
-  const l2 = dx*dx+dy*dy;
-  if (!l2) return ptDist(p, a);
-  const t = Math.max(0, Math.min(1, ((p.x-a.x)*dx+(p.y-a.y)*dy)/l2));
-  return ptDist(p, { x:a.x+t*dx, y:a.y+t*dy });
-}
-
-// ═══════════════════════════════════════════════════════════════
-// EXPORT / IMPORT
-// ═══════════════════════════════════════════════════════════════
-window.doExport = () => {
+// ── EXPORT / IMPORT ───────────────────────────────────────────────
+function doExport() {
   const doc = {
-    slimbim_version: '1.0.0',
+    slimbim_version:'1.0.0',
     created_at: new Date().toISOString(),
-    created_by: 'placely-floorplanner-v1',
+    created_by: 'placely-floorplanner-v2',
     property: {
-      id: 'prop_' + Date.now(), type: 'property',
+      id:'prop_'+Date.now(), type:'property',
       address: document.getElementById('plan-name').textContent,
       buildings: [{
-        id: 'bygg_001', type: 'building', version_status: 'proposed',
+        id:'bygg_001', type:'building', version_status:'proposed',
         floors: [{
-          id: 'etg_01', type: 'floor', level_index: 0, floor_type: 'ground',
+          id:'etg_01', type:'floor', level_index:0, floor_type:'ground',
           bra_m2: state.rooms.reduce((s,r)=>s+r.area,0)||null,
           walls: state.walls.map(w => ({
-            id: w.id, type: 'wall',
-            start: [+w.start.x.toFixed(4), +w.start.y.toFixed(4), 0],
-            end:   [+w.end.x.toFixed(4),   +w.end.y.toFixed(4),   0],
-            height_left_m: w.heightL, height_right_m: w.heightR,
-            thickness_m: w.thickness, wall_type: w.type,
-            is_roof_driver: w.roofDriver,
+            id:w.id, type:'wall',
+            start:[+w.start.x.toFixed(4),+w.start.y.toFixed(4),0],
+            end:  [+w.end.x.toFixed(4),  +w.end.y.toFixed(4),  0],
+            height_left_m:w.heightL, height_right_m:w.heightR,
+            thickness_m:w.thickness, wall_type:w.type,
+            is_roof_driver:w.roofDriver,
             top_points: w.topPoints.length
-              ? w.topPoints.map(p => ({ x_m: p.x, z_m: p.z }))
-              : [{ x_m: 0, z_m: w.heightL }, { x_m: +ptDist(w.start,w.end).toFixed(4), z_m: w.heightR }],
-            source_info: { source: 'placely_floorplanner', confidence: 1.0 },
+              ? w.topPoints.map(p=>({x_m:p.x,z_m:p.z}))
+              : [{x_m:0,z_m:w.heightL},{x_m:+dist(w.start,w.end).toFixed(4),z_m:w.heightR}],
           })),
-          rooms: state.rooms.map((r,i) => ({
-            id: 'room_' + i, type: 'room',
-            area_m2: +r.area.toFixed(2),
-          })),
+          rooms: state.rooms.map((r,i) => ({ id:'room_'+i, type:'room', area_m2:+r.area.toFixed(2) })),
         }],
       }],
     },
   };
-  const blob = new Blob([JSON.stringify(doc, null, 2)], { type: 'application/json' });
-  const a = Object.assign(document.createElement('a'), { href: URL.createObjectURL(blob), download: 'plantegning_slimbim.json' });
-  a.click();
-};
+  const blob = new Blob([JSON.stringify(doc,null,2)], {type:'application/json'});
+  Object.assign(document.createElement('a'), { href:URL.createObjectURL(blob), download:'plantegning_slimbim.json' }).click();
+}
 
 function importSlimBIM(doc) {
   const walls = [];
   try {
-    for (const b of doc?.property?.buildings || [])
-      for (const f of b.floors || [])
-        for (const w of f.walls || []) {
-          const s = w.start || [0,0,0], e = w.end || [1,0,0];
+    for (const b of doc?.property?.buildings||[])
+      for (const f of b.floors||[])
+        for (const w of f.walls||[]) {
+          const s=w.start||[0,0,0], e=w.end||[1,0,0];
           walls.push({
-            id: w.id || newId(),
-            start: { x:+s[0], y:+s[1] }, end: { x:+e[0], y:+e[1] },
-            heightL: w.height_left_m  || 2.4,
-            heightR: w.height_right_m || 2.4,
-            thickness: w.thickness_m || 0.248,
-            type: w.wall_type || 'exterior',
-            roofDriver: !!w.is_roof_driver,
-            topPoints: (w.top_points||[]).map(p=>({ x:p.x_m, z:p.z_m })),
+            id:w.id||newId(),
+            start:{x:+s[0],y:+s[1]}, end:{x:+e[0],y:+e[1]},
+            heightL:w.height_left_m||2.4, heightR:w.height_right_m||2.4,
+            thickness:w.thickness_m||0.25,
+            type:w.wall_type||'exterior',
+            roofDriver:w.is_roof_driver||false,
+            topPoints:(w.top_points||[]).map(p=>({x:p.x_m||0,z:p.z_m||2.4})),
           });
         }
-  } catch(err) { alert('Ugyldig SlimBIM: ' + err.message); return; }
-  if (!walls.length) { alert('Ingen vegger funnet.'); return; }
-  pushUndo();
-  state.walls = [...state.walls, ...walls];
+  } catch(e) { alert('Feil i SlimBIM JSON: '+e.message); return; }
+  if (!walls.length) { alert('Ingen vegger funnet i dokumentet.'); return; }
+  pushUndo(); state.walls = walls; state.selected = null;
   fitView(); afterWallChange(); closeImport();
   alert(walls.length + ' vegger importert.');
 }
 
-let modalImgFile = null;
-
-window.openImport  = () => document.getElementById('import-modal').classList.add('open');
-window.closeImport = () => document.getElementById('import-modal').classList.remove('open');
-
-window.switchMtab = t => {
+let _modalFile = null;
+function openImport()  { document.getElementById('import-modal').classList.add('open'); }
+function closeImport() { document.getElementById('import-modal').classList.remove('open'); }
+function switchMtab(t) {
   ['img','json'].forEach(n => {
-    document.getElementById('mtab-' + n).classList.toggle('active', n===t);
-    document.getElementById('mpanel-' + n).style.display = n===t ? '' : 'none';
+    document.getElementById('mtab-'+n).classList.toggle('active', n===t);
+    document.getElementById('mpanel-'+n).style.display = n===t?'':'none';
   });
-};
-
-window.onModalFile = input => {
-  if (input.files[0]) { modalImgFile = input.files[0]; document.getElementById('m-file-txt').textContent = '✓ ' + input.files[0].name; }
-};
-
-window.doImport = async () => {
+}
+function onModalFile(inp) {
+  if (inp.files[0]) { _modalFile = inp.files[0]; document.getElementById('m-file-txt').textContent = '✓ '+inp.files[0].name; }
+}
+async function doImport() {
   const isJson = document.getElementById('mtab-json').classList.contains('active');
   if (isJson) {
     try { importSlimBIM(JSON.parse(document.getElementById('m-json').value)); }
-    catch(e) { alert('Ugyldig JSON: ' + e.message); }
+    catch(e) { alert('Ugyldig JSON: '+e.message); }
     return;
   }
-  if (!modalImgFile) { alert('Velg en fil'); return; }
-  const key = localStorage.getItem('placely_api_key') || '';
+  if (!_modalFile) { alert('Velg en fil'); return; }
+  const key = localStorage.getItem('placely_api_key')||'';
   const btn = document.getElementById('m-ok');
-  btn.innerHTML = '<span class="spin"></span>';
-  btn.disabled = true;
+  btn.innerHTML = '<span class="spin"></span> Analyserer…'; btn.disabled = true;
   try {
-    const fd = new FormData(); fd.append('file', modalImgFile);
-    const ext = modalImgFile.name.split('.').pop().toLowerCase();
-    const r = await fetch(XDI + (ext==='pdf' ? '/parse/pdf' : '/parse/image'), { method:'POST', headers:{'X-API-Key':key}, body:fd });
+    const fd = new FormData(); fd.append('file', _modalFile);
+    const ext = _modalFile.name.split('.').pop().toLowerCase();
+    const r = await fetch(XDI+(ext==='pdf'?'/parse/pdf':'/parse/image'), {method:'POST', headers:{'X-API-Key':key}, body:fd});
     if (!r.ok) throw new Error((await r.json()).detail||'Feil');
     importSlimBIM(await r.json());
-  } catch(e) { alert('XDi: ' + e.message); }
+  } catch(e) { alert('XDi: '+e.message); }
   finally { btn.innerHTML = 'Importer'; btn.disabled = false; }
-};
+}
 
-// ═══════════════════════════════════════════════════════════════
-// DIVIDER DRAG
-// ═══════════════════════════════════════════════════════════════
-const divider = document.getElementById('divider');
+// ── MISC ──────────────────────────────────────────────────────────
+function confirmClear() {
+  if (!state.walls.length || confirm('Tøm hele tegningen?')) {
+    pushUndo(); state.walls=[]; state.rooms=[]; state.selected=null; state.chainStart=null;
+    afterWallChange();
+    document.getElementById('propbar').classList.remove('open');
+  }
+}
+function renamePlan() {
+  const v = prompt('Navn på tegning:', document.getElementById('plan-name').textContent);
+  if (v) document.getElementById('plan-name').textContent = v;
+}
+
+// ── DIVIDER DRAG ──────────────────────────────────────────────────
+const divEl = document.getElementById('divider');
 let divDrag = false;
-divider.addEventListener('mousedown', () => { divDrag = true; document.body.style.cursor = 'col-resize'; });
-window.addEventListener('mouseup', () => { if (divDrag) { divDrag = false; document.body.style.cursor = ''; resize2D(); resize3D(); } });
+divEl.addEventListener('mousedown', () => { divDrag=true; document.body.style.userSelect='none'; document.body.style.cursor='col-resize'; });
+window.addEventListener('mouseup', () => {
+  if (divDrag) { divDrag=false; document.body.style.userSelect=''; document.body.style.cursor=''; resize2D(); if(window._resize3D) window._resize3D(); }
+});
 window.addEventListener('mousemove', e => {
   if (!divDrag) return;
-  const workspace = document.querySelector('.workspace');
-  const wLeft = workspace.getBoundingClientRect().left;
-  const total = workspace.clientWidth - divider.offsetWidth;
-  const pct = Math.max(25, Math.min(75, (e.clientX - wLeft) / total * 100));
+  const ws = document.querySelector('.workspace');
+  const pct = Math.max(25, Math.min(72, (e.clientX - ws.getBoundingClientRect().left) / ws.clientWidth * 100));
   document.getElementById('view2d').style.width = pct + '%';
 });
 
-// ═══════════════════════════════════════════════════════════════
-// 3D RESIZE & RENDER LOOP
-// ═══════════════════════════════════════════════════════════════
-function resize3D() {
-  const w = view3d.clientWidth, h = view3d.clientHeight;
-  renderer.setSize(w, h);
-  camera3d.aspect = w / h;
-  camera3d.updateProjectionMatrix();
-}
+// Expose state so 3D script can read selected + walls after async load
+window._fpState = state;
 
-function animate3D() {
-  requestAnimationFrame(animate3D);
-  controls.update();
-  renderer.render(scene, camera3d);
-}
+// ── EXPOSE AS window.FP ──────────────────────────────────────────
+window.FP = {
+  setTool, setThickness, setWallType, setSnap, undo, fitView,
+  deleteSelected, closePropBar, renderPropBar,
+  setProp(k, v) {
+    const wall = state.walls.find(w => w.id === state.selected);
+    if (!wall) return;
+    wall[k] = v;
+    renderPropBar();
+    afterWallChange();
+  },
+  doExport, openImport, closeImport, switchMtab, onModalFile, doImport,
+  confirmClear, renamePlan,
+  resetCamera() { if (window._resetCamera) window._resetCamera(); },
+  toggleTopView() { if (window._toggleTopView) window._toggleTopView(); },
+};
 
-// ═══════════════════════════════════════════════════════════════
-// INIT
-// ═══════════════════════════════════════════════════════════════
-function init() {
-  resize2D(); resize3D(); animate3D();
-  window.addEventListener('resize', () => { resize2D(); resize3D(); });
-  // Small demo walls to show on load
-  const demo = [
-    { x:0,   y:0 }, { x:8,   y:0 }, { x:8, y:6 },
-    { x:8,   y:6 }, { x:4.5, y:6 }, { x:4.5, y:6 },
-    { x:4.5, y:6 }, { x:4.5, y:10}, { x:4.5, y:10},
-    { x:4.5, y:10}, { x:0,   y:10}, { x:0, y:10},
-    { x:0,   y:10}, { x:0,   y:0 },
-    // interior wall
-    { x:4.5, y:0 }, { x:4.5, y:6 },
+// ── INIT ──────────────────────────────────────────────────────────
+function loadDemoHouse() {
+  // Proper L-shaped house: each pair is (start, end) of one wall
+  const walls = [
+    // Outer shell (clockwise)
+    [{x:0,y:0},   {x:8,y:0}],    // bottom
+    [{x:8,y:0},   {x:8,y:6}],    // right
+    [{x:8,y:6},   {x:4.5,y:6}],  // step horizontal
+    [{x:4.5,y:6}, {x:4.5,y:10}], // step vertical
+    [{x:4.5,y:10},{x:0,y:10}],   // top
+    [{x:0,y:10},  {x:0,y:0}],    // left
+    // Interior walls
+    [{x:4.5,y:0}, {x:4.5,y:6}],  // divider
+    [{x:0,y:5},   {x:4.5,y:5}],  // horizontal divider
   ];
-  for (let i = 0; i < demo.length; i += 2) {
-    if (i+1 < demo.length) state.walls.push({
-      id: newId(), start: demo[i], end: demo[i+1],
-      heightL:2.6, heightR:2.6, thickness:i===demo.length-2?0.12:0.25,
-      type: i===demo.length-2?'interior':'exterior',
-      roofDriver: false, topPoints: [],
+  for (const [s, e] of walls) {
+    const isInterior = walls.indexOf([s,e]) >= 6;
+    state.walls.push({
+      id: newId(), start:{...s}, end:{...e},
+      heightL:2.6, heightR:2.6,
+      thickness: s === walls[6][0] || s === walls[7][0] ? 0.15 : 0.20,
+      type: 'exterior',
+      roofDriver:false, topPoints:[],
     });
   }
-  fitView();
-  afterWallChange();
+  // Fix interior wall types
+  state.walls[6].type = 'interior';
+  state.walls[7].type = 'interior';
 }
 
-init();
+window.addEventListener('resize', () => { resize2D(); if(window._resize3D) window._resize3D(); });
 
-// Expose module-scoped functions needed by HTML onclick attributes
-window.undo           = undo;
-window.deleteSelected = deleteSelected;
-window.closePropBar   = () => { state.selected = null; renderPropBar(); redraw(); update3D(); };
+resize2D();
+loadDemoHouse();
+fitView();
+afterWallChange();
+</script>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     SCRIPT 2 — Three.js 3D (loaded async, graceful fallback)
+     ═══════════════════════════════════════════════════════════════ -->
+<script type="module">
+let THREE, OrbitControls;
+try {
+  [{ default: THREE }, { OrbitControls }] = await Promise.all([
+    import('https://unpkg.com/three@0.160.0/build/three.module.js'),
+    import('https://unpkg.com/three@0.160.0/examples/jsm/controls/OrbitControls.js'),
+  ]);
+} catch(e) {
+  document.getElementById('view3d-loading').textContent = '3D ikke tilgjengelig (nettverk)';
+  console.warn('Three.js failed:', e);
+  return; // abort 3D setup, 2D still works fine
+}
+
+// ── SCENE SETUP ───────────────────────────────────────────────────
+const view3d  = document.getElementById('view3d');
+const cv3     = document.getElementById('canvas3d');
+
+const renderer = new THREE.WebGLRenderer({ canvas: cv3, antialias: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type    = THREE.PCFSoftShadowMap;
+renderer.toneMapping       = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.15;
+renderer.outputColorSpace  = THREE.SRGBColorSpace;
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x18181a);
+scene.fog = new THREE.FogExp2(0x18181a, 0.018);
+
+const camera = new THREE.PerspectiveCamera(44, 1, 0.1, 500);
+camera.position.set(12, 9, 12);
+
+const controls = new OrbitControls(camera, cv3);
+controls.enableDamping  = true;
+controls.dampingFactor  = 0.06;
+controls.minDistance    = 2;
+controls.maxDistance    = 80;
+controls.maxPolarAngle  = Math.PI / 2.02;
+controls.target.set(4, 1, -5);
+controls.update();
+
+// ── LIGHTS ────────────────────────────────────────────────────────
+scene.add(new THREE.AmbientLight(0xfff5e8, 0.45));
+
+const hemi = new THREE.HemisphereLight(0xfff8f0, 0x22201e, 0.75);
+scene.add(hemi);
+
+const sun = new THREE.DirectionalLight(0xfffaf0, 1.3);
+sun.position.set(18, 28, 14);
+sun.castShadow = true;
+sun.shadow.mapSize.set(2048, 2048);
+sun.shadow.camera.near  = 0.5;
+sun.shadow.camera.far   = 80;
+sun.shadow.camera.left  = -22; sun.shadow.camera.right  = 22;
+sun.shadow.camera.top   =  22; sun.shadow.camera.bottom = -22;
+sun.shadow.bias = -0.0006;
+sun.shadow.normalBias = 0.03;
+scene.add(sun);
+
+const fill = new THREE.DirectionalLight(0xb8cce0, 0.35);
+fill.position.set(-10, 6, -10);
+scene.add(fill);
+
+// ── GROUND ────────────────────────────────────────────────────────
+const ground = new THREE.Mesh(
+  new THREE.PlaneGeometry(150, 150),
+  new THREE.MeshStandardMaterial({ color:0x1c1c1a, roughness:0.95, metalness:0 })
+);
+ground.rotation.x = -Math.PI/2; ground.position.y = -0.004;
+ground.receiveShadow = true;
+scene.add(ground);
+
+scene.add(new THREE.GridHelper(60, 60, 0x282826, 0x242422));
+
+// ── MATERIALS ─────────────────────────────────────────────────────
+const MAT_WALL_EXT  = new THREE.MeshStandardMaterial({ color:0xf0ece6, roughness:0.85, metalness:0 });
+const MAT_WALL_INT  = new THREE.MeshStandardMaterial({ color:0xf5f2ee, roughness:0.9,  metalness:0 });
+const MAT_WALL_LOAD = new THREE.MeshStandardMaterial({ color:0xe8ddd4, roughness:0.9,  metalness:0 });
+const MAT_WALL_SEL  = new THREE.MeshStandardMaterial({ color:0xccd8f8, roughness:0.8,  metalness:0, emissive:0x1030c0, emissiveIntensity:0.07 });
+const MAT_FLOOR     = new THREE.MeshStandardMaterial({ color:0xd8cfc4, roughness:0.95, metalness:0, side:THREE.DoubleSide });
+
+function getWallMat(wall, selected) {
+  if (selected) return MAT_WALL_SEL;
+  return { exterior:MAT_WALL_EXT, interior:MAT_WALL_INT, load_bearing:MAT_WALL_LOAD }[wall.type] || MAT_WALL_EXT;
+}
+
+// ── GROUPS ────────────────────────────────────────────────────────
+const wallGroup  = new THREE.Group(); scene.add(wallGroup);
+const floorGroup = new THREE.Group(); scene.add(floorGroup);
+
+// ── BUILD WALL MESH ───────────────────────────────────────────────
+function buildWallMesh(wall, selected) {
+  const ax=wall.start.x, ay=wall.start.y;
+  const bx=wall.end.x,   by=wall.end.y;
+  const dx=bx-ax, dy=by-ay;
+  const length=Math.hypot(dx,dy);
+  if (length < 0.01) return null;
+
+  const wx=dx/length, wy=dy/length; // wall dir
+  const px=-wy, py=wx;              // perpendicular (left)
+  const tk=wall.thickness;
+
+  const tps = (wall.topPoints && wall.topPoints.length >= 2)
+    ? wall.topPoints.map(p=>({x:p.x, z:p.z}))
+    : [{x:0, z:wall.heightL}, {x:length, z:wall.heightR}];
+
+  // Helper: world position at (along-wall, height, side: 0=front, 1=back)
+  const V = (al, ht, side) => new THREE.Vector3(
+    ax + wx*al + px*(side*tk),
+    ht,
+    -(ay + wy*al + py*(side*tk))
+  );
+
+  const verts = []; const inds = [];
+  let vi = 0;
+
+  function quad(a, b, c, d) {
+    verts.push(a,b,c,d);
+    inds.push(vi,vi+1,vi+2, vi+1,vi+3,vi+2);
+    vi += 4;
+  }
+
+  const n = tps.length;
+  for (let i = 0; i < n-1; i++) {
+    const x0=tps[i].x,   z0=tps[i].z;
+    const x1=tps[i+1].x, z1=tps[i+1].z;
+    quad(V(x0,0,0), V(x1,0,0), V(x0,z0,0), V(x1,z1,0)); // front
+    quad(V(x1,0,1), V(x0,0,1), V(x1,z1,1), V(x0,z0,1)); // back
+    quad(V(x0,z0,0), V(x1,z1,0), V(x0,z0,1), V(x1,z1,1)); // top
+  }
+  // Caps
+  quad(V(0,0,1),V(0,0,0),V(0,tps[0].z,1),V(0,tps[0].z,0));
+  quad(V(length,0,0),V(length,0,1),V(length,tps[n-1].z,0),V(length,tps[n-1].z,1));
+
+  const geo = new THREE.BufferGeometry();
+  const positions = new Float32Array(verts.length * 3);
+  verts.forEach((v,i) => { positions[i*3]=v.x; positions[i*3+1]=v.y; positions[i*3+2]=v.z; });
+  geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+  geo.setIndex(inds);
+  geo.computeVertexNormals();
+
+  const mesh = new THREE.Mesh(geo, getWallMat(wall, selected).clone());
+  mesh.castShadow = true; mesh.receiveShadow = true;
+  mesh.userData.wallId = wall.id;
+  return mesh;
+}
+
+// ── BUILD FLOOR ───────────────────────────────────────────────────
+function buildFloorMesh(room) {
+  if (!room.polygon || room.polygon.length < 3) return null;
+  const shape = new THREE.Shape();
+  shape.moveTo(room.polygon[0].x, -room.polygon[0].y);
+  for (let i=1; i<room.polygon.length; i++) shape.lineTo(room.polygon[i].x, -room.polygon[i].y);
+  shape.closePath();
+  const geo  = new THREE.ShapeGeometry(shape);
+  const mesh = new THREE.Mesh(geo, MAT_FLOOR.clone());
+  mesh.rotation.x = -Math.PI/2;
+  mesh.position.y = 0.003;
+  mesh.receiveShadow = true;
+  return mesh;
+}
+
+// ── UPDATE ────────────────────────────────────────────────────────
+function update3D(walls, rooms) {
+  wallGroup.clear();
+  floorGroup.clear();
+  const selId = window._fpState?.selected;
+  for (const w of walls) {
+    const mesh = buildWallMesh(w, w.id === selId);
+    if (mesh) wallGroup.add(mesh);
+  }
+  for (const r of rooms) {
+    const mesh = buildFloorMesh(r);
+    if (mesh) floorGroup.add(mesh);
+  }
+}
+
+// Register callback so 2D changes update 3D
+window._update3D = (walls, rooms) => update3D(walls, rooms);
+
+// ── CAMERA CONTROLS ───────────────────────────────────────────────
+let topView = false;
+window._resetCamera = () => {
+  camera.position.set(12, 9, 12);
+  controls.target.set(4, 1, -5);
+  controls.update();
+  topView = false;
+};
+window._toggleTopView = () => {
+  topView = !topView;
+  if (topView) {
+    camera.position.set(4, 28, -0.01);
+    controls.target.set(4, 0, -5);
+  } else {
+    camera.position.set(12, 9, 12);
+    controls.target.set(4, 1, -5);
+  }
+  controls.update();
+};
+
+// ── RESIZE ────────────────────────────────────────────────────────
+function resize3D() {
+  const w=view3d.clientWidth, h=view3d.clientHeight;
+  renderer.setSize(w, h);
+  camera.aspect = w/h;
+  camera.updateProjectionMatrix();
+}
+window._resize3D = resize3D;
+
+// ── RENDER LOOP ───────────────────────────────────────────────────
+function animate() {
+  requestAnimationFrame(animate);
+  controls.update();
+  renderer.render(scene, camera);
+}
+
+// ── START ─────────────────────────────────────────────────────────
+resize3D();
+document.getElementById('view3d-loading').textContent = '';
+animate();
+
+// Sync initial walls that 2D script already loaded before 3D was ready
+if (window._fpState) {
+  update3D(window._fpState.walls, window._fpState.rooms);
+}
 </script>
 </body>
 </html>
