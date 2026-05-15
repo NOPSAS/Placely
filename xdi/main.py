@@ -18,6 +18,7 @@ from parsers.iguide_parser import IGuideParser
 from parsers.pdf_parser import PDFParser
 from analyzers.floor_plan_analyzer import FloorPlanAnalyzer
 from analyzers.compliance_checker import ComplianceChecker
+from analyzers.soknadssjekk_analyzer import SoknadssjekKAnalyzer
 
 try:
     from parsers.ifc_parser import IfcParser
@@ -267,6 +268,27 @@ async def analyse_byggesjekk(
     except Exception as e:
         raise HTTPException(500, f"Byggesjekk feilet: {str(e)}")
 
+    return result
+
+
+# ── Analyse: Søknadssjekk ─────────────────────────────────────────────────────
+
+@app.post("/analyse/soknadssjekk", tags=["analyse"])
+async def analyse_soknadssjekk(
+    beskrivelse: str = Form(..., description="Beskriv de planlagte byggearbeidene"),
+    adresse:     Optional[str] = Form(None, description="Adresse (valgfritt)"),
+    _key:        str = Depends(require_api_key),
+):
+    """
+    Sjekk om planlagte byggearbeider krever søknad etter PBL/SAK10.
+    Returnerer søknadsplikt per arbeidspost med begrunnelse og TEK17-krav.
+    """
+    api_key = _require_api_key()
+    try:
+        analyzer = SoknadssjekKAnalyzer(api_key=api_key)
+        result   = analyzer.analyze(beskrivelse, adresse)
+    except Exception as e:
+        raise HTTPException(500, f"Søknadssjekk feilet: {str(e)}")
     return result
 
 
