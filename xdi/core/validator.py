@@ -8,8 +8,8 @@ from typing import Any
 
 import jsonschema
 
-# Last schema fra prosjektmappen
-_SCHEMA_PATH = Path(__file__).parent.parent.parent / "slimbim-schema.json"
+# Last schema – kopiert inn i xdi/ slik at det er med i Docker-imaget
+_SCHEMA_PATH = Path(__file__).parent.parent / "slimbim-schema.json"
 
 
 def load_schema() -> dict:

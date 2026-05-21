@@ -92,7 +92,7 @@ async def parse_image(
     """
     api_key = _require_api_key()
 
-    if not file.content_type.startswith("image/"):
+    if not (file.content_type or "").startswith("image/"):
         raise HTTPException(400, f"Forventet bildefil, fikk: {file.content_type}")
 
     image_bytes = await file.read()
@@ -125,8 +125,8 @@ async def parse_pdf(
     """
     api_key = _require_api_key()
 
-    if file.content_type != "application/pdf":
-        raise HTTPException(400, "Forventet PDF-fil")
+    if (file.content_type or "") not in ("application/pdf", "application/octet-stream"):
+        raise HTTPException(400, f"Forventet PDF-fil, fikk: {file.content_type}")
 
     pdf_bytes = await file.read()
     parser    = PDFParser(api_key=api_key)

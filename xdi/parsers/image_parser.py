@@ -108,16 +108,17 @@ class ImageParser:
         response = self.client.messages.create(
             model="claude-sonnet-4-6",
             max_tokens=4096,
+            system=[
+                {
+                    "type": "text",
+                    "text": PARSE_PROMPT,
+                    "cache_control": {"type": "ephemeral"},
+                }
+            ],
             messages=[
                 {
                     "role": "user",
                     "content": [
-                        # Cache systemprompten (konstant på tvers av kall)
-                        {
-                            "type": "text",
-                            "text": PARSE_PROMPT,
-                            "cache_control": {"type": "ephemeral"},
-                        },
                         {
                             "type": "image",
                             "source": {
